@@ -11,6 +11,9 @@ export default {
       'ts-jest',
       {
         useESM: true,
+        tsconfig: {
+          types: ['node', 'jest'],
+        },
       },
     ],
   },
