@@ -3,7 +3,7 @@
   "repo": "git@github.com:rn1024/creatoria-miniapp-mcp.git",
   "branch": "main",
   "stage": "Automate",
-  "task_id": "TASK-2025-001-B3",
+  "task_id": "TASK-2025-001-B4",
   "agent": {
     "name": "ClaudeCode",
     "mode": "generalist",
@@ -11,52 +11,53 @@
     "session_ttl_minutes": 270,
     "handoff_planned_at": "2025-10-02T07:45:00Z"
   },
-  "context_digest": "✅ 已完成 [B3] ElementRef 解析器: 实现了完整的元素定位逻辑（refId/selector/xpath/index），32 个单元测试全部通过，覆盖所有定位场景和错误处理",
+  "context_digest": "✅ 已完成 [B4] 日志与输出接口设计: 实现 Logger（结构化日志）和 OutputManager（文件输出管理），32 个新测试全部通过，已集成到 SessionStore",
   "open_questions": [
     "是否需要立即配置 A1（Node 18+、微信开发者工具）的环境验证脚本？",
     "是否需要在 Stage A 阶段完成 A2（配置自动化端口）的脚本编写？",
-    "是否立即继续 Stage B 下一个任务 [B4] 日志与输出接口设计？"
+    "Stage B 基础任务已全部完成，是否开始 Stage C 工具实现？"
   ],
   "artifacts": [
-    {"path": ".llm/state.json", "type": "config", "change": "updated", "note": "更新为 B3 任务完成状态"},
-    {"path": "src/types.ts", "type": "code", "change": "updated", "note": "新增 ElementRefInput 和 ResolvedElement 接口"},
-    {"path": "src/core/element-ref.ts", "type": "code", "change": "created", "note": "实现完整的元素解析器（198 行）"},
-    {"path": "tests/unit/element-ref.test.ts", "type": "test", "change": "created", "note": "创建完整单元测试套件，32 个测试用例"},
-    {"path": "package.json", "type": "config", "change": "unchanged", "note": "B2 添加了 @types/jest 依赖"},
-    {"path": "tsconfig.json", "type": "config", "change": "unchanged", "note": "B2 配置了测试目录排除"},
-    {"path": "jest.config.js", "type": "config", "change": "unchanged", "note": "B2 配置了 ts-jest 类型定义"},
-    {"path": "src/core/session.ts", "type": "code", "change": "unchanged", "note": "B2 实现的会话管理器"},
-    {"path": "tests/unit/session.test.ts", "type": "test", "change": "unchanged", "note": "B2 的会话测试套件"},
+    {"path": ".llm/state.json", "type": "config", "change": "updated", "note": "更新为 B4 任务完成状态"},
+    {"path": "src/types.ts", "type": "code", "change": "updated", "note": "新增 Logger、OutputManager 接口定义，更新 SessionState"},
+    {"path": "src/core/logger.ts", "type": "code", "change": "created", "note": "实现 ConsoleLogger（85 行）"},
+    {"path": "src/core/output.ts", "type": "code", "change": "created", "note": "实现 FileOutputManager（66 行）"},
+    {"path": "src/core/session.ts", "type": "code", "change": "updated", "note": "集成 logger 和 outputManager 到 SessionStore"},
+    {"path": "tests/unit/logger.test.ts", "type": "test", "change": "created", "note": "Logger 单元测试（10 个测试）"},
+    {"path": "tests/unit/output.test.ts", "type": "test", "change": "created", "note": "OutputManager 单元测试（12 个测试）"},
+    {"path": "tests/unit/session.test.ts", "type": "test", "change": "updated", "note": "新增 logger/outputManager 集成测试（2 个测试）"},
+    {"path": "src/core/element-ref.ts", "type": "code", "change": "unchanged", "note": "B3 实现的元素解析器"},
+    {"path": "tests/unit/element-ref.test.ts", "type": "test", "change": "unchanged", "note": "B3 的元素解析器测试"},
     {"path": "dist/", "type": "dir", "change": "updated", "note": "TypeScript 编译输出"}
   ],
   "risks": [
     "微信开发者工具 CLI 路径可能因系统差异需要手动配置",
     ".mcp.json 和 .claude/ 包含敏感信息，已从 git 排除",
     "miniprogram-automator 版本为 0.12.1（最新），需要验证 API 兼容性",
-    "XPath 支持需要 SDK 0.11.0+，当前版本 0.12.1 已支持",
-    "元素句柄在页面切换后可能失效，需要工具层面处理重新查找"
+    "Logger 使用 console.error 输出，在 MCP 环境中会通过 stderr 传输",
+    "OutputManager 会创建 .mcp-artifacts 目录，需要添加到 .gitignore"
   ],
   "blocks": [],
   "next_actions": [
     {
       "owner": "ClaudeCode",
-      "action": "创建 B3 会话日志记录本次任务",
+      "action": "创建 B4 会话日志记录本次任务",
       "depends_on": []
     },
     {
       "owner": "ClaudeCode",
-      "action": "提交代码到 Git（feat: [B3] ElementRef 解析器）",
+      "action": "提交代码到 Git（feat: [B4] 日志与输出接口设计）",
       "depends_on": []
     },
     {
       "owner": "ClaudeCode",
-      "action": "[B4] 日志与输出接口设计",
-      "depends_on": ["B3"]
+      "action": "[C1] Automator 工具实现（launch/connect/disconnect/close）",
+      "depends_on": ["B1", "B2", "B3", "B4"]
     },
     {
       "owner": "ClaudeCode",
-      "action": "[C1] Automator 工具实现（需要 B1-B3 完成）",
-      "depends_on": ["B1", "B2", "B3"]
+      "action": "Stage B 已全部完成，考虑是否先完成 Stage A 环境配置任务",
+      "depends_on": []
     }
   ],
   "handoff": {
@@ -65,5 +66,5 @@
     "to": "",
     "package": []
   },
-  "timestamp": "2025-10-02T10:00:00Z"
+  "timestamp": "2025-10-02T11:00:00Z"
 }

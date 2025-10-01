@@ -22,6 +22,8 @@ export interface SessionState {
   createdAt: Date
   lastActivity: Date
   config?: SessionConfig
+  logger?: Logger // Session-specific logger
+  outputManager?: OutputManager // Session-specific output manager
 }
 
 export interface SessionConfig {
@@ -60,4 +62,61 @@ export interface ResolvedElement {
   page: any // Page object from miniprogram-automator
   element: any // Element object from miniprogram-automator
   refId?: string // Generated refId if save=true
+}
+
+/**
+ * Log level
+ */
+export type LogLevel = 'info' | 'warn' | 'error' | 'debug'
+
+/**
+ * Structured log entry
+ */
+export interface LogEntry {
+  timestamp: Date
+  level: LogLevel
+  message: string
+  sessionId?: string
+  toolName?: string
+  context?: Record<string, any>
+}
+
+/**
+ * Logger interface for structured logging
+ */
+export interface Logger {
+  info(message: string, context?: Record<string, any>): void
+  warn(message: string, context?: Record<string, any>): void
+  error(message: string, context?: Record<string, any>): void
+  debug(message: string, context?: Record<string, any>): void
+}
+
+/**
+ * Output file type
+ */
+export type OutputType = 'screenshot' | 'snapshot' | 'log' | 'other'
+
+/**
+ * Output manager for artifact generation
+ */
+export interface OutputManager {
+  /**
+   * Get output directory for the session
+   */
+  getOutputDir(): string
+
+  /**
+   * Generate filename for output artifact
+   */
+  generateFilename(type: OutputType, extension: string): string
+
+  /**
+   * Write content to file
+   */
+  writeFile(filename: string, content: Buffer | string): Promise<string>
+
+  /**
+   * Check if output directory exists
+   */
+  ensureOutputDir(): Promise<void>
 }

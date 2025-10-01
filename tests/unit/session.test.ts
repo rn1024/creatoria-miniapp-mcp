@@ -37,6 +37,24 @@ describe('SessionStore', () => {
       expect(session1.outputDir).toContain('session-1')
       expect(session2.outputDir).toContain('session-2')
     })
+
+    it('should create logger for new session', () => {
+      const session = store.getOrCreate('test-session')
+      expect(session.logger).toBeDefined()
+      expect(typeof session.logger?.info).toBe('function')
+      expect(typeof session.logger?.warn).toBe('function')
+      expect(typeof session.logger?.error).toBe('function')
+      expect(typeof session.logger?.debug).toBe('function')
+    })
+
+    it('should create output manager for new session', () => {
+      const session = store.getOrCreate('test-session')
+      expect(session.outputManager).toBeDefined()
+      expect(typeof session.outputManager?.getOutputDir).toBe('function')
+      expect(typeof session.outputManager?.generateFilename).toBe('function')
+      expect(typeof session.outputManager?.writeFile).toBe('function')
+      expect(typeof session.outputManager?.ensureOutputDir).toBe('function')
+    })
   })
 
   describe('Session Lifecycle', () => {

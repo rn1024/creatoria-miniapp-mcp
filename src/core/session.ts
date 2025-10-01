@@ -5,6 +5,8 @@
 
 import { join } from 'path'
 import type { SessionState, SessionConfig, SessionMetrics } from '../types.js'
+import { createLogger } from './logger.js'
+import { createOutputManager } from './output.js'
 
 const DEFAULT_SESSION_TIMEOUT = 30 * 60 * 1000 // 30 minutes
 const DEFAULT_OUTPUT_DIR = '.mcp-artifacts'
@@ -108,14 +110,18 @@ export class SessionStore {
     let session = this.get(sessionId)
     if (!session) {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+      const outputDir = join(DEFAULT_OUTPUT_DIR, `${sessionId}-${timestamp}`)
+
       session = {
         sessionId,
         pages: [],
         elements: new Map(),
-        outputDir: join(DEFAULT_OUTPUT_DIR, `${sessionId}-${timestamp}`),
+        outputDir,
         createdAt: new Date(),
         lastActivity: new Date(),
         config,
+        logger: createLogger(sessionId),
+        outputManager: createOutputManager(outputDir),
       }
       this.set(sessionId, session)
       console.error(`Created new session: ${sessionId}`)
