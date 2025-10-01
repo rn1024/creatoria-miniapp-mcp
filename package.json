@@ -33,7 +33,7 @@
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
-    "miniprogram-automator": "^0.13.0",
+    "miniprogram-automator": "^0.12.1",
     "commander": "^12.1.0",
     "zod": "^3.23.8"
   },
