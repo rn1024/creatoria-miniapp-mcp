@@ -3,7 +3,7 @@
   "repo": "git@github.com:rn1024/creatoria-miniapp-mcp.git",
   "branch": "main",
   "stage": "Automate",
-  "task_id": "TASK-2025-001-B2",
+  "task_id": "TASK-2025-001-B3",
   "agent": {
     "name": "ClaudeCode",
     "mode": "generalist",
@@ -11,52 +11,52 @@
     "session_ttl_minutes": 270,
     "handoff_planned_at": "2025-10-02T07:45:00Z"
   },
-  "context_digest": "✅ 已完成 [B2] Session 管理器增强: 实现了完整的会话超时管理、自动清理机制、资源释放、会话指标统计，18 个单元测试全部通过",
+  "context_digest": "✅ 已完成 [B3] ElementRef 解析器: 实现了完整的元素定位逻辑（refId/selector/xpath/index），32 个单元测试全部通过，覆盖所有定位场景和错误处理",
   "open_questions": [
     "是否需要立即配置 A1（Node 18+、微信开发者工具）的环境验证脚本？",
     "是否需要在 Stage A 阶段完成 A2（配置自动化端口）的脚本编写？",
-    "是否立即继续 Stage B 下一个任务 [B3] ElementRef 解析器？"
+    "是否立即继续 Stage B 下一个任务 [B4] 日志与输出接口设计？"
   ],
   "artifacts": [
-    {"path": ".llm/state.json", "type": "config", "change": "updated", "note": "更新为 B2 任务完成状态"},
-    {"path": "package.json", "type": "config", "change": "updated", "note": "添加 @types/jest 依赖"},
-    {"path": "tsconfig.json", "type": "config", "change": "updated", "note": "移除 tests 目录避免编译冲突"},
-    {"path": "jest.config.js", "type": "config", "change": "updated", "note": "配置 ts-jest 类型定义"},
-    {"path": "pnpm-lock.yaml", "type": "config", "change": "updated", "note": "新增 @types/jest 依赖锁定"},
-    {"path": "src/types.ts", "type": "code", "change": "updated", "note": "增强 SessionState、新增 SessionConfig 和 SessionMetrics 接口"},
-    {"path": "src/core/session.ts", "type": "code", "change": "updated", "note": "完全重写 SessionStore，实现超时管理、自动清理、资源释放、指标统计（234 行）"},
-    {"path": "tests/unit/session.test.ts", "type": "test", "change": "created", "note": "创建完整单元测试套件，覆盖 8 个测试组，18 个测试用例"},
-    {"path": "CLAUDE.md", "type": "doc", "change": "created", "note": "B1 创建的 Claude Code 指导文档"},
+    {"path": ".llm/state.json", "type": "config", "change": "updated", "note": "更新为 B3 任务完成状态"},
+    {"path": "src/types.ts", "type": "code", "change": "updated", "note": "新增 ElementRefInput 和 ResolvedElement 接口"},
+    {"path": "src/core/element-ref.ts", "type": "code", "change": "created", "note": "实现完整的元素解析器（198 行）"},
+    {"path": "tests/unit/element-ref.test.ts", "type": "test", "change": "created", "note": "创建完整单元测试套件，32 个测试用例"},
+    {"path": "package.json", "type": "config", "change": "unchanged", "note": "B2 添加了 @types/jest 依赖"},
+    {"path": "tsconfig.json", "type": "config", "change": "unchanged", "note": "B2 配置了测试目录排除"},
+    {"path": "jest.config.js", "type": "config", "change": "unchanged", "note": "B2 配置了 ts-jest 类型定义"},
+    {"path": "src/core/session.ts", "type": "code", "change": "unchanged", "note": "B2 实现的会话管理器"},
+    {"path": "tests/unit/session.test.ts", "type": "test", "change": "unchanged", "note": "B2 的会话测试套件"},
     {"path": "dist/", "type": "dir", "change": "updated", "note": "TypeScript 编译输出"}
   ],
   "risks": [
     "微信开发者工具 CLI 路径可能因系统差异需要手动配置",
     ".mcp.json 和 .claude/ 包含敏感信息，已从 git 排除",
     "miniprogram-automator 版本为 0.12.1（最新），需要验证 API 兼容性",
-    "Session 超时时间默认 30 分钟，在高并发场景可能需要调整",
-    "自动清理定时器每 5 分钟执行，可能需要根据实际负载调整"
+    "XPath 支持需要 SDK 0.11.0+，当前版本 0.12.1 已支持",
+    "元素句柄在页面切换后可能失效，需要工具层面处理重新查找"
   ],
   "blocks": [],
   "next_actions": [
     {
       "owner": "ClaudeCode",
-      "action": "创建 B2 会话日志记录本次任务",
+      "action": "创建 B3 会话日志记录本次任务",
       "depends_on": []
     },
     {
       "owner": "ClaudeCode",
-      "action": "提交代码到 Git（feat: [B2] Session 管理器增强）",
+      "action": "提交代码到 Git（feat: [B3] ElementRef 解析器）",
       "depends_on": []
-    },
-    {
-      "owner": "ClaudeCode",
-      "action": "[B3] 实现 ElementRef 解析器",
-      "depends_on": ["B2"]
     },
     {
       "owner": "ClaudeCode",
       "action": "[B4] 日志与输出接口设计",
-      "depends_on": ["B2"]
+      "depends_on": ["B3"]
+    },
+    {
+      "owner": "ClaudeCode",
+      "action": "[C1] Automator 工具实现（需要 B1-B3 完成）",
+      "depends_on": ["B1", "B2", "B3"]
     }
   ],
   "handoff": {
@@ -65,5 +65,5 @@
     "to": "",
     "package": []
   },
-  "timestamp": "2025-10-02T09:30:00Z"
+  "timestamp": "2025-10-02T10:00:00Z"
 }

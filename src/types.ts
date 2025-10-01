@@ -40,3 +40,24 @@ export interface SessionMetrics {
   }
   totalElements: number
 }
+
+/**
+ * Element reference input - supports multiple ways to locate elements
+ */
+export interface ElementRefInput {
+  refId?: string // Previously cached element handle
+  selector?: string // CSS-style WXML selector
+  xpath?: string // XPath selector (requires SDK 0.11.0+)
+  index?: number // Index when using $$ (query all)
+  pagePath?: string // Specific page path (defaults to currentPage)
+  save?: boolean // Whether to cache handle and return refId
+}
+
+/**
+ * Resolved element result
+ */
+export interface ResolvedElement {
+  page: any // Page object from miniprogram-automator
+  element: any // Element object from miniprogram-automator
+  refId?: string // Generated refId if save=true
+}
