@@ -1,6 +1,14 @@
 /**
  * Tool registration for MCP server
  * Registers all automation tools with the MCP server
+ *
+ * Tool Categories:
+ * - Automator (4 tools): Connection and lifecycle management
+ * - MiniProgram (6 tools): Mini program-level operations
+ * - Page (8 tools): Page-level operations and data access
+ * - Element (11 tools): Element-level interactions and properties
+ *
+ * Total: 29 tools
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
@@ -14,8 +22,21 @@ import * as elementTools from './element.js'
 // Tool handler type
 export type ToolHandler = (session: SessionState, args: any) => Promise<any>
 
-// Tool categories based on capabilities
-export const CORE_TOOLS: Tool[] = [
+/**
+ * Tool category metadata
+ */
+export interface ToolCategory {
+  name: string
+  description: string
+  tools: Tool[]
+  handlers: Record<string, ToolHandler>
+}
+
+// ============================================================================
+// AUTOMATOR TOOLS (Connection & Lifecycle)
+// ============================================================================
+
+export const AUTOMATOR_TOOLS: Tool[] = [
   {
     name: 'miniprogram_launch',
     description: 'Launch WeChat Mini Program with automator',
@@ -67,6 +88,20 @@ export const CORE_TOOLS: Tool[] = [
       properties: {},
     },
   },
+]
+
+export const AUTOMATOR_TOOL_HANDLERS: Record<string, ToolHandler> = {
+  miniprogram_launch: automatorTools.launch,
+  miniprogram_connect: automatorTools.connect,
+  miniprogram_disconnect: automatorTools.disconnect,
+  miniprogram_close: automatorTools.close,
+}
+
+// ============================================================================
+// MINIPROGRAM TOOLS (MiniProgram-level Operations)
+// ============================================================================
+
+export const MINIPROGRAM_TOOLS: Tool[] = [
   {
     name: 'miniprogram_navigate',
     description: 'Navigate to a page using various navigation methods (navigateTo, redirectTo, reLaunch, switchTab, navigateBack)',
@@ -161,6 +196,22 @@ export const CORE_TOOLS: Tool[] = [
       properties: {},
     },
   },
+]
+
+export const MINIPROGRAM_TOOL_HANDLERS: Record<string, ToolHandler> = {
+  miniprogram_navigate: miniprogramTools.navigate,
+  miniprogram_call_wx: miniprogramTools.callWx,
+  miniprogram_evaluate: miniprogramTools.evaluate,
+  miniprogram_screenshot: miniprogramTools.screenshot,
+  miniprogram_get_page_stack: miniprogramTools.getPageStack,
+  miniprogram_get_system_info: miniprogramTools.getSystemInfo,
+}
+
+// ============================================================================
+// PAGE TOOLS (Page-level Operations)
+// ============================================================================
+
+export const PAGE_TOOLS: Tool[] = [
   {
     name: 'page_query',
     description: 'Query a single element on the page',
@@ -310,6 +361,24 @@ export const CORE_TOOLS: Tool[] = [
       },
     },
   },
+]
+
+export const PAGE_TOOL_HANDLERS: Record<string, ToolHandler> = {
+  page_query: pageTools.query,
+  page_query_all: pageTools.queryAll,
+  page_wait_for: pageTools.waitFor,
+  page_get_data: pageTools.getData,
+  page_set_data: pageTools.setData,
+  page_call_method: pageTools.callMethod,
+  page_get_size: pageTools.getSize,
+  page_get_scroll_top: pageTools.getScrollTop,
+}
+
+// ============================================================================
+// ELEMENT TOOLS (Element-level Interactions)
+// ============================================================================
+
+export const ELEMENT_TOOLS: Tool[] = [
   {
     name: 'element_tap',
     description: 'Tap (click) an element',
@@ -490,26 +559,7 @@ export const CORE_TOOLS: Tool[] = [
   },
 ]
 
-// Tool handlers mapping
-export const CORE_TOOL_HANDLERS: Record<string, ToolHandler> = {
-  miniprogram_launch: automatorTools.launch,
-  miniprogram_connect: automatorTools.connect,
-  miniprogram_disconnect: automatorTools.disconnect,
-  miniprogram_close: automatorTools.close,
-  miniprogram_navigate: miniprogramTools.navigate,
-  miniprogram_call_wx: miniprogramTools.callWx,
-  miniprogram_evaluate: miniprogramTools.evaluate,
-  miniprogram_screenshot: miniprogramTools.screenshot,
-  miniprogram_get_page_stack: miniprogramTools.getPageStack,
-  miniprogram_get_system_info: miniprogramTools.getSystemInfo,
-  page_query: pageTools.query,
-  page_query_all: pageTools.queryAll,
-  page_wait_for: pageTools.waitFor,
-  page_get_data: pageTools.getData,
-  page_set_data: pageTools.setData,
-  page_call_method: pageTools.callMethod,
-  page_get_size: pageTools.getSize,
-  page_get_scroll_top: pageTools.getScrollTop,
+export const ELEMENT_TOOL_HANDLERS: Record<string, ToolHandler> = {
   element_tap: elementTools.tap,
   element_longpress: elementTools.longpress,
   element_input: elementTools.input,
@@ -522,6 +572,118 @@ export const CORE_TOOL_HANDLERS: Record<string, ToolHandler> = {
   element_trigger: elementTools.trigger,
   element_get_style: elementTools.getStyle,
 }
+
+// ============================================================================
+// TOOL CATEGORIES
+// ============================================================================
+
+export const TOOL_CATEGORIES: Record<string, ToolCategory> = {
+  automator: {
+    name: 'Automator',
+    description: 'Connection and lifecycle management (4 tools)',
+    tools: AUTOMATOR_TOOLS,
+    handlers: AUTOMATOR_TOOL_HANDLERS,
+  },
+  miniprogram: {
+    name: 'MiniProgram',
+    description: 'Mini program-level operations (6 tools)',
+    tools: MINIPROGRAM_TOOLS,
+    handlers: MINIPROGRAM_TOOL_HANDLERS,
+  },
+  page: {
+    name: 'Page',
+    description: 'Page-level operations and data access (8 tools)',
+    tools: PAGE_TOOLS,
+    handlers: PAGE_TOOL_HANDLERS,
+  },
+  element: {
+    name: 'Element',
+    description: 'Element-level interactions and properties (11 tools)',
+    tools: ELEMENT_TOOLS,
+    handlers: ELEMENT_TOOL_HANDLERS,
+  },
+}
+
+// ============================================================================
+// CORE TOOLS (All tools combined for backward compatibility)
+// ============================================================================
+
+export const CORE_TOOLS: Tool[] = [
+  ...AUTOMATOR_TOOLS,
+  ...MINIPROGRAM_TOOLS,
+  ...PAGE_TOOLS,
+  ...ELEMENT_TOOLS,
+]
+
+export const CORE_TOOL_HANDLERS: Record<string, ToolHandler> = {
+  ...AUTOMATOR_TOOL_HANDLERS,
+  ...MINIPROGRAM_TOOL_HANDLERS,
+  ...PAGE_TOOL_HANDLERS,
+  ...ELEMENT_TOOL_HANDLERS,
+}
+
+// ============================================================================
+// TOOL VALIDATION AND UTILITIES
+// ============================================================================
+
+/**
+ * Validate that all tool definitions have corresponding handlers
+ */
+export function validateToolRegistration(): { valid: boolean; errors: string[] } {
+  const errors: string[] = []
+
+  for (const tool of CORE_TOOLS) {
+    if (!CORE_TOOL_HANDLERS[tool.name]) {
+      errors.push(`Missing handler for tool: ${tool.name}`)
+    }
+  }
+
+  for (const handlerName in CORE_TOOL_HANDLERS) {
+    const hasTool = CORE_TOOLS.some(t => t.name === handlerName)
+    if (!hasTool) {
+      errors.push(`Handler without tool definition: ${handlerName}`)
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  }
+}
+
+/**
+ * Get tool statistics
+ */
+export function getToolStats() {
+  return {
+    total: CORE_TOOLS.length,
+    categories: {
+      automator: AUTOMATOR_TOOLS.length,
+      miniprogram: MINIPROGRAM_TOOLS.length,
+      page: PAGE_TOOLS.length,
+      element: ELEMENT_TOOLS.length,
+    },
+    handlers: Object.keys(CORE_TOOL_HANDLERS).length,
+  }
+}
+
+/**
+ * Get tool by name
+ */
+export function getToolByName(name: string): Tool | undefined {
+  return CORE_TOOLS.find(t => t.name === name)
+}
+
+/**
+ * Get tools by category
+ */
+export function getToolsByCategory(category: keyof typeof TOOL_CATEGORIES): Tool[] {
+  return TOOL_CATEGORIES[category]?.tools || []
+}
+
+// ============================================================================
+// TOOL REGISTRATION
+// ============================================================================
 
 export interface ToolRegistrationOptions {
   capabilities?: string[]
@@ -542,6 +704,14 @@ export function registerTools(
   const tools: Tool[] = []
   const handlers: Record<string, ToolHandler> = {}
 
+  // Validate tool registration
+  const validation = validateToolRegistration()
+  if (!validation.valid) {
+    console.error('Tool registration validation failed:')
+    validation.errors.forEach(err => console.error(`  - ${err}`))
+    throw new Error('Tool registration validation failed')
+  }
+
   // Core tools (always included)
   if (capabilities.includes('core')) {
     tools.push(...CORE_TOOLS)
@@ -553,6 +723,14 @@ export function registerTools(
   //   tools.push(...ASSERT_TOOLS)
   //   Object.assign(handlers, ASSERT_TOOL_HANDLERS)
   // }
+
+  // Log registration stats
+  const stats = getToolStats()
+  console.error(`Registering ${stats.total} tools:`)
+  console.error(`  - Automator: ${stats.categories.automator}`)
+  console.error(`  - MiniProgram: ${stats.categories.miniprogram}`)
+  console.error(`  - Page: ${stats.categories.page}`)
+  console.error(`  - Element: ${stats.categories.element}`)
 
   // Register CallToolRequest handler
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
