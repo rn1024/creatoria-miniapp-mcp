@@ -269,7 +269,7 @@ describe('MiniProgram Tools', () => {
       })
 
       expect(mockSession.logger?.info).toHaveBeenCalledWith(
-        'Evaluating expression',
+        '[SECURITY] Evaluating expression',
         expect.any(Object)
       )
     })

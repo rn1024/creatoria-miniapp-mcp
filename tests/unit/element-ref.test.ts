@@ -224,7 +224,11 @@ describe('ElementRef', () => {
     it('should resolve element by refId', async () => {
       const mockElement = { id: 'element-1' }
       const state = createMockState()
-      state.elements.set('ref123', mockElement)
+      state.elements.set('ref123', {
+        element: mockElement,
+        pagePath: 'pages/index/index',
+        cachedAt: new Date(),
+      })
 
       const result = await resolveElement(state, { refId: 'ref123' })
 
@@ -305,7 +309,7 @@ describe('ElementRef', () => {
       })
 
       expect(result.refId).toBeTruthy()
-      expect(state.elements.get(result.refId!)).toBe(mockElement)
+      expect(state.elements.get(result.refId!)?.element).toBe(mockElement)
     })
 
     it('should not cache element when save=false', async () => {

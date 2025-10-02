@@ -168,8 +168,8 @@ describe('SessionStore', () => {
 
     it('should track element count', () => {
       const session = store.getOrCreate('session-1')
-      session.elements.set('elem-1', {})
-      session.elements.set('elem-2', {})
+      session.elements.set('elem-1', { element: {}, pagePath: 'pages/test', cachedAt: new Date() })
+      session.elements.set('elem-2', { element: {}, pagePath: 'pages/test', cachedAt: new Date() })
 
       const metrics = store.getMetrics()
       expect(metrics.totalElements).toBe(2)
@@ -189,7 +189,7 @@ describe('SessionStore', () => {
     it('should cleanup IDE process on session delete', () => {
       const session = store.getOrCreate('test-session')
       const mockKill = jest.fn()
-      session.ideProcess = { kill: mockKill }
+      session.ideProcess = { kill: mockKill } as any
 
       store.delete('test-session')
       expect(mockKill).toHaveBeenCalled()
@@ -197,7 +197,7 @@ describe('SessionStore', () => {
 
     it('should clear element cache on session delete', () => {
       const session = store.getOrCreate('test-session')
-      session.elements.set('elem-1', {})
+      session.elements.set('elem-1', { element: {}, pagePath: 'pages/test', cachedAt: new Date() })
       expect(session.elements.size).toBe(1)
 
       store.delete('test-session')

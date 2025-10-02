@@ -213,7 +213,7 @@ describe('Automator Tools', () => {
       }
 
       mockSession.miniProgram = mockMiniProgram
-      mockSession.elements.set('elem-1', {})
+      mockSession.elements.set('elem-1', { element: {}, pagePath: 'pages/test', cachedAt: new Date() })
       mockSession.pages = [{ path: '/pages/index' }]
 
       const result = await automatorTools.disconnect(mockSession)
@@ -244,7 +244,7 @@ describe('Automator Tools', () => {
       }
 
       mockSession.miniProgram = mockMiniProgram
-      mockSession.elements.set('elem-1', {})
+      mockSession.elements.set('elem-1', { element: {}, pagePath: 'pages/test', cachedAt: new Date() })
       mockSession.pages = [{ path: '/pages/index' }]
 
       await expect(automatorTools.disconnect(mockSession)).rejects.toThrow(
@@ -283,8 +283,8 @@ describe('Automator Tools', () => {
       }
 
       mockSession.miniProgram = mockMiniProgram
-      mockSession.ideProcess = mockIdeProcess
-      mockSession.elements.set('elem-1', {})
+      mockSession.ideProcess = mockIdeProcess as any
+      mockSession.elements.set('elem-1', { element: {}, pagePath: 'pages/test', cachedAt: new Date() })
       mockSession.pages = [{ path: '/pages/index' }]
 
       const result = await automatorTools.close(mockSession)
@@ -316,7 +316,7 @@ describe('Automator Tools', () => {
       }
 
       mockSession.miniProgram = mockMiniProgram
-      mockSession.ideProcess = mockIdeProcess
+      mockSession.ideProcess = mockIdeProcess as any
 
       await expect(automatorTools.close(mockSession)).rejects.toThrow(
         'Error closing miniprogram session'
@@ -346,7 +346,7 @@ describe('Automator Tools', () => {
     })
 
     it('should not fail if IDE process has no kill method', async () => {
-      mockSession.ideProcess = {} // No kill method
+      mockSession.ideProcess = {} as any // No kill method
 
       const result = await automatorTools.close(mockSession)
 

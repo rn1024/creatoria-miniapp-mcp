@@ -32,7 +32,7 @@ describe('Element Tools', () => {
       const mockElement = {
         tap: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.tap(mockSession, {
         refId: 'test-ref-1',
@@ -55,7 +55,7 @@ describe('Element Tools', () => {
       const mockElement = {
         tap: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.tap(mockSession, {
         refId: 'test-ref-1',
@@ -70,7 +70,7 @@ describe('Element Tools', () => {
       const mockElement = {
         longpress: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.longpress(mockSession, {
         refId: 'test-ref-1',
@@ -93,7 +93,7 @@ describe('Element Tools', () => {
       const mockElement = {
         longpress: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.longpress(mockSession, {
         refId: 'test-ref-1',
@@ -111,7 +111,7 @@ describe('Element Tools', () => {
       const mockElement = {
         input: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.input(mockSession, {
         refId: 'test-ref-1',
@@ -136,7 +136,7 @@ describe('Element Tools', () => {
       const mockElement = {
         input: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.input(mockSession, {
         refId: 'test-ref-1',
@@ -152,7 +152,7 @@ describe('Element Tools', () => {
       const mockElement = {
         text: jest.fn().mockResolvedValue('Hello World'),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.getText(mockSession, {
         refId: 'test-ref-1',
@@ -175,7 +175,7 @@ describe('Element Tools', () => {
       const mockElement = {
         text: jest.fn().mockResolvedValue('test'),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.getText(mockSession, {
         refId: 'test-ref-1',
@@ -193,7 +193,7 @@ describe('Element Tools', () => {
       const mockElement = {
         attribute: jest.fn().mockResolvedValue('test-value'),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.getAttribute(mockSession, {
         refId: 'test-ref-1',
@@ -218,7 +218,7 @@ describe('Element Tools', () => {
       const mockElement = {
         attribute: jest.fn().mockResolvedValue('value'),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.getAttribute(mockSession, {
         refId: 'test-ref-1',
@@ -237,7 +237,7 @@ describe('Element Tools', () => {
       const mockElement = {
         property: jest.fn().mockResolvedValue({ foo: 'bar' }),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.getProperty(mockSession, {
         refId: 'test-ref-1',
@@ -262,7 +262,7 @@ describe('Element Tools', () => {
       const mockElement = {
         property: jest.fn().mockResolvedValue('value'),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.getProperty(mockSession, {
         refId: 'test-ref-1',
@@ -281,7 +281,7 @@ describe('Element Tools', () => {
       const mockElement = {
         value: jest.fn().mockResolvedValue('input-value'),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.getValue(mockSession, {
         refId: 'test-ref-1',
@@ -304,7 +304,7 @@ describe('Element Tools', () => {
       const mockElement = {
         value: jest.fn().mockResolvedValue('test'),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.getValue(mockSession, {
         refId: 'test-ref-1',
@@ -323,7 +323,7 @@ describe('Element Tools', () => {
       const mockElement = {
         size: jest.fn().mockResolvedValue(mockSize),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.getSize(mockSession, {
         refId: 'test-ref-1',
@@ -346,7 +346,7 @@ describe('Element Tools', () => {
       const mockElement = {
         size: jest.fn().mockResolvedValue({ width: 100, height: 50 }),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.getSize(mockSession, {
         refId: 'test-ref-1',
@@ -365,7 +365,7 @@ describe('Element Tools', () => {
       const mockElement = {
         offset: jest.fn().mockResolvedValue(mockOffset),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.getOffset(mockSession, {
         refId: 'test-ref-1',
@@ -388,7 +388,7 @@ describe('Element Tools', () => {
       const mockElement = {
         offset: jest.fn().mockResolvedValue({ left: 0, top: 0 }),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.getOffset(mockSession, {
         refId: 'test-ref-1',
@@ -406,7 +406,7 @@ describe('Element Tools', () => {
       const mockElement = {
         trigger: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.trigger(mockSession, {
         refId: 'test-ref-1',
@@ -423,7 +423,7 @@ describe('Element Tools', () => {
       const mockElement = {
         trigger: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.trigger(mockSession, {
         refId: 'test-ref-1',
@@ -447,7 +447,7 @@ describe('Element Tools', () => {
       const mockElement = {
         trigger: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.trigger(mockSession, {
         refId: 'test-ref-1',
@@ -463,7 +463,7 @@ describe('Element Tools', () => {
       const mockElement = {
         style: jest.fn().mockResolvedValue('red'),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.getStyle(mockSession, {
         refId: 'test-ref-1',
@@ -488,7 +488,7 @@ describe('Element Tools', () => {
       const mockElement = {
         style: jest.fn().mockResolvedValue('blue'),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.getStyle(mockSession, {
         refId: 'test-ref-1',
@@ -519,7 +519,7 @@ describe('Element Tools', () => {
       const mockElement = {
         touchstart: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const touches = [{ identifier: 0, pageX: 10, pageY: 20 }]
       const changedTouches = [{ identifier: 0, pageX: 10, pageY: 20 }]
@@ -549,7 +549,7 @@ describe('Element Tools', () => {
       const mockElement = {
         touchstart: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.touchstart(mockSession, {
         refId: 'test-ref-1',
@@ -569,7 +569,7 @@ describe('Element Tools', () => {
       const mockElement = {
         touchmove: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const touches = [{ identifier: 0, pageX: 15, pageY: 25 }]
       const changedTouches = [{ identifier: 0, pageX: 15, pageY: 25 }]
@@ -599,7 +599,7 @@ describe('Element Tools', () => {
       const mockElement = {
         touchmove: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.touchmove(mockSession, {
         refId: 'test-ref-1',
@@ -619,7 +619,7 @@ describe('Element Tools', () => {
       const mockElement = {
         touchend: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const touches: any[] = []
       const changedTouches = [{ identifier: 0, pageX: 20, pageY: 30 }]
@@ -649,7 +649,7 @@ describe('Element Tools', () => {
       const mockElement = {
         touchend: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.touchend(mockSession, {
         refId: 'test-ref-1',
@@ -669,7 +669,7 @@ describe('Element Tools', () => {
       const mockElement = {
         scrollTo: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.scrollTo(mockSession, {
         refId: 'test-ref-1',
@@ -696,7 +696,7 @@ describe('Element Tools', () => {
       const mockElement = {
         scrollTo: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.scrollTo(mockSession, {
         refId: 'test-ref-1',
@@ -716,7 +716,7 @@ describe('Element Tools', () => {
       const mockElement = {
         scrollWidth: jest.fn().mockResolvedValue(500),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.scrollWidth(mockSession, {
         refId: 'test-ref-1',
@@ -739,7 +739,7 @@ describe('Element Tools', () => {
       const mockElement = {
         scrollWidth: jest.fn().mockResolvedValue(500),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.scrollWidth(mockSession, {
         refId: 'test-ref-1',
@@ -757,7 +757,7 @@ describe('Element Tools', () => {
       const mockElement = {
         scrollHeight: jest.fn().mockResolvedValue(800),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.scrollHeight(mockSession, {
         refId: 'test-ref-1',
@@ -780,7 +780,7 @@ describe('Element Tools', () => {
       const mockElement = {
         scrollHeight: jest.fn().mockResolvedValue(800),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.scrollHeight(mockSession, {
         refId: 'test-ref-1',
@@ -798,7 +798,7 @@ describe('Element Tools', () => {
       const mockElement = {
         swipeTo: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.swipeTo(mockSession, {
         refId: 'test-ref-1',
@@ -823,7 +823,7 @@ describe('Element Tools', () => {
       const mockElement = {
         swipeTo: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.swipeTo(mockSession, {
         refId: 'test-ref-1',
@@ -839,7 +839,7 @@ describe('Element Tools', () => {
       const mockElement = {
         moveTo: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.moveTo(mockSession, {
         refId: 'test-ref-1',
@@ -866,7 +866,7 @@ describe('Element Tools', () => {
       const mockElement = {
         moveTo: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.moveTo(mockSession, {
         refId: 'test-ref-1',
@@ -886,7 +886,7 @@ describe('Element Tools', () => {
       const mockElement = {
         slideTo: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.slideTo(mockSession, {
         refId: 'test-ref-1',
@@ -911,7 +911,7 @@ describe('Element Tools', () => {
       const mockElement = {
         slideTo: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.slideTo(mockSession, {
         refId: 'test-ref-1',
@@ -927,7 +927,7 @@ describe('Element Tools', () => {
       const mockElement = {
         callContextMethod: jest.fn().mockResolvedValue({ result: 'success' }),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.callContextMethod(mockSession, {
         refId: 'test-ref-1',
@@ -945,7 +945,7 @@ describe('Element Tools', () => {
       const mockElement = {
         callContextMethod: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.callContextMethod(mockSession, {
         refId: 'test-ref-1',
@@ -969,7 +969,7 @@ describe('Element Tools', () => {
       const mockElement = {
         callContextMethod: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.callContextMethod(mockSession, {
         refId: 'test-ref-1',
@@ -988,7 +988,7 @@ describe('Element Tools', () => {
       const mockElement = {
         setData: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const data = { count: 5, name: 'test' }
       const result = await elementTools.setData(mockSession, {
@@ -1014,7 +1014,7 @@ describe('Element Tools', () => {
       const mockElement = {
         setData: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.setData(mockSession, {
         refId: 'test-ref-1',
@@ -1033,7 +1033,7 @@ describe('Element Tools', () => {
       const mockElement = {
         callMethod: jest.fn().mockResolvedValue({ data: 'result' }),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.callMethod(mockSession, {
         refId: 'test-ref-1',
@@ -1051,7 +1051,7 @@ describe('Element Tools', () => {
       const mockElement = {
         callMethod: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       const result = await elementTools.callMethod(mockSession, {
         refId: 'test-ref-1',
@@ -1075,7 +1075,7 @@ describe('Element Tools', () => {
       const mockElement = {
         callMethod: jest.fn().mockResolvedValue(undefined),
       }
-      mockSession.elements.set('test-ref-1', mockElement)
+      mockSession.elements.set('test-ref-1', { element: mockElement, pagePath: 'pages/test', cachedAt: new Date() })
 
       await elementTools.callMethod(mockSession, {
         refId: 'test-ref-1',
