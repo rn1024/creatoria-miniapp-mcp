@@ -7,8 +7,9 @@
  * - MiniProgram (6 tools): Mini program-level operations
  * - Page (8 tools): Page-level operations and data access
  * - Element (23 tools): Element-level interactions, properties, and subclass operations
+ * - Assert (9 tools): Testing and verification utilities
  *
- * Total: 41 tools
+ * Total: 50 tools
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
@@ -18,6 +19,7 @@ import * as automatorTools from './automator.js'
 import * as miniprogramTools from './miniprogram.js'
 import * as pageTools from './page.js'
 import * as elementTools from './element.js'
+import * as assertTools from './assert.js'
 
 // Tool handler type
 export type ToolHandler = (session: SessionState, args: any) => Promise<any>
@@ -824,6 +826,193 @@ export const ELEMENT_TOOL_HANDLERS: Record<string, ToolHandler> = {
 }
 
 // ============================================================================
+// ASSERT TOOLS (Testing & Verification)
+// ============================================================================
+
+export const ASSERT_TOOLS: Tool[] = [
+  {
+    name: 'assert_exists',
+    description: 'Assert that an element exists on the page',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        selector: {
+          type: 'string',
+          description: 'CSS selector for the element',
+        },
+        pagePath: {
+          type: 'string',
+          description: 'Page path (optional, defaults to current page)',
+        },
+      },
+      required: ['selector'],
+    },
+  },
+  {
+    name: 'assert_not_exists',
+    description: 'Assert that an element does not exist on the page',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        selector: {
+          type: 'string',
+          description: 'CSS selector for the element',
+        },
+        pagePath: {
+          type: 'string',
+          description: 'Page path (optional, defaults to current page)',
+        },
+      },
+      required: ['selector'],
+    },
+  },
+  {
+    name: 'assert_text',
+    description: 'Assert element text equals expected value',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        expected: {
+          type: 'string',
+          description: 'Expected text value',
+        },
+      },
+      required: ['refId', 'expected'],
+    },
+  },
+  {
+    name: 'assert_text_contains',
+    description: 'Assert element text contains expected substring',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        expected: {
+          type: 'string',
+          description: 'Expected substring',
+        },
+      },
+      required: ['refId', 'expected'],
+    },
+  },
+  {
+    name: 'assert_value',
+    description: 'Assert element value equals expected value',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        expected: {
+          type: 'string',
+          description: 'Expected value',
+        },
+      },
+      required: ['refId', 'expected'],
+    },
+  },
+  {
+    name: 'assert_attribute',
+    description: 'Assert element attribute equals expected value',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        name: {
+          type: 'string',
+          description: 'Attribute name',
+        },
+        expected: {
+          type: 'string',
+          description: 'Expected attribute value',
+        },
+      },
+      required: ['refId', 'name', 'expected'],
+    },
+  },
+  {
+    name: 'assert_property',
+    description: 'Assert element property equals expected value',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        name: {
+          type: 'string',
+          description: 'Property name',
+        },
+        expected: {
+          description: 'Expected property value (any type)',
+        },
+      },
+      required: ['refId', 'name', 'expected'],
+    },
+  },
+  {
+    name: 'assert_data',
+    description: 'Assert page data equals expected value',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: {
+          type: 'string',
+          description: 'Data path (optional, for nested data)',
+        },
+        expected: {
+          description: 'Expected data value (any type)',
+        },
+        pagePath: {
+          type: 'string',
+          description: 'Page path (optional, defaults to current page)',
+        },
+      },
+      required: ['expected'],
+    },
+  },
+  {
+    name: 'assert_visible',
+    description: 'Assert element is visible (has non-zero size)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+      },
+      required: ['refId'],
+    },
+  },
+]
+
+export const ASSERT_TOOL_HANDLERS: Record<string, ToolHandler> = {
+  assert_exists: assertTools.assertExists,
+  assert_not_exists: assertTools.assertNotExists,
+  assert_text: assertTools.assertText,
+  assert_text_contains: assertTools.assertTextContains,
+  assert_value: assertTools.assertValue,
+  assert_attribute: assertTools.assertAttribute,
+  assert_property: assertTools.assertProperty,
+  assert_data: assertTools.assertData,
+  assert_visible: assertTools.assertVisible,
+}
+
+// ============================================================================
 // TOOL CATEGORIES
 // ============================================================================
 
@@ -852,6 +1041,12 @@ export const TOOL_CATEGORIES: Record<string, ToolCategory> = {
     tools: ELEMENT_TOOLS,
     handlers: ELEMENT_TOOL_HANDLERS,
   },
+  assert: {
+    name: 'Assert',
+    description: 'Testing and verification utilities (9 tools)',
+    tools: ASSERT_TOOLS,
+    handlers: ASSERT_TOOL_HANDLERS,
+  },
 }
 
 // ============================================================================
@@ -863,6 +1058,7 @@ export const CORE_TOOLS: Tool[] = [
   ...MINIPROGRAM_TOOLS,
   ...PAGE_TOOLS,
   ...ELEMENT_TOOLS,
+  ...ASSERT_TOOLS,
 ]
 
 export const CORE_TOOL_HANDLERS: Record<string, ToolHandler> = {
@@ -870,6 +1066,7 @@ export const CORE_TOOL_HANDLERS: Record<string, ToolHandler> = {
   ...MINIPROGRAM_TOOL_HANDLERS,
   ...PAGE_TOOL_HANDLERS,
   ...ELEMENT_TOOL_HANDLERS,
+  ...ASSERT_TOOL_HANDLERS,
 }
 
 // ============================================================================
@@ -912,6 +1109,7 @@ export function getToolStats() {
       miniprogram: MINIPROGRAM_TOOLS.length,
       page: PAGE_TOOLS.length,
       element: ELEMENT_TOOLS.length,
+      assert: ASSERT_TOOLS.length,
     },
     handlers: Object.keys(CORE_TOOL_HANDLERS).length,
   }

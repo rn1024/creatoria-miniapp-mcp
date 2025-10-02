@@ -3,7 +3,7 @@
   "repo": "git@github.com:rn1024/creatoria-miniapp-mcp.git",
   "branch": "main",
   "stage": "Automate",
-  "task_id": "TASK-2025-001-C5",
+  "task_id": "TASK-2025-001-D1",
   "agent": {
     "name": "ClaudeCode",
     "mode": "generalist",
@@ -11,12 +11,12 @@
     "session_ttl_minutes": 270,
     "handoff_planned_at": "2025-10-02T07:45:00Z"
   },
-  "context_digest": "✅ 已完成 Stage A-B-C (完整): A2 DevTools 启动脚本，B1 工具注册器重构，B2 SessionStore 配置，C1 Automator 工具，C2 MiniProgram 工具，C3 Page 工具，C4 Element 工具完整实现（23 个工具，包含 touch 事件和所有子类操作），C5 工具注册器优化（分类、元数据、验证），249 个测试全部通过",
+  "context_digest": "✅ 已完成 Stage A-B-C-D1 (完整): A2 DevTools 启动脚本，B1 工具注册器重构，B2 SessionStore 配置，C1 Automator 工具，C2 MiniProgram 工具，C3 Page 工具，C4 Element 工具完整实现（23 个工具，包含 touch 事件和所有子类操作），C5 工具注册器优化（分类、元数据、验证），D1 断言工具集（9 个断言工具），276 个测试全部通过",
   "open_questions": [
-    "D1 是否需要添加断言工具集（assert.exists/text/data）？"
+    "D2 是否需要集成测试框架或 E2E 测试？"
   ],
   "artifacts": [
-    {"path": ".llm/state.json", "type": "config", "change": "updated", "note": "更新为 Stage C 完整完成状态"},
+    {"path": ".llm/state.json", "type": "config", "change": "updated", "note": "更新为 Stage D1 完成状态"},
     {"path": "scripts/setup-devtools-port.sh", "type": "script", "change": "created", "note": "A2: 微信开发者工具端口配置脚本"},
     {"path": "docs/setup-guide.md", "type": "docs", "change": "created", "note": "A2: 环境配置和快速开始指南"},
     {"path": "src/core/session.ts", "type": "code", "change": "updated", "note": "B2 修复: outputDir 配置穿透"},
@@ -31,8 +31,10 @@
     {"path": "tests/unit/page.test.ts", "type": "test", "change": "created", "note": "C3: Page 工具单元测试（27 个测试）"},
     {"path": "src/tools/element.ts", "type": "code", "change": "updated", "note": "C4: 完整实现 23 个 Element 工具（包含 touch 事件和所有子类操作，467→957 行）"},
     {"path": "tests/unit/element.test.ts", "type": "test", "change": "updated", "note": "C4: Element 工具完整测试（36→72 个测试，总计 249 个）"},
-    {"path": "src/tools/index.ts", "type": "code", "change": "updated", "note": "C4+C5: 工具注册器完整重构（分类、元数据、验证）+ 41 个工具注册"},
-    {"path": "tests/unit/tool-registration.test.ts", "type": "test", "change": "created", "note": "C5: 工具注册系统验证测试（31 个测试）"},
+    {"path": "src/tools/index.ts", "type": "code", "change": "updated", "note": "C5: 工具注册器完整重构（分类、元数据、验证）+ 41→50 个工具注册"},
+    {"path": "tests/unit/tool-registration.test.ts", "type": "test", "change": "updated", "note": "C5+D1: 工具注册系统验证测试（31→46 个测试）"},
+    {"path": "src/tools/assert.ts", "type": "code", "change": "created", "note": "D1: 实现 9 个断言工具（assertExists/notExists/text/textContains/value/attribute/property/data/visible，465 行）"},
+    {"path": "tests/unit/assert.test.ts", "type": "test", "change": "created", "note": "D1: 断言工具单元测试（27 个测试）"},
     {"path": "dist/", "type": "dir", "change": "updated", "note": "TypeScript 编译输出"}
   ],
   "risks": [
@@ -47,11 +49,6 @@
   "next_actions": [
     {
       "owner": "ClaudeCode",
-      "action": "[D1] 断言工具集（assert.exists/text/data）或进入 Stage D",
-      "depends_on": ["C5"]
-    },
-    {
-      "owner": "ClaudeCode",
       "action": "[D2] 集成测试框架或 E2E 测试",
       "depends_on": ["D1"]
     },
@@ -59,6 +56,11 @@
       "owner": "ClaudeCode",
       "action": "[E1] 文档完善和使用示例",
       "depends_on": ["D2"]
+    },
+    {
+      "owner": "ClaudeCode",
+      "action": "[E2] 发布和部署准备",
+      "depends_on": ["E1"]
     }
   ],
   "handoff": {
