@@ -24,6 +24,7 @@ export interface SessionState {
   config?: SessionConfig
   logger?: Logger // Session-specific logger
   outputManager?: OutputManager // Session-specific output manager
+  recording?: RecordingState // Recording state
 }
 
 export interface SessionConfig {
@@ -119,4 +120,37 @@ export interface OutputManager {
    * Check if output directory exists
    */
   ensureOutputDir(): Promise<void>
+}
+
+/**
+ * Recorded action in a sequence
+ */
+export interface RecordedAction {
+  timestamp: Date
+  toolName: string
+  args: Record<string, any>
+  duration?: number // milliseconds
+  success: boolean
+  error?: string
+}
+
+/**
+ * Action sequence for recording/replay
+ */
+export interface ActionSequence {
+  id: string
+  name: string
+  description?: string
+  createdAt: Date
+  actions: RecordedAction[]
+  metadata?: Record<string, any>
+}
+
+/**
+ * Recording state
+ */
+export interface RecordingState {
+  isRecording: boolean
+  currentSequence?: ActionSequence
+  startedAt?: Date
 }

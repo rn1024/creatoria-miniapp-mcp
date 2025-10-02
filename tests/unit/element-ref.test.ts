@@ -37,9 +37,7 @@ describe('ElementRef', () => {
     })
 
     it('should accept selector with index', () => {
-      expect(() =>
-        validateElementRef({ selector: '.item', index: 0 })
-      ).not.toThrow()
+      expect(() => validateElementRef({ selector: '.item', index: 0 })).not.toThrow()
     })
 
     it('should accept selector with pagePath', () => {
@@ -49,9 +47,7 @@ describe('ElementRef', () => {
     })
 
     it('should accept selector with save flag', () => {
-      expect(() =>
-        validateElementRef({ selector: '.button', save: true })
-      ).not.toThrow()
+      expect(() => validateElementRef({ selector: '.button', save: true })).not.toThrow()
     })
 
     it('should reject empty object', () => {
@@ -61,21 +57,21 @@ describe('ElementRef', () => {
     })
 
     it('should reject invalid index type', () => {
-      expect(() =>
-        validateElementRef({ selector: '.item', index: '0' as any })
-      ).toThrow('ElementRef.index must be a number')
+      expect(() => validateElementRef({ selector: '.item', index: '0' as any })).toThrow(
+        'ElementRef.index must be a number'
+      )
     })
 
     it('should reject invalid pagePath type', () => {
-      expect(() =>
-        validateElementRef({ selector: '.item', pagePath: 123 as any })
-      ).toThrow('ElementRef.pagePath must be a string')
+      expect(() => validateElementRef({ selector: '.item', pagePath: 123 as any })).toThrow(
+        'ElementRef.pagePath must be a string'
+      )
     })
 
     it('should reject invalid save type', () => {
-      expect(() =>
-        validateElementRef({ selector: '.item', save: 'yes' as any })
-      ).toThrow('ElementRef.save must be a boolean')
+      expect(() => validateElementRef({ selector: '.item', save: 'yes' as any })).toThrow(
+        'ElementRef.save must be a boolean'
+      )
     })
   })
 
@@ -90,9 +86,7 @@ describe('ElementRef', () => {
         lastActivity: new Date(),
       }
 
-      await expect(resolvePage(state)).rejects.toThrow(
-        'MiniProgram not launched or connected'
-      )
+      await expect(resolvePage(state)).rejects.toThrow('MiniProgram not launched or connected')
     })
 
     it('should return current page when no pagePath specified', async () => {
@@ -127,9 +121,7 @@ describe('ElementRef', () => {
         lastActivity: new Date(),
       }
 
-      await expect(resolvePage(state)).rejects.toThrow(
-        'No current page found'
-      )
+      await expect(resolvePage(state)).rejects.toThrow('No current page found')
     })
 
     it('should find page by path in pageStack', async () => {
@@ -201,9 +193,7 @@ describe('ElementRef', () => {
         lastActivity: new Date(),
       }
 
-      await expect(resolvePage(state, 'pages/index/index')).rejects.toThrow(
-        'Page stack is empty'
-      )
+      await expect(resolvePage(state, 'pages/index/index')).rejects.toThrow('Page stack is empty')
     })
   })
 
@@ -290,18 +280,18 @@ describe('ElementRef', () => {
       mockPage.$$.mockResolvedValue(mockElements)
       const state = createMockState()
 
-      await expect(
-        resolveElement(state, { selector: '.item', index: 5 })
-      ).rejects.toThrow('Index 5 out of range. Found 2 elements')
+      await expect(resolveElement(state, { selector: '.item', index: 5 })).rejects.toThrow(
+        'Index 5 out of range. Found 2 elements'
+      )
     })
 
     it('should throw if $$ returns empty array', async () => {
       mockPage.$$.mockResolvedValue([])
       const state = createMockState()
 
-      await expect(
-        resolveElement(state, { selector: '.item', index: 0 })
-      ).rejects.toThrow('No elements found with selector: .item')
+      await expect(resolveElement(state, { selector: '.item', index: 0 })).rejects.toThrow(
+        'No elements found with selector: .item'
+      )
     })
 
     it('should cache element when save=true', async () => {
@@ -343,9 +333,9 @@ describe('ElementRef', () => {
     it('should throw if xpath not supported', async () => {
       const state = createMockState()
 
-      await expect(
-        resolveElement(state, { xpath: '//view[@class="container"]' })
-      ).rejects.toThrow('XPath is not supported')
+      await expect(resolveElement(state, { xpath: '//view[@class="container"]' })).rejects.toThrow(
+        'XPath is not supported'
+      )
     })
 
     it('should resolve element by xpath if supported', async () => {
@@ -391,9 +381,9 @@ describe('ElementRef', () => {
       const state = createMockState()
       state.miniProgram.currentPage = jest.fn().mockResolvedValue(mockPageWithXpath)
 
-      await expect(
-        resolveElement(state, { xpath: '//view[@class="notfound"]' })
-      ).rejects.toThrow('Element not found with XPath')
+      await expect(resolveElement(state, { xpath: '//view[@class="notfound"]' })).rejects.toThrow(
+        'Element not found with XPath'
+      )
     })
   })
 })

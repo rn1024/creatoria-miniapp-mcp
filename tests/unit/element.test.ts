@@ -61,10 +61,7 @@ describe('Element Tools', () => {
         refId: 'test-ref-1',
       })
 
-      expect(mockSession.logger?.info).toHaveBeenCalledWith(
-        'Tapping element',
-        expect.any(Object)
-      )
+      expect(mockSession.logger?.info).toHaveBeenCalledWith('Tapping element', expect.any(Object))
     })
   })
 
@@ -146,10 +143,7 @@ describe('Element Tools', () => {
         value: 'test',
       })
 
-      expect(mockSession.logger?.info).toHaveBeenCalledWith(
-        'Inputting text',
-        expect.any(Object)
-      )
+      expect(mockSession.logger?.info).toHaveBeenCalledWith('Inputting text', expect.any(Object))
     })
   })
 
@@ -460,10 +454,7 @@ describe('Element Tools', () => {
         type: 'change',
       })
 
-      expect(mockSession.logger?.info).toHaveBeenCalledWith(
-        'Triggering event',
-        expect.any(Object)
-      )
+      expect(mockSession.logger?.info).toHaveBeenCalledWith('Triggering event', expect.any(Object))
     })
   })
 
@@ -517,7 +508,9 @@ describe('Element Tools', () => {
         elementTools.tap(mockSession, {
           refId: 'missing-ref',
         })
-      ).rejects.toThrow('Element not found with refId: missing-ref. Use page_query to get element reference first.')
+      ).rejects.toThrow(
+        'Element not found with refId: missing-ref. Use page_query to get element reference first.'
+      )
     })
   })
 
@@ -837,10 +830,7 @@ describe('Element Tools', () => {
         index: 1,
       })
 
-      expect(mockSession.logger?.info).toHaveBeenCalledWith(
-        'Swiping to index',
-        expect.any(Object)
-      )
+      expect(mockSession.logger?.info).toHaveBeenCalledWith('Swiping to index', expect.any(Object))
     })
   })
 
@@ -928,10 +918,7 @@ describe('Element Tools', () => {
         value: 50,
       })
 
-      expect(mockSession.logger?.info).toHaveBeenCalledWith(
-        'Sliding to value',
-        expect.any(Object)
-      )
+      expect(mockSession.logger?.info).toHaveBeenCalledWith('Sliding to value', expect.any(Object))
     })
   })
 

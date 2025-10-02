@@ -35,7 +35,7 @@ describe('Assert Tools', () => {
 
   describe('assertExists', () => {
     it('should pass when element exists', async () => {
-      (pageTools.query as jest.Mock).mockResolvedValue({
+      ;(pageTools.query as jest.Mock).mockResolvedValue({
         exists: true,
         refId: 'test-ref',
         success: true,
@@ -56,7 +56,7 @@ describe('Assert Tools', () => {
     })
 
     it('should fail when element not found', async () => {
-      (pageTools.query as jest.Mock).mockResolvedValue({
+      ;(pageTools.query as jest.Mock).mockResolvedValue({
         exists: false,
         success: true,
         message: 'Element not found',
@@ -70,7 +70,7 @@ describe('Assert Tools', () => {
     })
 
     it('should support pagePath parameter', async () => {
-      (pageTools.query as jest.Mock).mockResolvedValue({
+      ;(pageTools.query as jest.Mock).mockResolvedValue({
         exists: true,
         refId: 'test-ref',
         success: true,
@@ -93,7 +93,7 @@ describe('Assert Tools', () => {
 
   describe('assertNotExists', () => {
     it('should pass when element does not exist', async () => {
-      (pageTools.query as jest.Mock).mockResolvedValue({
+      ;(pageTools.query as jest.Mock).mockResolvedValue({
         exists: false,
         success: true,
         message: 'Element not found',
@@ -108,7 +108,7 @@ describe('Assert Tools', () => {
     })
 
     it('should fail when element exists', async () => {
-      (pageTools.query as jest.Mock).mockResolvedValue({
+      ;(pageTools.query as jest.Mock).mockResolvedValue({
         exists: true,
         refId: 'test-ref',
         success: true,
@@ -123,7 +123,7 @@ describe('Assert Tools', () => {
     })
 
     it('should pass when query throws error', async () => {
-      (pageTools.query as jest.Mock).mockRejectedValue(
+      ;(pageTools.query as jest.Mock).mockRejectedValue(
         new Error('Query failed: Element not found')
       )
 
@@ -138,7 +138,7 @@ describe('Assert Tools', () => {
 
   describe('assertText', () => {
     it('should pass when text matches', async () => {
-      (elementTools.getText as jest.Mock).mockResolvedValue({
+      ;(elementTools.getText as jest.Mock).mockResolvedValue({
         text: 'Hello World',
       })
 
@@ -155,7 +155,7 @@ describe('Assert Tools', () => {
     })
 
     it('should fail when text does not match', async () => {
-      (elementTools.getText as jest.Mock).mockResolvedValue({
+      ;(elementTools.getText as jest.Mock).mockResolvedValue({
         text: 'Actual Text',
       })
 
@@ -170,7 +170,7 @@ describe('Assert Tools', () => {
 
   describe('assertTextContains', () => {
     it('should pass when text contains substring', async () => {
-      (elementTools.getText as jest.Mock).mockResolvedValue({
+      ;(elementTools.getText as jest.Mock).mockResolvedValue({
         text: 'Hello World from Test',
       })
 
@@ -184,7 +184,7 @@ describe('Assert Tools', () => {
     })
 
     it('should fail when text does not contain substring', async () => {
-      (elementTools.getText as jest.Mock).mockResolvedValue({
+      ;(elementTools.getText as jest.Mock).mockResolvedValue({
         text: 'Hello World',
       })
 
@@ -199,7 +199,7 @@ describe('Assert Tools', () => {
 
   describe('assertValue', () => {
     it('should pass when value matches', async () => {
-      (elementTools.getValue as jest.Mock).mockResolvedValue({
+      ;(elementTools.getValue as jest.Mock).mockResolvedValue({
         value: 'test-value',
       })
 
@@ -213,7 +213,7 @@ describe('Assert Tools', () => {
     })
 
     it('should fail when value does not match', async () => {
-      (elementTools.getValue as jest.Mock).mockResolvedValue({
+      ;(elementTools.getValue as jest.Mock).mockResolvedValue({
         value: 'actual-value',
       })
 
@@ -228,7 +228,7 @@ describe('Assert Tools', () => {
 
   describe('assertAttribute', () => {
     it('should pass when attribute matches', async () => {
-      (elementTools.getAttribute as jest.Mock).mockResolvedValue({
+      ;(elementTools.getAttribute as jest.Mock).mockResolvedValue({
         value: 'test-id',
       })
 
@@ -247,7 +247,7 @@ describe('Assert Tools', () => {
     })
 
     it('should fail when attribute does not match', async () => {
-      (elementTools.getAttribute as jest.Mock).mockResolvedValue({
+      ;(elementTools.getAttribute as jest.Mock).mockResolvedValue({
         value: 'actual-id',
       })
 
@@ -263,7 +263,7 @@ describe('Assert Tools', () => {
 
   describe('assertProperty', () => {
     it('should pass when property matches', async () => {
-      (elementTools.getProperty as jest.Mock).mockResolvedValue({
+      ;(elementTools.getProperty as jest.Mock).mockResolvedValue({
         value: { foo: 'bar' },
       })
 
@@ -278,7 +278,7 @@ describe('Assert Tools', () => {
     })
 
     it('should fail when property does not match', async () => {
-      (elementTools.getProperty as jest.Mock).mockResolvedValue({
+      ;(elementTools.getProperty as jest.Mock).mockResolvedValue({
         value: { foo: 'bar' },
       })
 
@@ -294,7 +294,7 @@ describe('Assert Tools', () => {
 
   describe('assertData', () => {
     it('should pass when page data matches', async () => {
-      (pageTools.getData as jest.Mock).mockResolvedValue({
+      ;(pageTools.getData as jest.Mock).mockResolvedValue({
         data: { count: 5 },
       })
 
@@ -311,7 +311,7 @@ describe('Assert Tools', () => {
     })
 
     it('should pass when nested data matches', async () => {
-      (pageTools.getData as jest.Mock).mockResolvedValue({
+      ;(pageTools.getData as jest.Mock).mockResolvedValue({
         data: 5,
       })
 
@@ -329,7 +329,7 @@ describe('Assert Tools', () => {
     })
 
     it('should fail when data does not match', async () => {
-      (pageTools.getData as jest.Mock).mockResolvedValue({
+      ;(pageTools.getData as jest.Mock).mockResolvedValue({
         data: { count: 5 },
       })
 
@@ -343,7 +343,7 @@ describe('Assert Tools', () => {
 
   describe('assertVisible', () => {
     it('should pass when element is visible', async () => {
-      (elementTools.getSize as jest.Mock).mockResolvedValue({
+      ;(elementTools.getSize as jest.Mock).mockResolvedValue({
         size: { width: 100, height: 50 },
       })
 
@@ -356,7 +356,7 @@ describe('Assert Tools', () => {
     })
 
     it('should fail when element has zero width', async () => {
-      (elementTools.getSize as jest.Mock).mockResolvedValue({
+      ;(elementTools.getSize as jest.Mock).mockResolvedValue({
         size: { width: 0, height: 50 },
       })
 
@@ -368,7 +368,7 @@ describe('Assert Tools', () => {
     })
 
     it('should fail when element has zero height', async () => {
-      (elementTools.getSize as jest.Mock).mockResolvedValue({
+      ;(elementTools.getSize as jest.Mock).mockResolvedValue({
         size: { width: 100, height: 0 },
       })
 
@@ -380,7 +380,7 @@ describe('Assert Tools', () => {
     })
 
     it('should fail when size is null', async () => {
-      (elementTools.getSize as jest.Mock).mockResolvedValue({
+      ;(elementTools.getSize as jest.Mock).mockResolvedValue({
         size: null,
       })
 

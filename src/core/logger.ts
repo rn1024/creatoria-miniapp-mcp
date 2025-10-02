@@ -19,11 +19,7 @@ export class ConsoleLogger implements Logger {
   /**
    * Create log entry with metadata
    */
-  private createEntry(
-    level: LogLevel,
-    message: string,
-    context?: Record<string, any>
-  ): LogEntry {
+  private createEntry(level: LogLevel, message: string, context?: Record<string, any>): LogEntry {
     return {
       timestamp: new Date(),
       level,

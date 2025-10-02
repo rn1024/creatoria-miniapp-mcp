@@ -71,8 +71,7 @@ export async function snapshotPage(
     const outputManager = session.outputManager
     await outputManager.ensureOutputDir()
 
-    const snapshotFilename =
-      filename || outputManager.generateFilename('snapshot', 'json')
+    const snapshotFilename = filename || outputManager.generateFilename('snapshot', 'json')
     const snapshotPath = await outputManager.writeFile(
       snapshotFilename,
       Buffer.from(JSON.stringify(snapshotData, null, 2))
@@ -161,8 +160,7 @@ export async function snapshotFull(
 
     // Get page stack
     const pageStackResult = await miniprogramTools.getPageStack(session)
-    const currentPageInfo =
-      pageStackResult.pages[pageStackResult.pages.length - 1]
+    const currentPageInfo = pageStackResult.pages[pageStackResult.pages.length - 1]
 
     if (!currentPageInfo) {
       throw new Error('No active page found')
@@ -188,8 +186,7 @@ export async function snapshotFull(
     const outputManager = session.outputManager
     await outputManager.ensureOutputDir()
 
-    const snapshotFilename =
-      filename || outputManager.generateFilename('snapshot', 'json')
+    const snapshotFilename = filename || outputManager.generateFilename('snapshot', 'json')
     const snapshotPath = await outputManager.writeFile(
       snapshotFilename,
       Buffer.from(JSON.stringify(snapshotData, null, 2))
@@ -307,8 +304,7 @@ export async function snapshotElement(
     const outputManager = session.outputManager
     await outputManager.ensureOutputDir()
 
-    const snapshotFilename =
-      filename || outputManager.generateFilename('snapshot', 'json')
+    const snapshotFilename = filename || outputManager.generateFilename('snapshot', 'json')
     const snapshotPath = await outputManager.writeFile(
       snapshotFilename,
       Buffer.from(JSON.stringify(snapshotData, null, 2))

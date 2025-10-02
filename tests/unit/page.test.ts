@@ -108,10 +108,7 @@ describe('Page Tools', () => {
         selector: '.test-element',
       })
 
-      expect(mockSession.logger?.info).toHaveBeenCalledWith(
-        'Querying element',
-        expect.any(Object)
-      )
+      expect(mockSession.logger?.info).toHaveBeenCalledWith('Querying element', expect.any(Object))
     })
   })
 
@@ -331,10 +328,7 @@ describe('Page Tools', () => {
         data: { name: 'test' },
       })
 
-      expect(mockSession.logger?.info).toHaveBeenCalledWith(
-        'Setting page data',
-        expect.any(Object)
-      )
+      expect(mockSession.logger?.info).toHaveBeenCalledWith('Setting page data', expect.any(Object))
     })
   })
 

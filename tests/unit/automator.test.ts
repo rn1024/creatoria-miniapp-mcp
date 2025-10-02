@@ -103,9 +103,7 @@ describe('Automator Tools', () => {
     })
 
     it('should throw error if launch fails', async () => {
-      ;(automator.launch as jest.Mock).mockRejectedValue(
-        new Error('Launch failed')
-      )
+      ;(automator.launch as jest.Mock).mockRejectedValue(new Error('Launch failed'))
 
       await expect(
         automatorTools.launch(mockSession, {
@@ -127,10 +125,9 @@ describe('Automator Tools', () => {
         'Launching miniprogram',
         expect.any(Object)
       )
-      expect(mockSession.logger?.info).toHaveBeenCalledWith(
-        'MiniProgram launched successfully',
-        { port: 9420 }
-      )
+      expect(mockSession.logger?.info).toHaveBeenCalledWith('MiniProgram launched successfully', {
+        port: 9420,
+      })
     })
   })
 
@@ -186,13 +183,11 @@ describe('Automator Tools', () => {
     })
 
     it('should throw error if connect fails', async () => {
-      ;(automator.connect as jest.Mock).mockRejectedValue(
-        new Error('Connection refused')
-      )
+      ;(automator.connect as jest.Mock).mockRejectedValue(new Error('Connection refused'))
 
-      await expect(
-        automatorTools.connect(mockSession, { port: 9420 })
-      ).rejects.toThrow('Failed to connect to DevTools: Connection refused')
+      await expect(automatorTools.connect(mockSession, { port: 9420 })).rejects.toThrow(
+        'Failed to connect to DevTools: Connection refused'
+      )
     })
 
     it('should log connect attempt', async () => {
@@ -205,10 +200,9 @@ describe('Automator Tools', () => {
         'Connecting to existing DevTools instance',
         { port: 9420 }
       )
-      expect(mockSession.logger?.info).toHaveBeenCalledWith(
-        'Connected to DevTools successfully',
-        { port: 9420 }
-      )
+      expect(mockSession.logger?.info).toHaveBeenCalledWith('Connected to DevTools successfully', {
+        port: 9420,
+      })
     })
   })
 
@@ -272,9 +266,7 @@ describe('Automator Tools', () => {
 
       await automatorTools.disconnect(mockSession)
 
-      expect(mockSession.logger?.info).toHaveBeenCalledWith(
-        'Disconnecting from miniprogram'
-      )
+      expect(mockSession.logger?.info).toHaveBeenCalledWith('Disconnecting from miniprogram')
       expect(mockSession.logger?.info).toHaveBeenCalledWith(
         'Disconnected from miniprogram successfully'
       )

@@ -19,12 +19,11 @@ export function generateRefId(): string {
  * @returns Page object
  * @throws Error if miniProgram not connected or page not found
  */
-export async function resolvePage(
-  state: SessionState,
-  pagePath?: string
-): Promise<any> {
+export async function resolvePage(state: SessionState, pagePath?: string): Promise<any> {
   if (!state.miniProgram) {
-    throw new Error('MiniProgram not launched or connected. Call miniprogram_launch or miniprogram_connect first.')
+    throw new Error(
+      'MiniProgram not launched or connected. Call miniprogram_launch or miniprogram_connect first.'
+    )
   }
 
   // If no pagePath specified, use current page
@@ -44,15 +43,11 @@ export async function resolvePage(
 
   // Normalize pagePath (support both '/path' and 'path')
   const normalizedPath = pagePath.startsWith('/') ? pagePath.slice(1) : pagePath
-  const found = pageStack.find(
-    (p: any) => p.path === normalizedPath || p.path === pagePath
-  )
+  const found = pageStack.find((p: any) => p.path === normalizedPath || p.path === pagePath)
 
   if (!found) {
     const availablePaths = pageStack.map((p: any) => p.path).join(', ')
-    throw new Error(
-      `Page not found in stack: ${pagePath}. Available pages: ${availablePaths}`
-    )
+    throw new Error(`Page not found in stack: ${pagePath}. Available pages: ${availablePaths}`)
   }
 
   return found
@@ -81,8 +76,8 @@ export async function resolveElement(
       const availableRefs = Array.from(state.elements.keys()).join(', ')
       throw new Error(
         `Invalid refId: ${ref.refId}. ` +
-        `Available refIds: ${availableRefs || '(none)'}. ` +
-        `The element may have been removed or the page has changed.`
+          `Available refIds: ${availableRefs || '(none)'}. ` +
+          `The element may have been removed or the page has changed.`
       )
     }
   }
@@ -94,7 +89,7 @@ export async function resolveElement(
     if (typeof anyPage.xpath !== 'function' && typeof anyPage.getElementByXpath !== 'function') {
       throw new Error(
         'XPath is not supported by current miniprogram-automator SDK version. ' +
-        'Please upgrade to SDK 0.11.0 or later, or use selector instead.'
+          'Please upgrade to SDK 0.11.0 or later, or use selector instead.'
       )
     }
 
@@ -153,9 +148,7 @@ export async function resolveElement(
   }
   // No valid location strategy provided
   else {
-    throw new Error(
-      'Invalid ElementRef: must provide one of: refId, selector, or xpath'
-    )
+    throw new Error('Invalid ElementRef: must provide one of: refId, selector, or xpath')
   }
 
   // Cache element if save=true
@@ -186,9 +179,7 @@ export function validateElementRef(ref: ElementRefInput): void {
   const hasXpath = typeof ref.xpath === 'string' && ref.xpath.length > 0
 
   if (!hasRefId && !hasSelector && !hasXpath) {
-    throw new Error(
-      'ElementRef must provide one of: refId, selector, or xpath'
-    )
+    throw new Error('ElementRef must provide one of: refId, selector, or xpath')
   }
 
   if (ref.index !== undefined && typeof ref.index !== 'number') {

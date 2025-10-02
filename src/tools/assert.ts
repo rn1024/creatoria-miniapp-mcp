@@ -34,9 +34,7 @@ export async function assertExists(
     })
 
     if (!result.exists) {
-      throw new Error(
-        `Assertion failed: Element not found with selector: ${selector}`
-      )
+      throw new Error(`Assertion failed: Element not found with selector: ${selector}`)
     }
 
     logger?.info('Element exists assertion passed', { selector })
@@ -432,9 +430,7 @@ export async function assertVisible(
     const size = result.size
 
     if (!size || size.width === 0 || size.height === 0) {
-      throw new Error(
-        `Assertion failed: Element is not visible. Size: ${JSON.stringify(size)}`
-      )
+      throw new Error(`Assertion failed: Element is not visible. Size: ${JSON.stringify(size)}`)
     }
 
     logger?.info('Visible assertion passed', { refId, size })

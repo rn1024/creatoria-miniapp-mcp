@@ -18,12 +18,8 @@ describe('Snapshot Tools', () => {
   beforeEach(() => {
     const mockOutputManager = {
       ensureOutputDir: jest.fn().mockResolvedValue(undefined),
-      generateFilename: jest.fn(
-        (prefix: string, ext: string) => `${prefix}-${Date.now()}.${ext}`
-      ),
-      writeFile: jest.fn((filename: string) =>
-        Promise.resolve(`/tmp/test-output/${filename}`)
-      ),
+      generateFilename: jest.fn((prefix: string, ext: string) => `${prefix}-${Date.now()}.${ext}`),
+      writeFile: jest.fn((filename: string) => Promise.resolve(`/tmp/test-output/${filename}`)),
     }
 
     mockSession = {
@@ -48,19 +44,17 @@ describe('Snapshot Tools', () => {
 
   describe('snapshotPage', () => {
     it('should capture page snapshot with screenshot', async () => {
-      (miniprogramTools.getPageStack as jest.Mock).mockResolvedValue({
+      ;(miniprogramTools.getPageStack as jest.Mock).mockResolvedValue({
         success: true,
         pages: [
           { path: 'pages/index/index', query: {} },
           { path: 'pages/detail/detail', query: { id: '123' } },
         ],
       })
-
       ;(pageTools.getData as jest.Mock).mockResolvedValue({
         success: true,
         data: { count: 5, items: [] },
       })
-
       ;(miniprogramTools.screenshot as jest.Mock).mockResolvedValue({
         success: true,
         path: '/tmp/test-output/page-snapshot-123.png',
@@ -83,11 +77,10 @@ describe('Snapshot Tools', () => {
     })
 
     it('should capture page snapshot without screenshot', async () => {
-      (miniprogramTools.getPageStack as jest.Mock).mockResolvedValue({
+      ;(miniprogramTools.getPageStack as jest.Mock).mockResolvedValue({
         success: true,
         pages: [{ path: 'pages/index/index', query: {} }],
       })
-
       ;(pageTools.getData as jest.Mock).mockResolvedValue({
         success: true,
         data: { text: 'Hello' },
@@ -104,16 +97,14 @@ describe('Snapshot Tools', () => {
     })
 
     it('should support custom filename', async () => {
-      (miniprogramTools.getPageStack as jest.Mock).mockResolvedValue({
+      ;(miniprogramTools.getPageStack as jest.Mock).mockResolvedValue({
         success: true,
         pages: [{ path: 'pages/index/index', query: {} }],
       })
-
       ;(pageTools.getData as jest.Mock).mockResolvedValue({
         success: true,
         data: {},
       })
-
       ;(miniprogramTools.screenshot as jest.Mock).mockResolvedValue({
         success: true,
         path: '/tmp/test-output/custom-snapshot.png',
@@ -133,13 +124,13 @@ describe('Snapshot Tools', () => {
     it('should fail when no miniProgram connected', async () => {
       const sessionWithoutMP = { ...mockSession, miniProgram: undefined }
 
-      await expect(
-        snapshotTools.snapshotPage(sessionWithoutMP, {})
-      ).rejects.toThrow('MiniProgram not connected')
+      await expect(snapshotTools.snapshotPage(sessionWithoutMP, {})).rejects.toThrow(
+        'MiniProgram not connected'
+      )
     })
 
     it('should fail when no active page', async () => {
-      (miniprogramTools.getPageStack as jest.Mock).mockResolvedValue({
+      ;(miniprogramTools.getPageStack as jest.Mock).mockResolvedValue({
         success: true,
         pages: [],
       })
@@ -152,14 +143,13 @@ describe('Snapshot Tools', () => {
 
   describe('snapshotFull', () => {
     it('should capture full application snapshot', async () => {
-      (miniprogramTools.getSystemInfo as jest.Mock).mockResolvedValue({
+      ;(miniprogramTools.getSystemInfo as jest.Mock).mockResolvedValue({
         success: true,
         systemInfo: {
           platform: 'devtools',
           version: '8.0.0',
         },
       })
-
       ;(miniprogramTools.getPageStack as jest.Mock).mockResolvedValue({
         success: true,
         pages: [
@@ -167,12 +157,10 @@ describe('Snapshot Tools', () => {
           { path: 'pages/detail/detail', query: { id: '123' } },
         ],
       })
-
       ;(pageTools.getData as jest.Mock).mockResolvedValue({
         success: true,
         data: { count: 5 },
       })
-
       ;(miniprogramTools.screenshot as jest.Mock).mockResolvedValue({
         success: true,
         path: '/tmp/test-output/app-snapshot-123.png',
@@ -198,16 +186,14 @@ describe('Snapshot Tools', () => {
     })
 
     it('should capture full snapshot without screenshot', async () => {
-      (miniprogramTools.getSystemInfo as jest.Mock).mockResolvedValue({
+      ;(miniprogramTools.getSystemInfo as jest.Mock).mockResolvedValue({
         success: true,
         systemInfo: { platform: 'devtools' },
       })
-
       ;(miniprogramTools.getPageStack as jest.Mock).mockResolvedValue({
         success: true,
         pages: [{ path: 'pages/index/index', query: {} }],
       })
-
       ;(pageTools.getData as jest.Mock).mockResolvedValue({
         success: true,
         data: {},
@@ -225,9 +211,9 @@ describe('Snapshot Tools', () => {
     it('should fail when no miniProgram connected', async () => {
       const sessionWithoutMP = { ...mockSession, miniProgram: undefined }
 
-      await expect(
-        snapshotTools.snapshotFull(sessionWithoutMP, {})
-      ).rejects.toThrow('MiniProgram not connected')
+      await expect(snapshotTools.snapshotFull(sessionWithoutMP, {})).rejects.toThrow(
+        'MiniProgram not connected'
+      )
     })
   })
 

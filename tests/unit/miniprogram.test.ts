@@ -245,11 +245,7 @@ describe('MiniProgram Tools', () => {
       })
 
       expect(result.success).toBe(true)
-      expect(mockMiniProgram.evaluate).toHaveBeenCalledWith(
-        '(a, b) => a + b',
-        'Hello',
-        ' World'
-      )
+      expect(mockMiniProgram.evaluate).toHaveBeenCalledWith('(a, b) => a + b', 'Hello', ' World')
     })
 
     it('should throw error if miniprogram not connected', async () => {
@@ -321,10 +317,7 @@ describe('MiniProgram Tools', () => {
       const result = await miniprogramTools.screenshot(mockSession)
 
       expect(result.success).toBe(true)
-      expect(mockSession.outputManager?.generateFilename).toHaveBeenCalledWith(
-        'screenshot',
-        'png'
-      )
+      expect(mockSession.outputManager?.generateFilename).toHaveBeenCalledWith('screenshot', 'png')
     })
 
     it('should throw error if miniprogram not connected', async () => {

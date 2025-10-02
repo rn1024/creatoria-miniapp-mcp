@@ -206,8 +206,7 @@ export async function screenshot(
     await outputManager.ensureOutputDir()
 
     // Generate filename if not provided
-    const outputFilename =
-      filename || outputManager.generateFilename('screenshot', 'png')
+    const outputFilename = filename || outputManager.generateFilename('screenshot', 'png')
 
     // Get full path
     const fullPath = await outputManager.writeFile(
@@ -248,9 +247,7 @@ export async function screenshot(
 /**
  * Get current page stack
  */
-export async function getPageStack(
-  session: SessionState
-): Promise<{
+export async function getPageStack(session: SessionState): Promise<{
   success: boolean
   message: string
   pages: Array<{ path: string; query: Record<string, any> }>
@@ -294,9 +291,7 @@ export async function getPageStack(
 /**
  * Get system information
  */
-export async function getSystemInfo(
-  session: SessionState
-): Promise<{
+export async function getSystemInfo(session: SessionState): Promise<{
   success: boolean
   message: string
   systemInfo: any

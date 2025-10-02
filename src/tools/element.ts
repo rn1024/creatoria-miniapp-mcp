@@ -11,7 +11,9 @@ import type { SessionState } from '../types.js'
 function getElement(session: SessionState, refId: string): any {
   const element = session.elements.get(refId)
   if (!element) {
-    throw new Error(`Element not found with refId: ${refId}. Use page_query to get element reference first.`)
+    throw new Error(
+      `Element not found with refId: ${refId}. Use page_query to get element reference first.`
+    )
   }
   return element
 }

@@ -14,8 +14,7 @@ const DEFAULT_PORT = 9420
 /**
  * Default CLI path for macOS
  */
-const DEFAULT_CLI_PATH =
-  '/Applications/wechatwebdevtools.app/Contents/MacOS/cli'
+const DEFAULT_CLI_PATH = '/Applications/wechatwebdevtools.app/Contents/MacOS/cli'
 
 /**
  * Launch WeChat DevTools and connect to miniprogram
@@ -147,9 +146,7 @@ export async function connect(
 /**
  * Disconnect from miniprogram but keep IDE process running
  */
-export async function disconnect(
-  session: SessionState
-): Promise<{
+export async function disconnect(session: SessionState): Promise<{
   success: boolean
   message: string
 }> {
@@ -204,9 +201,7 @@ export async function disconnect(
  * This will disconnect and cleanup all resources
  * The session itself will be deleted by the caller
  */
-export async function close(
-  session: SessionState
-): Promise<{
+export async function close(session: SessionState): Promise<{
   success: boolean
   message: string
 }> {

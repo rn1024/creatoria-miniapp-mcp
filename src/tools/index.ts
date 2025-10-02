@@ -9,8 +9,9 @@
  * - Element (23 tools): Element-level interactions, properties, and subclass operations
  * - Assert (9 tools): Testing and verification utilities
  * - Snapshot (3 tools): State capture and diagnostic utilities
+ * - Record (6 tools): Action recording and replay utilities
  *
- * Total: 53 tools
+ * Total: 59 tools
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
@@ -22,6 +23,7 @@ import * as pageTools from './page.js'
 import * as elementTools from './element.js'
 import * as assertTools from './assert.js'
 import * as snapshotTools from './snapshot.js'
+import * as recordTools from './record.js'
 
 // Tool handler type
 export type ToolHandler = (session: SessionState, args: any) => Promise<any>
@@ -108,7 +110,8 @@ export const AUTOMATOR_TOOL_HANDLERS: Record<string, ToolHandler> = {
 export const MINIPROGRAM_TOOLS: Tool[] = [
   {
     name: 'miniprogram_navigate',
-    description: 'Navigate to a page using various navigation methods (navigateTo, redirectTo, reLaunch, switchTab, navigateBack)',
+    description:
+      'Navigate to a page using various navigation methods (navigateTo, redirectTo, reLaunch, switchTab, navigateBack)',
     inputSchema: {
       type: 'object',
       properties: {
@@ -175,7 +178,8 @@ export const MINIPROGRAM_TOOLS: Tool[] = [
       properties: {
         filename: {
           type: 'string',
-          description: 'Custom filename for the screenshot (optional, auto-generated if not provided)',
+          description:
+            'Custom filename for the screenshot (optional, auto-generated if not provided)',
         },
         fullPage: {
           type: 'boolean',
@@ -1096,6 +1100,106 @@ export const SNAPSHOT_TOOL_HANDLERS: Record<string, ToolHandler> = {
 }
 
 // ============================================================================
+// RECORD TOOLS (Recording & Replay)
+// ============================================================================
+
+export const RECORD_TOOLS: Tool[] = [
+  {
+    name: 'record_start',
+    description: 'Start recording user actions for later replay',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Name for this recording sequence',
+        },
+        description: {
+          type: 'string',
+          description: 'Optional description of what this sequence does',
+        },
+      },
+    },
+  },
+  {
+    name: 'record_stop',
+    description: 'Stop the current recording and save the sequence',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        save: {
+          type: 'boolean',
+          description: 'Whether to save the sequence (default: true)',
+        },
+      },
+    },
+  },
+  {
+    name: 'record_list',
+    description: 'List all saved action sequences',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+    },
+  },
+  {
+    name: 'record_get',
+    description: 'Get details of a specific sequence',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        sequenceId: {
+          type: 'string',
+          description: 'ID of the sequence to retrieve',
+        },
+      },
+      required: ['sequenceId'],
+    },
+  },
+  {
+    name: 'record_delete',
+    description: 'Delete a saved sequence',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        sequenceId: {
+          type: 'string',
+          description: 'ID of the sequence to delete',
+        },
+      },
+      required: ['sequenceId'],
+    },
+  },
+  {
+    name: 'record_replay',
+    description: 'Replay a recorded action sequence',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        sequenceId: {
+          type: 'string',
+          description: 'ID of the sequence to replay',
+        },
+        continueOnError: {
+          type: 'boolean',
+          description: 'Whether to continue replaying if an action fails (default: false)',
+        },
+      },
+      required: ['sequenceId'],
+    },
+  },
+]
+
+export const RECORD_TOOL_HANDLERS: Record<string, ToolHandler> = {
+  record_start: recordTools.startRecording,
+  record_stop: recordTools.stopRecording,
+  record_list: recordTools.listSequences,
+  record_get: recordTools.getSequence,
+  record_delete: recordTools.deleteSequence,
+  record_replay: recordTools.replaySequence,
+}
+
+// ============================================================================
 // TOOL CATEGORIES
 // ============================================================================
 
@@ -1136,6 +1240,12 @@ export const TOOL_CATEGORIES: Record<string, ToolCategory> = {
     tools: SNAPSHOT_TOOLS,
     handlers: SNAPSHOT_TOOL_HANDLERS,
   },
+  record: {
+    name: 'Record',
+    description: 'Action recording and replay utilities (6 tools)',
+    tools: RECORD_TOOLS,
+    handlers: RECORD_TOOL_HANDLERS,
+  },
 }
 
 // ============================================================================
@@ -1149,6 +1259,7 @@ export const CORE_TOOLS: Tool[] = [
   ...ELEMENT_TOOLS,
   ...ASSERT_TOOLS,
   ...SNAPSHOT_TOOLS,
+  ...RECORD_TOOLS,
 ]
 
 export const CORE_TOOL_HANDLERS: Record<string, ToolHandler> = {
@@ -1158,6 +1269,7 @@ export const CORE_TOOL_HANDLERS: Record<string, ToolHandler> = {
   ...ELEMENT_TOOL_HANDLERS,
   ...ASSERT_TOOL_HANDLERS,
   ...SNAPSHOT_TOOL_HANDLERS,
+  ...RECORD_TOOL_HANDLERS,
 }
 
 // ============================================================================
@@ -1177,7 +1289,7 @@ export function validateToolRegistration(): { valid: boolean; errors: string[] }
   }
 
   for (const handlerName in CORE_TOOL_HANDLERS) {
-    const hasTool = CORE_TOOLS.some(t => t.name === handlerName)
+    const hasTool = CORE_TOOLS.some((t) => t.name === handlerName)
     if (!hasTool) {
       errors.push(`Handler without tool definition: ${handlerName}`)
     }
@@ -1202,6 +1314,7 @@ export function getToolStats() {
       element: ELEMENT_TOOLS.length,
       assert: ASSERT_TOOLS.length,
       snapshot: SNAPSHOT_TOOLS.length,
+      record: RECORD_TOOLS.length,
     },
     handlers: Object.keys(CORE_TOOL_HANDLERS).length,
   }
@@ -1211,7 +1324,7 @@ export function getToolStats() {
  * Get tool by name
  */
 export function getToolByName(name: string): Tool | undefined {
-  return CORE_TOOLS.find(t => t.name === name)
+  return CORE_TOOLS.find((t) => t.name === name)
 }
 
 /**
@@ -1235,10 +1348,7 @@ export interface ToolRegistrationOptions {
  * Register tools based on enabled capabilities
  * This function actually registers the tool handlers with the MCP server
  */
-export function registerTools(
-  server: Server,
-  options: ToolRegistrationOptions
-): Tool[] {
+export function registerTools(server: Server, options: ToolRegistrationOptions): Tool[] {
   const { capabilities = ['core'], getSession, deleteSession } = options
 
   const tools: Tool[] = []
@@ -1248,7 +1358,7 @@ export function registerTools(
   const validation = validateToolRegistration()
   if (!validation.valid) {
     console.error('Tool registration validation failed:')
-    validation.errors.forEach(err => console.error(`  - ${err}`))
+    validation.errors.forEach((err) => console.error(`  - ${err}`))
     throw new Error('Tool registration validation failed')
   }
 
