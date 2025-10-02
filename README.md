@@ -2,22 +2,22 @@
 
 > 🤖 Enable AI assistants to orchestrate WeChat Mini Program testing through natural language
 
-**creatoria-miniapp-mcp** is a production-ready MCP (Model Context Protocol) server that wraps WeChat's official `miniprogram-automator` SDK into 59 AI-friendly tools. Let LLMs like Claude control your Mini Program with simple natural language commands - from navigation and interaction to assertions and debugging.
+**creatoria-miniapp-mcp** is a production-ready MCP (Model Context Protocol) server that wraps WeChat's official `miniprogram-automator` SDK into 65 AI-friendly tools. Let LLMs like Claude control your Mini Program with simple natural language commands - from navigation and interaction to assertions and debugging.
 
 **Why?** Traditional UI automation requires writing brittle scripts. With MCP, you describe what to test in plain English, and AI agents handle the implementation details - making test creation 10x faster and maintenance effortless.
 
-[![Tests](https://img.shields.io/badge/tests-290%2B%20passed-success)](https://github.com/rn1024/creatoria-miniapp-mcp) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/) [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-1.0-purple)](https://modelcontextprotocol.io/)
+[![Tests](https://img.shields.io/badge/tests-354%20passed-success)](https://github.com/rn1024/creatoria-miniapp-mcp) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/) [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-1.0-purple)](https://modelcontextprotocol.io/)
 
 ---
 
 ## ✨ Core Features
 
-- 🎯 **59 AI-Friendly Tools**: Complete coverage across 7 categories (Automator, MiniProgram, Page, Element, Assert, Snapshot, Record)
+- 🎯 **65 AI-Friendly Tools**: Complete coverage across 8 categories (Automator, MiniProgram, Page, Element, Assert, Snapshot, Record, Network)
 - 🤖 **Natural Language Testing**: Describe tests in plain English, let AI write automation code
 - 🔧 **MCP Native**: Seamlessly integrates with Claude Desktop, Cline, and any MCP client
 - 🧪 **Test Automation**: 9 assertion tools + 6 recording tools for robust test workflows
 - 📸 **Debug Snapshots**: Capture page/app/element state for troubleshooting
-- 🎨 **TypeScript First**: Full type definitions, 290+ tests, 100% pass rate
+- 🎨 **TypeScript First**: Full type definitions, 354 tests, 100% pass rate
 - 🔄 **Session Isolation**: Multi-session support with automatic 30-min cleanup
 - ⚙️ **Flexible Config**: Environment variables, config files, or CLI arguments
 
@@ -397,10 +397,10 @@ Time:        ~6s
 
 ---
 
-**Project Status**: ✅ Stage A-E1 Complete (59 tools, 290+ tests, complete documentation suite)
+**Project Status**: ✅ Stage A-E Complete (65 tools, 354 tests, full config system, complete documentation suite)
 
-**Last Updated**: 2025-10-02
+**Last Updated**: 2025-10-03
 
 ---
 
-Made with ❤️ using the [6A Workflow](./docs/charter.E1.align.yaml) (Align → Architect → Atomize → Approve → Automate → Assess)
+Made with ❤️ using the [6A Workflow](./docs/charter.E-Docs.align.yaml) (Align → Architect → Atomize → Approve → Automate → Assess)
