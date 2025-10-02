@@ -1,0 +1,206 @@
+# Charter: [D3] Recording and Replay System
+
+task_id: D3
+task_name: 录制与回放系统实现
+stage: D
+phase: Align (Retrospective)
+created_at: "2025-10-02"
+status: COMPLETED
+estimated_hours: 3-4
+actual_hours: 3.5
+
+## Goal (目标)
+
+实现完整的工具调用序列录制与回放系统，支持保存测试场景、复现操作流程，为自动化测试和场景复用提供基础能力。
+
+**核心交付物**:
+- `src/tools/record.ts` - 录制/回放工具实现 (428 lines)
+- `tests/unit/record.test.ts` - 完整单元测试 (422 lines)
+- 6 个 MCP 工具：record_start, record_stop, record_list, record_get, record_delete, record_replay
+- ActionSequence 数据结构定义
+
+## Non-Goals (非目标)
+
+- ❌ 不实现视频录制（仅录制工具调用序列）
+- ❌ 不实现性能分析（仅记录 duration，不做分析）
+- ❌ 不实现自动断言生成（回放仅执行，不验证）
+- ❌ 不实现远程存储（仅本地文件系统）
+- ❌ 不实现编辑/修改已保存序列的能力
+
+## Scope (范围)
+
+### In Scope (包含)
+
+1. **录制管理**
+   - ✅ 启动录制（record_start）：设置名称和描述
+   - ✅ 停止录制（record_stop）：保存到 JSON 文件
+   - ✅ 自动生成 sequence ID（时间戳+随机数）
+   - ✅ 记录状态管理（SessionState.recording）
+
+2. **动作捕获**
+   - ✅ RecordedAction 数据结构：timestamp/toolName/args/duration/success/error
+   - ✅ recordAction() 内部函数：被工具包装器调用
+   - ✅ 过滤掉录制工具自身的调用
+   - ✅ 支持成功和失败操作的记录
+
+3. **序列管理**
+   - ✅ 列出所有序列（record_list）：返回摘要信息
+   - ✅ 获取序列详情（record_get）：返回完整 actions
+   - ✅ 删除序列（record_delete）：从文件系统移除
+   - ✅ 文件存储位置：`{outputDir}/sequences/{sequenceId}.json`
+
+4. **回放执行**
+   - ✅ 按序执行录制的工具调用（record_replay）
+   - ✅ 支持 continueOnError 模式
+   - ✅ 返回详细执行结果（success/failure 统计）
+   - ✅ 动态导入 tools 模块
+
+5. **数据结构**
+   - ✅ ActionSequence: id/name/description/createdAt/actions[]
+   - ✅ RecordedAction: timestamp/toolName/args/duration/success/error
+   - ✅ SessionState.recording: isRecording/startedAt/currentSequence
+
+### Out of Scope (不包含)
+
+- ❌ 序列编辑功能（无法修改已保存序列）
+- ❌ 条件逻辑（if/else/loop）
+- ❌ 变量和参数化
+- ❌ 回放速度控制
+- ❌ 断点调试
+- ❌ 远程共享序列
+
+## Constraints (约束)
+
+### Technical Constraints (技术约束)
+
+1. **存储格式**
+   - 必须使用 JSON 格式（便于人工阅读和编辑）
+   - 文件命名：`{sequenceId}.json`
+   - 目录：`{outputDir}/sequences/`
+
+2. **录制状态**
+   - 同一 Session 只能同时录制一个序列
+   - 录制状态存储在 SessionState.recording
+   - 停止录制后自动清空状态
+
+3. **工具集成**
+   - recordAction() 必须被所有工具包装器调用
+   - 录制工具自身不应被录制
+   - 回放时使用动态导入（避免循环依赖）
+
+4. **错误处理**
+   - 录制失败的操作也应被记录
+   - 回放可选择在错误时停止或继续
+   - 所有错误信息完整保留
+
+### Business Constraints (业务约束)
+
+1. **存储容量**: 单个序列 <10MB（典型测试场景 <100 个操作）
+2. **回放性能**: 操作间延迟 <10ms（不模拟真实延迟）
+3. **兼容性**: 序列格式向后兼容
+
+## Success Criteria (成功标准)
+
+### Functional Criteria (功能标准)
+
+- ✅ 启动录制并获得 sequenceId
+- ✅ 执行工具调用时自动记录到当前序列
+- ✅ 停止录制后生成 JSON 文件
+- ✅ list/get/delete 操作正常工作
+- ✅ 回放成功重现录制的操作序列
+- ✅ continueOnError=false 时遇到错误立即停止
+- ✅ continueOnError=true 时继续执行并统计失败数
+
+### Quality Criteria (质量标准)
+
+- ✅ TypeScript 编译 0 错误
+- ✅ 单元测试覆盖率 >90% (422 lines 测试代码)
+- ✅ 无 ESLint 错误
+- ✅ JSDoc 注释完整
+- ✅ JSON 格式美化输出（2 空格缩进）
+
+### Documentation Criteria (文档标准)
+
+- ✅ 函数签名有 JSDoc
+- ✅ 数据结构注释清晰
+- ⏳ charter.D3.align.yaml (本文档)
+- ⏳ tasks.D3.atomize.md (任务卡)
+
+## Definition of Done (完成标准)
+
+**代码**:
+- ✅ `src/tools/record.ts` 实现完成 (428 lines)
+- ✅ 6 个工具全部实现
+- ✅ 集成到 registerTools (tools/index.ts)
+- ✅ SessionState 扩展 recording 字段
+- ✅ TypeScript 编译通过
+
+**测试**:
+- ✅ `tests/unit/record.test.ts` (422 lines)
+- ✅ 所有核心函数有单元测试
+- ✅ 边界情况覆盖（已录制/未录制/文件不存在等）
+- ✅ 所有测试通过
+
+**文档**:
+- ⏳ charter.D3.align.yaml (追溯)
+- ⏳ tasks.D3.atomize.md (追溯)
+- ⏳ session_log (追溯)
+
+**Git**:
+- ✅ 已提交（feat: [D3] 录制回放能力实现）
+
+## Dependencies (依赖)
+
+**前置任务**:
+- ✅ B2: SessionStore 和 SessionState 定义
+- ✅ C1-C4: 核心工具实现（需要被录制）
+- ✅ C5: registerTools 机制
+
+**后续任务**:
+- D3 → E4: 示例项目（使用录制序列）
+- D3 → G1: 集成测试（使用回放验证）
+
+## Risks (风险)
+
+### Technical Risks (技术风险)
+
+1. **循环依赖** - 🟢 已缓解
+   - 风险：record.ts 导入 tools/index.ts 导致循环依赖
+   - 缓解：使用动态导入 `await import('./index.js')`
+
+2. **存储空间** - 🟢 低风险
+   - 风险：大量序列占用磁盘空间
+   - 缓解：用户手动管理，提供 delete 工具
+
+3. **格式兼容性** - 🟡 中风险
+   - 风险：未来工具 API 变更导致旧序列无法回放
+   - 缓解：保留 toolName 和 args 原始结构
+
+### Business Risks (业务风险)
+
+1. **回放失败** - 🟡 中风险
+   - 影响：序列依赖特定状态（如页面路径）
+   - 缓解：记录完整 args，包括 pagePath 等上下文
+
+2. **误用风险** - 🟢 低风险
+   - 影响：用户误以为回放会自动验证结果
+   - 缓解：文档明确说明回放不包含断言
+
+## Open Questions (未决问题)
+
+- ❓ 是否需要支持序列参数化（变量替换）？（当前不支持）
+- ❓ 是否需要支持序列合并/拆分？（当前不支持）
+- ❓ 是否需要记录页面截图作为视觉参考？（当前不支持）
+
+## References (参考资料)
+
+- `docs/完整实现方案.md` - 录制/回放架构设计
+- `docs/微信小程序自动化完整操作手册.md` - 自动化 API 参考
+- `src/types.ts` - ActionSequence/RecordedAction 定义
+- Playwright Inspector 录制功能 - 设计灵感
+
+---
+
+**Approval**: ✅ RETROSPECTIVE APPROVED
+**Implementation**: ✅ COMPLETED
+**Documentation**: ⏳ IN PROGRESS

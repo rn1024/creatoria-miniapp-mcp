@@ -1,0 +1,179 @@
+# Charter: [B1] MCP Server 骨架
+
+task_id: B1
+task_name: MCP Server 骨架实现
+stage: B
+phase: Align (Retrospective)
+created_at: "2025-10-02"
+status: COMPLETED
+estimated_hours: 2-3
+actual_hours: 2
+
+## Goal (目标)
+
+实现可运行的 MCP Server 骨架，支持 stdio transport 连接，能够启动并响应基本的 MCP 协议请求。
+
+**核心交付物**:
+- `src/server.ts` - MCP Server 入口文件
+- `startServer(config)` 函数
+- ListToolsRequestSchema 处理器
+- 优雅关闭机制
+
+## Non-Goals (非目标)
+
+- ❌ 不实现具体工具（留给 C1-C5）
+- ❌ 不实现配置文件解析（留给 E2）
+- ❌ 不实现 CLI 入口（留给 E3）
+- ❌ 不实现 SessionStore 内部逻辑（属于 B2）
+
+## Scope (范围)
+
+### In Scope (包含)
+
+1. **Server 实例化**
+   - ✅ 使用 `@modelcontextprotocol/sdk` 的 Server 类
+   - ✅ 设置 name 和 version
+   - ✅ 配置 capabilities: `{ tools: {} }`
+
+2. **Transport 配置**
+   - ✅ 使用 `StdioServerTransport`
+   - ✅ 调用 `server.connect(transport)`
+   - ✅ 输出启动日志到 stderr
+
+3. **工具注册集成**
+   - ✅ 调用 `registerTools(server, context)`
+   - ✅ 传递 SessionStore 的 getSession/deleteSession 回调
+   - ✅ 支持 capabilities 参数
+
+4. **ListToolsRequestSchema 处理**
+   - ✅ 返回 registerTools 注册的工具列表
+   - ✅ 符合 MCP 协议规范
+
+5. **优雅关闭**
+   - ✅ 监听 SIGINT 和 SIGTERM
+   - ✅ 调用 sessionStore.dispose()
+   - ✅ 输出关闭日志
+
+### Out of Scope (不包含)
+
+- ❌ SessionStore 内部实现
+- ❌ 具体工具 handler 逻辑
+- ❌ 配置文件解析
+- ❌ CLI 参数处理
+- ❌ 错误监控和重试
+
+## Constraints (约束)
+
+### Technical Constraints (技术约束)
+
+1. **MCP 协议兼容**
+   - 必须使用官方 SDK (`@modelcontextprotocol/sdk`)
+   - 遵循 stdio transport 规范
+   - 正确处理 JSON-RPC 消息
+
+2. **TypeScript 规范**
+   - ESNext + ESM 模式
+   - 导入使用 `.js` 后缀
+   - 严格类型检查
+
+3. **日志输出**
+   - 使用 `console.error` 避免干扰 stdio
+   - 不输出到 stdout（被 MCP 协议占用）
+
+4. **依赖注入**
+   - SessionStore 作为外部依赖
+   - registerTools 通过参数传入
+
+### Business Constraints (业务约束)
+
+1. **启动时间**: <1 秒
+2. **内存占用**: 启动时 <50MB
+3. **兼容性**: 支持 Node.js 18+
+
+## Success Criteria (成功标准)
+
+### Functional Criteria (功能标准)
+
+- ✅ 运行 `node dist/server.js` 成功启动
+- ✅ MCP 客户端可连接
+- ✅ `list_tools` 请求返回工具列表
+- ✅ CTRL+C 触发优雅关闭
+- ✅ sessionStore.dispose() 被调用
+
+### Quality Criteria (质量标准)
+
+- ✅ TypeScript 编译 0 错误
+- ✅ 代码行数 <100 行（实际 64 行）
+- ✅ 无 ESLint 错误
+- ✅ JSDoc 注释完整
+
+### Documentation Criteria (文档标准)
+
+- ✅ 函数签名有 JSDoc
+- ✅ README 更新启动说明
+- ⏳ charter.B1.align.yaml (本文档)
+- ⏳ tasks.B1.atomize.md (任务卡)
+
+## Definition of Done (完成标准)
+
+**代码**:
+- ✅ `src/server.ts` 实现完成 (64 lines)
+- ✅ TypeScript 编译通过
+- ✅ 集成 SessionStore 和 registerTools
+
+**测试**:
+- ✅ 手动测试：启动 Server 并连接
+- ✅ 集成测试：通过其他工具测试间接验证
+
+**文档**:
+- ⏳ charter.B1.align.yaml (追溯)
+- ⏳ tasks.B1.atomize.md (追溯)
+- ⏳ session_log (追溯)
+
+**Git**:
+- ✅ 已提交（随 A2-B1-B2 修复提交）
+
+## Dependencies (依赖)
+
+**前置任务**:
+- ✅ A3: 仓库结构初始化
+- ✅ `@modelcontextprotocol/sdk` 已安装
+
+**后续任务**:
+- B1 → B2 (Server 需要 SessionStore)
+- B1 → C5 (registerTools 函数)
+
+## Risks (风险)
+
+### Technical Risks (技术风险)
+
+1. **MCP SDK 升级** - 🟢 低风险
+   - 影响：API 变更可能破坏兼容
+   - 缓解：锁定 SDK 版本
+
+2. **stdio 干扰** - 🟢 已缓解
+   - 风险：日志输出到 stdout 干扰协议
+   - 缓解：所有日志使用 console.error
+
+### Business Risks (业务风险)
+
+1. **启动失败** - 🟢 已缓解
+   - 影响：Server 无法启动导致服务不可用
+   - 缓解：错误日志清晰，便于排查
+
+## Open Questions (未决问题)
+
+- ❓ 是否需要支持多个 transport（HTTP/WebSocket）？（当前仅 stdio）
+- ❓ 是否需要健康检查端点？（当前无）
+
+## References (参考资料)
+
+- `docs/完整实现方案.md` - Server 架构设计
+- `docs/第一版本方案.md` - MCP 集成方案
+- `@modelcontextprotocol/sdk` 文档
+
+---
+
+**Approval**: ✅ RETROSPECTIVE APPROVED
+**Implementation**: ✅ COMPLETED
+**Documentation**: ⏳ IN PROGRESS

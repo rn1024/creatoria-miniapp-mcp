@@ -1,0 +1,294 @@
+# E1: Documentation Enhancement - Project Charter
+
+## Metadata
+task_id: E1
+stage: E - Documentation & Examples
+status: PLANNED
+created: 2025-10-02
+author: Claude Code
+approver: TBD
+
+## 1. Goals (目标)
+
+### Primary Goal (主要目标)
+Complete and polish the project documentation system to ensure developers can quickly understand, configure, and use the MCP server for WeChat Mini Program automation.
+
+完善 creatoria-miniapp-mcp 项目文档，提供清晰的使用指南、API 参考和实际示例，降低新用户上手门槛，提升项目可维护性。
+
+### Success Criteria (成功标准)
+- [ ] README.md provides 5-minute quickstart path
+- [ ] All 59 tools have complete API documentation with examples
+- [ ] At least 5 realistic usage examples covering major scenarios
+- [ ] Troubleshooting guide covers common errors and debugging workflows
+- [ ] Setup guide enables zero-to-running in <15 minutes
+- [ ] Documentation is consistent, searchable, and cross-referenced
+
+### Key Metrics (关键指标)
+- Documentation coverage: 100% of tools (59/59)
+- Example coverage: 5+ realistic scenarios
+- Quickstart completion time: <5 minutes (first run)
+- Setup completion time: <15 minutes (environment + config)
+
+## 2. Non-Goals (非目标)
+
+- ❌ Multi-language documentation (English/Chinese only, not other languages)
+- ❌ Interactive documentation website (Markdown files only for E1)
+- ❌ Video tutorials or screencasts (defer to Stage F)
+- ❌ Auto-generated API docs from TypeScript types (manual curation for now)
+- ❌ Migration guides from other automation frameworks
+- ❌ Performance benchmarking documentation
+- ❌ Advanced architecture deep-dives (keep in ADRs)
+
+## 3. Scope (范围)
+
+### In Scope
+
+#### 3.1 README.md Enhancement
+- **Current State**: Basic structure exists with installation and configuration sections
+- **Target State**:
+  - Hero section with value proposition
+  - Quickstart (<5 minutes to first successful command)
+  - Core features overview (59 tools categorized into 7 groups)
+  - 3 inline code examples (navigation, interaction, assertion)
+  - Clear navigation to detailed docs
+  - Badges (CI status, license, version)
+
+#### 3.2 API Documentation (docs/api/)
+- **Current State**: Framework exists with README + category files (placeholders)
+- **Target State**:
+  - `docs/api/README.md`: Tool catalog + basic workflows
+  - `docs/api/automator.md`: 4 tools (launch, connect, disconnect, close)
+  - `docs/api/miniprogram.md`: 6 tools (navigate, evaluate, screenshot, etc.)
+  - `docs/api/page.md`: 8 tools (query, data, wait, scroll, etc.)
+  - `docs/api/element.md`: 23 tools (attributes, interactions, component methods)
+  - `docs/api/assert.md`: 9 tools (exists, text, attribute, data, etc.)
+  - `docs/api/snapshot.md`: 3 tools (capture, restore, compare)
+  - `docs/api/record.md`: 6 tools (start, stop, save, replay, etc.)
+
+  **Format per tool**: Function description, parameters (with types), return value, code example, usage notes, common errors
+
+#### 3.3 Usage Examples (examples/)
+- **Current State**: `01-basic-navigation.md` exists (created previously)
+- **Target State**: 5+ examples covering:
+  1. ✅ `01-basic-navigation.md` (existing - review/enhance)
+  2. `02-element-interaction.md` (tap, input, swiper, scroll, picker)
+  3. `03-assertion-testing.md` (automated test workflow with asserts)
+  4. `04-snapshot-debugging.md` (capture/restore state for debugging)
+  5. `05-record-replay.md` (record user flow, replay for regression testing)
+  6. (Optional) `06-e2e-shopping.md` (complete shopping cart flow)
+
+  **Format**: Scenario description, prerequisites, step-by-step code with explanations, expected output, troubleshooting tips
+
+#### 3.4 Troubleshooting Guide (docs/troubleshooting.md)
+- **Current State**: File exists with basic structure
+- **Target State**:
+  - **FAQ Section**: Top 10-15 common questions
+  - **Error Reference**: Categorized by source (Automator, MCP, Network, Configuration)
+  - **Debugging Workflows**: Step-by-step diagnostic procedures
+  - **Best Practices**: Performance, reliability, maintainability tips
+  - **Common Pitfalls**: Element resolution, page state, timing issues
+
+#### 3.5 Setup Guide (docs/setup-guide.md)
+- **Current State**: File exists with basic installation steps
+- **Target State**:
+  - **Environment Requirements**: Detailed version requirements (Node, WeChat DevTools, OS)
+  - **WeChat DevTools Setup**: Automation port configuration, security settings
+  - **MCP Client Configuration**: Claude Desktop, Cline, custom clients
+  - **Verification Steps**: How to confirm everything is working
+  - **Configuration Options**: All .mcp.json options explained
+  - **Common Setup Issues**: Permission errors, port conflicts, path issues
+
+#### 3.6 Contributing Guide (CONTRIBUTING.md)
+- **Current State**: File exists
+- **Target State**:
+  - **6A Workflow**: Detailed explanation of Align/Architect/Atomize/Approve/Automate/Assess
+  - **Development Environment**: Setup, tools, commands
+  - **Code Standards**: TypeScript, testing, documentation conventions
+  - **Tool Development**: How to add new tools, register, test, document
+  - **PR Process**: Branch strategy, commit conventions, review checklist
+
+### Out of Scope (for E1)
+- Translation to languages other than English/Chinese
+- Interactive API playground
+- Auto-generated docs from code (revisit in Stage F)
+- Migration guides from Playwright/Cypress
+- Video/screencast tutorials (defer to Stage F)
+
+## 4. Context & Background (背景)
+
+### Current Documentation State
+```
+✅ Exists with content:
+  - README.md (basic structure)
+  - docs/api/README.md (framework)
+  - docs/api/*.md (category files with placeholders)
+  - examples/01-basic-navigation.md
+  - docs/troubleshooting.md (basic structure)
+  - docs/setup-guide.md (basic steps)
+  - CONTRIBUTING.md (exists)
+
+❌ Needs enhancement:
+  - All API docs need complete tool documentation (59 tools)
+  - Need 4+ additional examples
+  - Troubleshooting needs FAQ and error reference
+  - Setup guide needs detailed configuration explanations
+  - README needs quickstart and inline examples
+  - CONTRIBUTING needs 6A workflow documentation
+```
+
+### Implementation Context
+- Stage D2 (Snapshot capabilities) completed
+- All 59 tools are implemented and tested (290+ tests passing)
+- ElementRef protocol is stable
+- SessionStore and OutputManager are production-ready
+- MCP server is functional end-to-end
+- Record tools implemented in Stage D2
+
+### User Personas
+1. **New Users**: Need quickstart and simple examples
+2. **Integration Developers**: Need complete API reference
+3. **Test Engineers**: Need assertion and recording examples
+4. **Troubleshooters**: Need error reference and debugging guides
+5. **Contributors**: Need development workflow documentation
+
+## 5. Constraints & Assumptions (约束与假设)
+
+### Constraints
+- Documentation must be Markdown-based (portable, version-controlled)
+- Examples must be runnable or clearly fictional with explanations
+- API docs must stay synchronized with code (manual update protocol in CONTRIBUTING.md)
+- All code examples must use TypeScript/JavaScript (no other languages)
+- Documentation size: Keep individual files <2000 lines for readability
+- Bilingual support: English and Chinese (mixed is acceptable)
+
+### Assumptions
+- Readers have basic WeChat Mini Program knowledge
+- Readers understand MCP protocol basics (or can reference MCP docs)
+- Example code doesn't need to be copy-pastable (conceptual clarity prioritized)
+- Manual documentation maintenance is acceptable for now (no auto-generation)
+- Most users will access docs via GitHub (Markdown rendering)
+
+### Dependencies
+- Stage D completion (all 59 tools implemented)
+- Access to tool schemas and type definitions (src/tools/)
+- Understanding of ElementRef protocol (src/core/element-ref.ts)
+- Knowledge of SessionStore lifecycle (src/core/session-store.ts)
+- Test files as source of usage examples (tests/unit/)
+
+## 6. Risks & Mitigation (风险与缓解)
+
+### Risks
+
+| Risk | Impact | Probability | Mitigation |
+|------|--------|-------------|------------|
+| Documentation becomes outdated as code evolves | High | Medium | Establish update protocol in CONTRIBUTING.md, add checklist to PR template |
+| Examples don't match user scenarios | Medium | Medium | Base on test files, collect feedback, iterate |
+| API docs too technical for beginners | Medium | Low | Add beginner-friendly intro sections, progressive disclosure |
+| Inconsistent formatting across docs | Low | Medium | Create documentation template, review all docs for consistency |
+| Missing error codes in troubleshooting | Medium | Low | Cross-reference miniprogram-automator errors, add placeholders |
+| Work underestimated | Medium | Medium | Focus on core content, avoid over-polishing |
+
+### Open Questions
+1. **API Documentation Generation**: Should we invest in auto-generation from Zod schemas, or maintain manually?
+   - **Current Decision**: Manual for E1 (faster), revisit automation in Stage F
+
+2. **Example Code Verification**: Do we need a test suite that validates example code?
+   - **Decision Needed**: Defer to E2 or Stage G
+
+3. **Documentation Site**: Should we use VitePress/Docusaurus for better UX?
+   - **Current Decision**: Markdown files only for E1 (simplicity), revisit in Stage G
+
+4. **Localization Strategy**: Should we maintain separate EN/CN files or mixed?
+   - **Current Decision**: Mixed bilingual (headers in both languages) for critical docs
+
+5. **Example Mini Program**: Do we need a dedicated demo project?
+   - **Decision Needed**: Check if existing test project can serve this purpose
+
+## 7. Success Definition (完成标准)
+
+### Definition of Done (DoD)
+- [ ] README.md updated with quickstart, examples, and navigation
+- [ ] All 59 tools documented in docs/api/ with required format (function, params, return, example, notes, errors)
+- [ ] 5+ usage examples created in examples/ directory
+- [ ] docs/troubleshooting.md includes FAQ (10+ items), error reference (20+ codes), debugging workflows (3+ scenarios)
+- [ ] docs/setup-guide.md covers environment requirements, DevTools config, MCP client setup, verification steps
+- [ ] docs/architecture.md created with system overview, design decisions
+- [ ] CONTRIBUTING.md enhanced with 6A workflow, tool development guide
+- [ ] All documentation cross-referenced (internal links working)
+- [ ] Documentation reviewed for consistency, clarity, and completeness
+- [ ] All new/updated files committed to git with proper commit message
+
+### Acceptance Tests
+1. **Quickstart Test**: New user can run first automation command in <5 minutes following README
+2. **API Lookup Test**: Developer can find tool documentation and example for any of 59 tools in <2 minutes
+3. **Example Test**: User can understand and adapt example code for their scenario in <10 minutes
+4. **Troubleshooting Test**: User encountering error can find solution in troubleshooting.md in <5 minutes
+5. **Setup Test**: New user can configure environment end-to-end in <15 minutes following setup-guide.md
+
+### Evidence Collection
+- Screenshots of rendered Markdown in GitHub
+- Feedback from 2+ external reviewers (if available)
+- Checklist completion for all DoD items
+- Git commit log showing all documentation updates
+- Session log documenting work performed
+
+## 8. Timeline & Effort (时间与工作量)
+
+### Estimated Effort
+- README enhancement: 30 minutes
+- API documentation (59 tools): 2-3 hours (3-4 minutes per tool)
+- Usage examples (4 new + 1 enhancement): 2 hours (30 minutes each)
+- Troubleshooting enhancement: 1 hour
+- Setup guide enhancement: 30 minutes
+- Architecture document: 45 minutes
+- CONTRIBUTING enhancement: 30 minutes
+- Cross-referencing and review: 1 hour
+- **Total**: 7-9 hours
+
+### Phasing (分阶段执行)
+- **Phase 1** (2 hours): README + Setup Guide + Architecture (unblock new users)
+- **Phase 2** (3 hours): API Documentation (reference completion)
+- **Phase 3** (2 hours): Examples (learning materials)
+- **Phase 4** (1.5 hours): Troubleshooting + CONTRIBUTING + Review
+
+### Blockers
+- None identified (all dependencies complete)
+
+## 9. Stakeholders & Communication (相关方与沟通)
+
+### Stakeholders
+- **Primary**: Project maintainers (documentation owners)
+- **Secondary**: Future contributors (need clear docs to contribute)
+- **Tertiary**: End users (developers using the MCP server)
+
+### Communication Plan
+- Commit messages reference E1 task
+- Update .llm/state.json with progress
+- Create .llm/qa/E1-acceptance.md with evidence
+- Session log in .llm/session_log/ if work spans multiple sessions
+
+## 10. References (参考文档)
+
+### Related Documents
+- `docs/完整实现方案.md`: Original architecture
+- `docs/微信小程序自动化完整操作手册.md`: Source of truth for tool capabilities
+- `.llm/prompts/task.cards.md`: E1 task definition
+- `CONTRIBUTING.md`: Documentation contribution guidelines (to be enhanced)
+- `docs/charter.e1.align.yaml`: Original Chinese charter (superseded by this)
+- `docs/architecture.e1.md`: Original Chinese architecture (superseded by architecture.E1.md)
+
+### External References
+- MCP Protocol Documentation: https://modelcontextprotocol.io/
+- WeChat Mini Program Docs: https://developers.weixin.qq.com/miniprogram/dev/framework/
+- Markdown Style Guide: https://www.markdownguide.org/
+- GitHub Flavored Markdown: https://github.github.com/gfm/
+
+---
+
+**Approval Required**: YES (Align stage requires explicit approval before Atomize)
+
+**Next Steps After Approval**:
+1. Create `docs/tasks.E1.atomize.md` (break into implementation tasks)
+2. Proceed to Atomize stage (detailed task breakdown)
+3. Update `.llm/state.json` with E1 APPROVED status
+4. Begin implementation with Phase 1 (README + Setup Guide + Architecture)

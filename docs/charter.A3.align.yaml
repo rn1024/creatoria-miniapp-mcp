@@ -1,0 +1,242 @@
+# Charter: A3 - 建立基础目录结构与 TypeScript 工程
+# Task ID: TASK-2025-001-A3
+# Stage: Align (对齐阶段)
+# Status: RETROSPECTIVE (追溯补齐)
+# Created: 2025-10-02 (追溯)
+
+---
+
+## Goal (目标)
+
+建立完整的 TypeScript 项目结构，包括源代码目录、文档目录、测试目录和示例目录，配置现代化的 TypeScript 编译环境，为后续 MCP Server 开发提供坚实的工程基础。
+
+## Background (背景)
+
+作为 MCP Server 项目的基础设施准备阶段的最后一步，A3 任务需要建立标准的 TypeScript 项目结构。这个结构将支持：
+
+1. 清晰的代码组织（源代码、测试、文档、示例分离）
+2. TypeScript 严格类型检查和现代化特性
+3. 声明文件生成（支持其他项目引用）
+4. 测试框架集成（Jest）
+5. 版本控制配置（Git）
+
+## Scope (范围)
+
+### In Scope (范围内)
+
+- ✅ 创建 4 个核心目录结构
+  - `src/` - 源代码目录（包含子目录 tools/, core/, config/）
+  - `docs/` - 文档目录（任务卡、指南、API 文档等）
+  - `tests/` - 测试目录（unit/, integration/ 子目录）
+  - `examples/` - 示例目录（使用示例和脚本）
+
+- ✅ 配置 TypeScript 工程
+  - `tsconfig.json` - TypeScript 编译配置
+  - 严格模式（strict: true）
+  - ESNext 目标和模块系统
+  - 声明文件生成（declaration: true）
+  - Source Map 支持（sourceMap: true）
+  - Path 别名配置（@/* 映射到 src/*）
+
+- ✅ 配置 package.json
+  - TypeScript 依赖（typescript ^5.5.2）
+  - 类型定义（@types/node, @types/jest）
+  - 构建脚本（build, dev, typecheck）
+  - 模块类型（"type": "module" for ESM）
+
+- ✅ 配置测试框架
+  - `jest.config.js` - Jest 测试配置
+  - ts-jest 转换器
+  - 测试环境配置
+
+- ✅ 配置版本控制
+  - `.gitignore` - Git 忽略规则
+  - 排除 node_modules/, dist/, *.log 等
+
+### Out of Scope (范围外)
+
+- ❌ ESLint/Prettier 配置（属于 A4 任务）
+- ❌ Husky/Git Hooks（属于 A4 任务）
+- ❌ 实际业务代码实现（属于 Stage B-G）
+- ❌ 示例小程序项目（用户使用自己的项目）
+- ❌ CI/CD 配置（属于 Stage H）
+
+## Constraints (约束条件)
+
+### Technical Constraints (技术约束)
+
+- **TypeScript 版本**: 5.5.2
+  - 理由: 最新稳定版，支持最新语言特性
+  - 验证: package.json devDependencies
+
+- **模块系统**: ESNext (ES Modules)
+  - 理由: 现代化模块系统，Node.js 18+ 原生支持
+  - 验证: tsconfig.json module: "ESNext", package.json type: "module"
+
+- **编译目标**: ESNext
+  - 理由: Node.js 18+ 支持最新 ECMAScript 特性
+  - 验证: tsconfig.json target: "ESNext"
+
+- **严格模式**: 必须启用
+  - 理由: 确保类型安全，减少运行时错误
+  - 验证: tsconfig.json strict: true
+
+- **声明文件**: 必须生成
+  - 理由: 支持其他项目引用，提供类型提示
+  - 验证: tsconfig.json declaration: true
+
+- **测试框架**: Jest 29.7.0
+  - 理由: TypeScript 友好，社区成熟，功能完整
+  - 验证: package.json devDependencies
+
+### Business Constraints (业务约束)
+
+- 目录结构必须清晰，便于团队协作
+- 配置必须符合 TypeScript 最佳实践
+- 必须支持增量编译（watch 模式）
+- 必须支持类型检查而不生成文件（typecheck）
+
+## Success Criteria (完成标准 / DoD)
+
+### Deliverables (交付物)
+
+1. ✅ **目录结构**
+   - `src/` 目录存在，包含子目录（tools/, core/, config/）
+   - `docs/` 目录存在，包含文档文件
+   - `tests/` 目录存在，包含子目录（unit/, integration/）
+   - `examples/` 目录存在，包含示例文件
+
+2. ✅ **TypeScript 配置 (tsconfig.json)**
+   - compilerOptions.target: "ESNext"
+   - compilerOptions.module: "ESNext"
+   - compilerOptions.strict: true
+   - compilerOptions.declaration: true
+   - compilerOptions.sourceMap: true
+   - compilerOptions.rootDir: "./src"
+   - compilerOptions.outDir: "./dist"
+   - paths: {"@/*": ["src/*"]}
+   - include: ["src/**/*"]
+   - exclude: ["node_modules", "dist", "tests"]
+
+3. ✅ **Package.json 配置**
+   - dependencies: MCP SDK, commander, zod 等运行时依赖
+   - devDependencies: TypeScript, @types/node, @types/jest
+   - scripts.build: "tsc"
+   - scripts.dev: "tsc --watch"
+   - scripts.typecheck: "tsc --noEmit"
+   - type: "module"
+   - main: "dist/index.js"
+   - bin: {"miniprogram-mcp": "dist/cli.js"}
+
+4. ✅ **Jest 配置 (jest.config.js)**
+   - preset: "ts-jest"
+   - testEnvironment: "node"
+   - 支持 TypeScript 测试文件
+
+5. ✅ **Git 配置 (.gitignore)**
+   - 排除 node_modules/
+   - 排除 dist/
+   - 排除 *.log
+   - 排除 .env
+
+6. ✅ **可执行性验证**
+   - `pnpm build` 成功编译，生成 dist/ 目录
+   - `pnpm typecheck` 通过类型检查，无错误
+   - dist/ 包含 .js, .d.ts, .js.map 文件
+
+### Quality Standards (质量标准)
+
+- **代码组织**: 源代码、测试、文档、示例清晰分离
+- **类型安全**: 严格模式启用，所有代码类型完整
+- **可维护性**: 配置文件简洁，注释清晰
+- **开发体验**: 支持 watch 模式，快速迭代
+
+## Open Questions (开放问题)
+
+以下问题在实施过程中已经决议：
+
+1. **Q**: TypeScript 编译目标选择？
+   - **决议**: ESNext
+   - **理由**: Node.js 18+ 支持最新 ECMAScript 特性，无需降级编译
+   - **来源**: A1 环境要求 Node.js >= 18.0.0
+
+2. **Q**: 模块系统选择 CommonJS 还是 ES Modules？
+   - **决议**: ES Modules (ESNext)
+   - **理由**: 现代化标准，Node.js 18+ 原生支持，MCP SDK 也使用 ESM
+   - **来源**: package.json type: "module"
+
+3. **Q**: 是否启用 TypeScript 严格模式？
+   - **决议**: 启用（strict: true）
+   - **理由**: 提高类型安全，减少运行时错误，符合最佳实践
+   - **来源**: 项目质量要求
+
+4. **Q**: 是否生成声明文件？
+   - **决议**: 生成（declaration: true）
+   - **理由**: 支持其他项目引用，提供类型提示，专业项目标准
+   - **来源**: package.json main 字段指向 dist/index.js
+
+5. **Q**: 测试框架选择？
+   - **决议**: Jest
+   - **理由**: TypeScript 友好（ts-jest），社区成熟，功能完整
+   - **来源**: 业界标准实践
+
+6. **Q**: Path 别名是否需要？
+   - **决议**: 需要（@/* 映射到 src/*）
+   - **理由**: 简化 import 路径，避免 ../../.. 相对路径
+   - **来源**: 开发体验优化
+
+7. **Q**: 是否需要 Source Map？
+   - **决议**: 需要（sourceMap: true, declarationMap: true）
+   - **理由**: 支持调试，错误堆栈指向源代码
+   - **来源**: 开发体验和调试需求
+
+8. **Q**: dist/ 目录是否提交到 Git？
+   - **决议**: 不提交（.gitignore 排除）
+   - **理由**: 编译产物，由 CI/CD 或用户构建生成
+   - **来源**: Git 最佳实践
+
+## Risks (风险)
+
+### Technical Risks (技术风险)
+
+- ⚠️ **TypeScript 版本兼容性**
+  - 影响: 未来版本可能引入 Breaking Changes
+  - 缓解: 锁定主版本号（^5.5.2），定期测试更新
+
+- ⚠️ **ESM 模块系统兼容性**
+  - 影响: 某些老旧依赖可能不支持 ESM
+  - 缓解: 优先选择支持 ESM 的依赖，必要时使用动态 import
+
+- ⚠️ **Path 别名在测试中的支持**
+  - 影响: Jest 需要额外配置才能识别 @/* 别名
+  - 缓解: jest.config.js 配置 moduleNameMapper
+
+- ⚠️ **声明文件生成可能失败**
+  - 影响: 类型不完整时声明文件生成失败
+  - 缓解: 严格模式强制类型完整性
+
+### Process Risks (流程风险)
+
+- ⚠️ **追溯补齐文档**
+  - 影响: 本文档为追溯性创建，非正常 6A 流程
+  - 缓解: 明确标注 RETROSPECTIVE，等待用户批准
+
+## Dependencies (依赖)
+
+- **前置任务**:
+  - A1（环境与基础设施准备）- Node.js, pnpm 已安装
+  - A2（配置 IDE 自动化端口）- DevTools 已配置
+
+- **后续任务**:
+  - A4（Lint/Format/Commit Hooks）- 依赖 A3 的项目结构
+  - B1-B5（核心框架搭建）- 依赖 A3 的 TypeScript 配置
+
+## Approval (批准)
+
+- **Status**: ⏳ 等待用户批准追溯补齐文档
+- **Technical Implementation**: ✅ 已完成（目录结构 + TS 配置 + 测试配置）
+- **Process Compliance**: ❌ 流程违规（跳过 Align/Approve），通过追溯补齐修正
+
+---
+
+**注**: 本文档为追溯性创建，用于补齐 A3 任务的流程文档。技术实现已完成并验证通过（build ✓, typecheck ✓），现等待用户批准追溯补齐的合理性。

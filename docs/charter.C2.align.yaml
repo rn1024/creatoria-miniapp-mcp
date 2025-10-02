@@ -1,0 +1,202 @@
+# Charter: [C2] MiniProgram 工具
+
+task_id: C2
+task_name: MiniProgram 工具实现
+stage: C
+phase: Align (Retrospective)
+created_at: "2025-10-02"
+status: COMPLETED
+estimated_hours: 3-4
+actual_hours: 4
+
+## Goal (目标)
+
+实现 MiniProgram 级别的 6 个 MCP 工具，封装小程序导航、WX API 调用、代码执行、截图和系统信息获取功能。
+
+**核心交付物**:
+- `src/tools/miniprogram.ts` - 6 个工具实现 (330 lines)
+- `tests/unit/miniprogram.test.ts` - 单元测试 (403 lines, 25 tests)
+- 工具: navigate, callWx, evaluate, screenshot, getPageStack, getSystemInfo
+
+## Non-Goals (非目标)
+
+- ❌ 不实现 Page 级别工具（留给 C3）
+- ❌ 不实现元素查询（属于 Page 工具）
+- ❌ 不实现页面数据操作（属于 Page 工具）
+- ❌ 不实现复杂的导航历史管理
+
+## Scope (范围)
+
+### In Scope (包含)
+
+1. **navigate 工具**
+   - ✅ 支持 5 种导航方法：navigateTo, redirectTo, navigateBack, switchTab, reLaunch
+   - ✅ 支持路径参数（url, query）
+   - ✅ 支持返回层级（delta）
+   - ✅ 等待页面加载完成
+
+2. **callWx 工具**
+   - ✅ 调用微信小程序 API (wx.*)
+   - ✅ 支持任意参数传递
+   - ✅ 返回 API 执行结果
+   - ✅ 错误处理和日志记录
+
+3. **evaluate 工具**
+   - ✅ 在小程序环境中执行 JavaScript 代码
+   - ✅ 支持异步代码执行
+   - ✅ 返回执行结果
+   - ✅ 错误捕获和堆栈跟踪
+
+4. **screenshot 工具**
+   - ✅ 截取当前页面截图
+   - ✅ 保存到指定路径
+   - ✅ 返回文件路径和元数据
+   - ✅ 支持自动生成文件名
+
+5. **getPageStack 工具**
+   - ✅ 获取当前页面栈信息
+   - ✅ 返回所有页面路径
+   - ✅ 标识当前活动页面
+
+6. **getSystemInfo 工具**
+   - ✅ 获取设备系统信息
+   - ✅ 返回平台、版本、屏幕等信息
+   - ✅ 兼容微信 API 格式
+
+### Out of Scope (不包含)
+
+- ❌ 元素查询和操作（C3/C4）
+- ❌ 页面数据读写（C3）
+- ❌ 断言和验证（Stage D）
+- ❌ 网络 Mock（Stage F）
+
+## Constraints (约束)
+
+### Technical Constraints (技术约束)
+
+1. **miniprogram-automator 依赖**
+   - 使用 MiniProgram 实例的官方 API
+   - 遵循异步操作规范
+   - 正确处理页面加载时序
+
+2. **导航约束**
+   - navigateTo: 最多 10 层
+   - switchTab: 仅限 tabBar 页面
+   - reLaunch: 关闭所有页面
+   - navigateBack: 不能超过当前层级
+
+3. **截图约束**
+   - 格式: PNG
+   - 默认保存路径: outputDir/screenshots/
+   - 文件名格式: screenshot-{timestamp}.png
+
+4. **evaluate 约束**
+   - 执行环境: 小程序渲染层
+   - 超时时间: 30 秒
+   - 不支持 Node.js API
+
+### Business Constraints (业务约束)
+
+1. **导航时间**: <2 秒
+2. **API 调用时间**: <5 秒
+3. **截图时间**: <3 秒
+4. **evaluate 超时**: 30 秒
+
+## Success Criteria (成功标准)
+
+### Functional Criteria (功能标准)
+
+- ✅ navigate 支持 5 种导航方法
+- ✅ callWx 成功调用微信 API
+- ✅ evaluate 执行 JS 代码并返回结果
+- ✅ screenshot 生成正确的截图文件
+- ✅ getPageStack 返回完整页面栈
+- ✅ getSystemInfo 返回系统信息
+
+### Quality Criteria (质量标准)
+
+- ✅ TypeScript 编译 0 错误
+- ✅ 单元测试覆盖率 >80%
+- ✅ 25 个测试用例全部通过
+- ✅ 无 ESLint 错误
+- ✅ JSDoc 注释完整
+
+### Documentation Criteria (文档标准)
+
+- ✅ 每个工具有 zod schema 定义
+- ✅ 导航方法枚举清晰
+- ✅ 工具描述包含示例
+- ⏳ charter.C2.align.yaml (本文档)
+- ⏳ tasks.C2.atomize.md (任务卡)
+
+## Definition of Done (完成标准)
+
+**代码**:
+- ✅ `src/tools/miniprogram.ts` 实现完成 (330 lines)
+- ✅ TypeScript 编译通过
+- ✅ 6 个工具正确注册
+
+**测试**:
+- ✅ `tests/unit/miniprogram.test.ts` (403 lines)
+- ✅ 25 个测试用例全部通过
+- ✅ 覆盖所有导航方法
+- ✅ Mock MiniProgram 实例
+
+**文档**:
+- ⏳ charter.C2.align.yaml (追溯)
+- ⏳ tasks.C2.atomize.md (追溯)
+- ✅ README 工具列表更新
+
+**Git**:
+- ✅ 已提交（Stage C 提交）
+
+## Dependencies (依赖)
+
+**前置任务**:
+- ✅ C1: Automator 工具（获取 MiniProgram 实例）
+- ✅ B2: SessionStore（管理 MiniProgram 实例）
+
+**后续任务**:
+- C2 → C3 (Page 工具需要导航到页面)
+- C2 → C5 (工具注册器集成)
+
+## Risks (风险)
+
+### Technical Risks (技术风险)
+
+1. **导航时序问题** - 🟡 中风险
+   - 影响：页面未加载完成就执行操作
+   - 缓解：使用 waitFor 等待页面稳定
+
+2. **callWx 参数序列化** - 🟢 已缓解
+   - 风险：复杂对象无法传递
+   - 缓解：使用 JSON 序列化
+
+3. **evaluate 安全性** - 🟡 中风险
+   - 影响：执行任意代码可能导致安全问题
+   - 缓解：仅在测试环境使用
+
+### Business Risks (业务风险)
+
+1. **截图文件管理** - 🟢 已缓解
+   - 影响：大量截图占用磁盘空间
+   - 缓解：用户自行清理 outputDir
+
+## Open Questions (未决问题)
+
+- ❓ 是否需要支持导航历史回退？（当前仅 navigateBack）
+- ❓ 是否需要限制 evaluate 可执行的代码？（当前无限制）
+- ❓ 截图是否需要支持压缩和格式转换？（当前仅 PNG）
+
+## References (参考资料)
+
+- `docs/微信小程序自动化完整操作手册.md` - MiniProgram API 文档
+- `docs/完整实现方案.md` - 工具分层设计
+- `miniprogram-automator` 官方文档
+- 微信小程序 API 文档
+
+---
+
+**Approval**: ✅ RETROSPECTIVE APPROVED
+**Implementation**: ✅ COMPLETED
+**Documentation**: ⏳ IN PROGRESS

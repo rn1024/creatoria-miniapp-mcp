@@ -1,0 +1,227 @@
+# Charter: A4 - 搭建 lint / format / commit hooks
+# Task ID: TASK-2025-001-A4
+# Stage: Align (对齐阶段)
+# Status: RETROSPECTIVE (追溯补齐)
+# Created: 2025-10-02 (追溯)
+
+---
+
+## Goal (目标)
+
+配置代码质量工具（ESLint 和 Prettier）以及可选的 Git 提交钩子（Husky），确保代码风格一致性和基本代码质量标准，为团队协作和代码审查提供自动化保障。
+
+## Background (背景)
+
+代码质量和风格一致性对于团队协作至关重要。A4 任务作为"可选"任务，旨在：
+
+1. 配置 ESLint 进行代码静态检查（类型安全、潜在错误）
+2. 配置 Prettier 进行代码格式化（风格统一）
+3. 安装 Husky 支持 Git Hooks（为未来自动化检查预留）
+4. （可选）配置 pre-commit 钩子自动运行检查
+
+**注意**：任务定义明确标注"可选"，因此不强制要求所有功能都完全实现。
+
+## Scope (范围)
+
+### In Scope (范围内)
+
+- ✅ 配置 ESLint
+  - `.eslintrc.cjs` - ESLint 配置文件
+  - @typescript-eslint/parser - TypeScript 解析器
+  - @typescript-eslint/eslint-plugin - TypeScript 规则插件
+  - eslint-config-prettier - 禁用与 Prettier 冲突的规则
+  - 自定义规则（no-explicit-any, no-unused-vars 等）
+  - package.json scripts.lint - 运行 linter
+
+- ✅ 配置 Prettier
+  - `.prettierrc` - Prettier 配置文件
+  - `.prettierignore` - Prettier 忽略规则
+  - 代码风格规则（semi, singleQuote, printWidth 等）
+  - package.json scripts.format - 格式化代码
+  - package.json scripts.format:check - 检查格式
+
+- ✅ 安装 Husky
+  - husky 依赖包
+  - .husky/ 目录
+  - package.json scripts.prepare - 自动安装 hooks
+
+- ⚠️ 配置 Git Hooks（可选，部分实现）
+  - Husky 已安装
+  - 但未配置自定义 pre-commit hook
+
+### Out of Scope (范围外)
+
+- ❌ 强制代码风格（通过 CI 阻止提交）
+- ❌ 自动修复所有 lint 错误
+- ❌ 复杂的 lint 规则定制
+- ❌ Commitlint（提交消息检查）
+- ❌ 其他 Git Hooks（pre-push, commit-msg 等）
+
+## Constraints (约束条件)
+
+### Technical Constraints (技术约束)
+
+- **ESLint 版本**: 8.57.0
+  - 理由: 稳定版本，TypeScript 支持良好
+  - 验证: package.json devDependencies
+
+- **Prettier 版本**: 3.3.2
+  - 理由: 最新稳定版
+  - 验证: package.json devDependencies
+
+- **TypeScript 兼容性**: 必须支持
+  - 理由: 项目使用 TypeScript
+  - 验证: @typescript-eslint/parser 和 plugin
+
+- **Prettier 与 ESLint 集成**: 避免冲突
+  - 理由: 两者都控制代码风格可能冲突
+  - 验证: eslint-config-prettier 禁用冲突规则
+
+- **Husky 版本**: 9.0.11
+  - 理由: 支持现代 Git Hooks 配置
+  - 验证: package.json devDependencies
+
+### Business Constraints (业务约束)
+
+- 配置必须简单易懂，便于团队成员调整
+- Lint 规则不应过于严格，避免阻碍开发
+- Format 规则应符合主流 TypeScript 风格
+- 工具必须可选运行，不强制自动化（hook 可选）
+
+## Success Criteria (完成标准 / DoD)
+
+### Deliverables (交付物)
+
+1. ✅ **ESLint 配置 (.eslintrc.cjs)**
+   - parser: '@typescript-eslint/parser'
+   - extends: eslint:recommended + @typescript-eslint/recommended + prettier
+   - plugins: ['@typescript-eslint']
+   - parserOptions: project tsconfig.json, ES2022, module
+   - env: node, es2022, jest
+   - rules: 自定义规则（no-explicit-any: warn, no-unused-vars: error 等）
+   - ignorePatterns: dist, node_modules
+
+2. ✅ **Prettier 配置 (.prettierrc + .prettierignore)**
+   - .prettierrc:
+     - semi: false
+     - singleQuote: true
+     - printWidth: 100
+     - trailingComma: 'es5'
+     - tabWidth: 2
+     - arrowParens: 'always'
+     - endOfLine: 'lf'
+   - .prettierignore:
+     - node_modules, dist, coverage, *.log, .DS_Store, .llm, docs
+
+3. ✅ **Package.json 配置**
+   - devDependencies: eslint, @typescript-eslint/*, prettier, eslint-config-prettier, husky
+   - scripts.lint: "eslint . --ext .ts"
+   - scripts.format: "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\""
+   - scripts.format:check: "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\""
+   - scripts.prepare: "husky install"
+
+4. ✅ **Husky 安装**
+   - .husky/ 目录存在
+   - .husky/_/ 包含 husky 模板文件
+   - prepare 脚本可运行
+
+5. ⚠️ **Git Hooks（可选，未完全实现）**
+   - Husky 已安装
+   - 但未配置自定义 pre-commit hook
+   - 开发者可手动运行 lint/format
+
+6. ✅ **可执行性验证**
+   - `pnpm lint` 成功运行，检测代码问题
+   - `pnpm format:check` 成功运行，检测格式问题
+   - `pnpm format` 可格式化代码
+
+### Quality Standards (质量标准)
+
+- **Lint 规则**: 平衡严格性和开发体验
+- **Format 规则**: 符合主流 TypeScript 风格
+- **集成性**: ESLint 和 Prettier 无冲突
+- **可选性**: 工具可手动运行，不强制自动化
+
+## Open Questions (开放问题)
+
+以下问题在实施过程中已经决议：
+
+1. **Q**: ESLint 还是 TSLint？
+   - **决议**: ESLint
+   - **理由**: TSLint 已弃用，ESLint 通过 @typescript-eslint 支持 TypeScript
+   - **来源**: 官方推荐
+
+2. **Q**: 如何避免 ESLint 和 Prettier 规则冲突？
+   - **决议**: 使用 eslint-config-prettier
+   - **理由**: 自动禁用 ESLint 中与 Prettier 冲突的格式规则
+   - **来源**: 最佳实践
+
+3. **Q**: Prettier 代码风格选择？
+   - **决议**: semi: false, singleQuote: true, printWidth: 100
+   - **理由**: 符合现代 TypeScript/JavaScript 主流风格
+   - **来源**: 社区标准
+
+4. **Q**: 是否启用严格的 lint 规则？
+   - **决议**: 部分严格（no-explicit-any: warn, no-unused-vars: error）
+   - **理由**: 平衡代码质量和开发体验，any 警告不阻止开发
+   - **来源**: 渐进式类型安全
+
+5. **Q**: 是否配置 pre-commit hook？
+   - **决议**: 安装 Husky 但未配置自定义 hook
+   - **理由**: 任务标记"可选"，工具可手动运行
+   - **来源**: 任务定义 A4: "可选"
+
+6. **Q**: pre-commit hook 应该运行什么？
+   - **决议**: 未配置（可选）
+   - **可选方案**: lint-staged 运行 lint + format 仅对暂存文件
+   - **来源**: 最佳实践（但未实现）
+
+7. **Q**: 是否格式化文档文件（docs/）？
+   - **决议**: 排除（.prettierignore 包含 docs）
+   - **理由**: 文档可能包含特殊格式，避免破坏
+   - **来源**: 项目特性
+
+## Risks (风险)
+
+### Technical Risks (技术风险)
+
+- ⚠️ **ESLint 规则过于严格导致开发受阻**
+  - 影响: 开发者频繁遇到 lint 错误
+  - 缓解: no-explicit-any 设为 warn（警告）而非 error
+
+- ⚠️ **Prettier 和 ESLint 规则冲突**
+  - 影响: 格式化后 lint 报错，或反之
+  - 缓解: 使用 eslint-config-prettier 禁用冲突规则
+
+- ⚠️ **Husky hooks 在某些环境不工作**
+  - 影响: Windows/特殊 Git 环境可能 hooks 失效
+  - 缓解: 未配置强制 hooks，工具可手动运行
+
+- ⚠️ **未配置 pre-commit hook 可能导致代码质量下降**
+  - 影响: 开发者可能忘记运行 lint/format
+  - 缓解: 可通过 CI/CD 补充检查（Stage H）
+
+### Process Risks (流程风险)
+
+- ⚠️ **追溯补齐文档**
+  - 影响: 本文档为追溯性创建，非正常 6A 流程
+  - 缓解: 明确标注 RETROSPECTIVE，等待用户批准
+
+## Dependencies (依赖)
+
+- **前置任务**:
+  - A3（建立 TypeScript 工程）- 依赖 TypeScript 配置和项目结构
+
+- **后续任务**:
+  - B1-B5（核心框架搭建）- 代码将遵循 lint/format 规则
+  - H（CI/CD）- 可在 CI 中运行 lint/format 检查
+
+## Approval (批准)
+
+- **Status**: ⏳ 等待用户批准追溯补齐文档
+- **Technical Implementation**: ✅ 大部分完成（ESLint + Prettier 完整，Husky 安装，hooks 未配置）
+- **Process Compliance**: ❌ 流程违规（跳过 Align/Approve），通过追溯补齐修正
+
+---
+
+**注**: 本文档为追溯性创建，用于补齐 A4 任务的流程文档。技术实现大部分完成（lint ✓, format ✓, husky 安装 ✓），commit hooks 未配置（任务标记"可选"），现等待用户批准追溯补齐的合理性。

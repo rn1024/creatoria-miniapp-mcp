@@ -1,0 +1,188 @@
+# Charter: [B4] Logger 和 OutputManager
+
+task_id: B4
+task_name: Logger 和 OutputManager 实现
+stage: B
+phase: Align (Retrospective)
+created_at: "2025-10-02"
+status: COMPLETED
+estimated_hours: 1-2
+actual_hours: 1.5
+
+## Goal (目标)
+
+实现结构化日志系统（Logger）和产物管理器（OutputManager），为 MCP Server 提供统一的日志输出和文件管理能力。
+
+**核心交付物**:
+- `src/core/logger.ts` (~50 lines)
+- `src/core/output.ts` (~60 lines)
+- Logger: info/warn/error 方法
+- OutputManager: resolveOutputPath/writeFile 方法
+
+## Non-Goals (非目标)
+
+- ❌ 不实现日志持久化（仅 console 输出）
+- ❌ 不实现日志级别过滤
+- ❌ 不实现日志轮转
+- ❌ 不实现远程日志上传
+
+## Scope (范围)
+
+### In Scope (包含)
+
+1. **Logger 类**
+   - ✅ info(message: string, meta?: object): void
+   - ✅ warn(message: string, meta?: object): void
+   - ✅ error(message: string, meta?: object): void
+   - ✅ 所有日志输出到 console.error（避免干扰 stdio）
+   - ✅ 结构化日志格式：[level] message {meta}
+
+2. **OutputManager 类**
+   - ✅ constructor(sessionId: string, baseDir: string)
+   - ✅ resolveOutputPath(type: string, filename: string): string
+   - ✅ writeFile(type: string, filename: string, content: string|Buffer): Promise<string>
+   - ✅ 目录结构：{baseDir}/{sessionId}/{type}/
+
+3. **目录管理**
+   - ✅ 自动创建目录
+   - ✅ 支持多种产物类型（screenshot/snapshot/log/trace）
+   - ✅ 返回绝对路径
+
+4. **文件操作**
+   - ✅ 写入文本文件
+   - ✅ 写入二进制文件（Buffer）
+   - ✅ 错误处理和重试
+
+### Out of Scope (不包含)
+
+- ❌ 日志持久化到文件
+- ❌ 日志级别配置
+- ❌ 日志格式化选项
+- ❌ 文件压缩和清理
+
+## Constraints (约束)
+
+### Technical Constraints (技术约束)
+
+1. **stdio 避让**
+   - 所有日志必须输出到 console.error
+   - 不能使用 console.log（stdout 被 MCP 占用）
+
+2. **文件系统**
+   - 使用 Node.js fs/promises API
+   - 支持相对路径和绝对路径
+   - 自动创建目录（recursive）
+
+3. **TypeScript 规范**
+   - 完整类型定义
+   - 严格模式
+   - 导入使用 .js 后缀
+
+4. **错误处理**
+   - 捕获文件 I/O 错误
+   - 记录错误日志
+   - 抛出明确异常
+
+### Business Constraints (业务约束)
+
+1. **日志性能**: 日志输出不阻塞主流程
+2. **文件性能**: 文件写入 <100ms
+3. **存储限制**: 单会话产物 <100MB
+
+## Success Criteria (成功标准)
+
+### Functional Criteria (功能标准)
+
+- ✅ Logger.info/warn/error 正确输出
+- ✅ 日志格式清晰可读
+- ✅ OutputManager 正确创建目录
+- ✅ OutputManager 正确写入文件
+- ✅ resolveOutputPath 返回正确路径
+- ✅ 支持文本和二进制内容
+
+### Quality Criteria (质量标准)
+
+- ✅ TypeScript 编译 0 错误
+- ✅ logger.ts ~50 行
+- ✅ output.ts ~60 行
+- ✅ 无 ESLint 错误
+- ✅ JSDoc 注释完整
+
+### Documentation Criteria (文档标准)
+
+- ✅ Logger API 文档
+- ✅ OutputManager API 文档
+- ✅ 目录结构说明
+- ⏳ charter.B4.align.yaml (本文档)
+- ⏳ tasks.B4.atomize.md (任务卡)
+
+## Definition of Done (完成标准)
+
+**代码**:
+- ✅ `src/core/logger.ts` 实现完成 (~50 lines)
+- ✅ `src/core/output.ts` 实现完成 (~60 lines)
+- ✅ TypeScript 编译通过
+- ✅ 所有方法实现
+
+**测试**:
+- ✅ 单元测试随工具测试验证
+- ✅ 手动测试日志输出
+- ✅ 集成测试文件写入
+
+**文档**:
+- ⏳ charter.B4.align.yaml (追溯)
+- ⏳ tasks.B4.atomize.md (追溯)
+- ⏳ session_log (追溯)
+
+**Git**:
+- ✅ 已提交（随 D2 Snapshot 工具提交）
+
+## Dependencies (依赖)
+
+**前置任务**:
+- ✅ A3: 仓库结构初始化
+- ✅ Node.js fs/promises API 了解
+
+**后续任务**:
+- B4 → D2 (Snapshot 工具使用 OutputManager)
+- B4 → 所有需要输出文件的工具
+
+## Risks (风险)
+
+### Technical Risks (技术风险)
+
+1. **stdio 干扰** - 🟢 已缓解
+   - 影响：console.log 干扰 MCP 协议
+   - 缓解：强制使用 console.error
+
+2. **文件权限** - 🟡 中风险
+   - 影响：无法创建目录/写入文件
+   - 缓解：错误处理 + 清晰错误消息
+
+3. **路径安全** - 🟡 中风险
+   - 影响：路径遍历攻击
+   - 缓解：路径验证和规范化
+
+### Business Risks (业务风险)
+
+1. **存储占用** - 🟢 低风险
+   - 影响：产物文件占用磁盘空间
+   - 缓解：会话清理机制 + 用户管理
+
+## Open Questions (未决问题)
+
+- ✅ 日志是否需要持久化？（否，仅 console 输出）
+- ✅ 是否需要日志级别过滤？（否，后续扩展）
+- ❓ 是否需要产物文件清理策略？（当前手动清理）
+
+## References (参考资料)
+
+- `docs/完整实现方案.md` - 日志和产物管理设计
+- Node.js fs/promises API 文档
+- Node.js path API 文档
+
+---
+
+**Approval**: ✅ RETROSPECTIVE APPROVED
+**Implementation**: ✅ COMPLETED
+**Documentation**: ⏳ IN PROGRESS

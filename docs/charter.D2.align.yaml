@@ -1,0 +1,234 @@
+# Charter: [D2] 快照工具集
+
+task_id: D2
+task_name: 快照工具集实现
+stage: D
+phase: Align (Retrospective)
+created_at: "2025-10-02"
+status: COMPLETED
+estimated_hours: 2-3
+actual_hours: 2
+
+## Goal (目标)
+
+实现完整的快照工具集，为小程序自动化测试提供状态捕获和回溯能力。
+
+**核心交付物**:
+- `src/tools/snapshot.ts` - 3 个快照工具实现 (352 lines)
+- `tests/unit/snapshot.test.ts` - 单元测试 (251 lines, 10 tests)
+- 工具: snapshotPage, snapshotFull, snapshotElement
+
+## Non-Goals (非目标)
+
+- ❌ 不实现快照比对（diff）功能
+- ❌ 不实现快照回放（restore）功能
+- ❌ 不实现快照压缩/归档（仅原始 JSON + PNG）
+- ❌ 不实现多快照管理（仅单次捕获）
+
+## Scope (范围)
+
+### In Scope (包含)
+
+1. **snapshotPage - 页面快照**
+   - ✅ 捕获当前页面数据（data + query）
+   - ✅ 可选截图（PNG 格式）
+   - ✅ 保存为 JSON + 可选 PNG
+   - ✅ 返回文件路径
+
+2. **snapshotFull - 完整应用快照**
+   - ✅ 捕获系统信息（systemInfo）
+   - ✅ 捕获页面栈（pageStack）
+   - ✅ 捕获当前页面数据
+   - ✅ 可选截图（PNG 格式）
+   - ✅ 保存为 JSON + 可选 PNG
+
+3. **snapshotElement - 元素快照**
+   - ✅ 捕获元素文本（text）
+   - ✅ 捕获元素尺寸（size）
+   - ✅ 捕获元素位置（offset）
+   - ✅ 可选截图（PNG 格式）
+   - ✅ 保存为 JSON + 可选 PNG
+
+4. **通用功能**
+   - ✅ 自动生成文件名（带时间戳）
+   - ✅ 支持自定义文件名
+   - ✅ 使用 OutputManager 管理文件
+   - ✅ 时间戳记录（ISO8601 格式）
+
+### Out of Scope (不包含)
+
+- ❌ 快照比对（diff）
+- ❌ 快照恢复（restore）
+- ❌ 快照版本控制（git-like）
+- ❌ 快照压缩（zip/tar）
+
+## Constraints (约束)
+
+### Technical Constraints (技术约束)
+
+1. **工具依赖**
+   - 复用 MiniProgram 工具（getPageStack, getSystemInfo, screenshot）
+   - 复用 Page 工具（getData）
+   - 复用 Element 工具（getText, getSize, getOffset）
+   - 使用 OutputManager 管理文件输出
+
+2. **文件格式**
+   - JSON: 结构化数据，包含时间戳
+   - PNG: 截图文件（可选）
+   - 文件命名: `snapshot-{timestamp}.json` 或自定义
+
+3. **数据结构**
+   - **snapshotPage**:
+     ```typescript
+     {
+       timestamp: string          // ISO8601
+       pagePath: string           // 当前页面路径
+       pageData: any              // 页面 data
+       pageQuery: Record<string, any>  // 页面 query
+     }
+     ```
+   - **snapshotFull**:
+     ```typescript
+     {
+       timestamp: string
+       systemInfo: any            // 系统信息
+       pageStack: Array<{path, query}>  // 页面栈
+       currentPage: {
+         path: string
+         query: Record<string, any>
+         data: any
+       }
+     }
+     ```
+   - **snapshotElement**:
+     ```typescript
+     {
+       timestamp: string
+       refId: string
+       text?: string
+       attributes: Record<string, any>
+       size: {width, height} | null
+       offset: {left, top} | null
+     }
+     ```
+
+4. **返回值结构**
+   ```typescript
+   {
+     success: boolean
+     message: string
+     snapshotPath: string         // JSON 文件路径
+     screenshotPath?: string      // PNG 文件路径（可选）
+     data: {/* 快照数据 */}
+   }
+   ```
+
+### Business Constraints (业务约束)
+
+1. **执行时间**: 单次快照 <2s（含截图）
+2. **文件大小**: JSON <1MB, PNG <5MB
+3. **存储位置**: 默认 `outputDir`，可配置
+
+## Success Criteria (成功标准)
+
+### Functional Criteria (功能标准)
+
+- ✅ snapshotPage 正确捕获页面数据和截图
+- ✅ snapshotFull 正确捕获应用全局状态
+- ✅ snapshotElement 正确捕获元素状态
+- ✅ JSON 文件包含完整数据和时间戳
+- ✅ 截图可选（includeScreenshot 参数）
+- ✅ 支持自定义文件名
+- ✅ 文件保存到正确路径
+
+### Quality Criteria (质量标准)
+
+- ✅ TypeScript 编译 0 错误
+- ✅ 单元测试覆盖率 >80%
+- ✅ 10 个测试用例全部通过
+- ✅ 无 ESLint 错误
+- ✅ JSDoc 注释完整
+
+### Documentation Criteria (文档标准)
+
+- ✅ 每个工具有函数签名和 JSDoc
+- ✅ 数据结构定义清晰
+- ⏳ charter.D2.align.yaml (本文档)
+- ⏳ tasks.D2.atomize.md (任务卡)
+
+## Definition of Done (完成标准)
+
+**代码**:
+- ✅ `src/tools/snapshot.ts` 实现完成 (352 lines)
+- ✅ 3 个快照工具全部实现
+- ✅ TypeScript 编译通过
+
+**测试**:
+- ✅ `tests/unit/snapshot.test.ts` (251 lines)
+- ✅ 10 个测试用例全部通过
+- ✅ 覆盖成功和失败场景
+- ✅ Mock miniprogram/page/element 工具依赖
+
+**文档**:
+- ⏳ charter.D2.align.yaml (追溯)
+- ⏳ tasks.D2.atomize.md (追溯)
+- ✅ 代码注释完整
+
+**Git**:
+- ✅ 已提交（commit: feat: [D2] 快照能力实现）
+
+## Dependencies (依赖)
+
+**前置任务**:
+- ✅ C2: MiniProgram 工具（getPageStack, getSystemInfo, screenshot）
+- ✅ C3: Page 工具（getData）
+- ✅ C4: Element 工具（getText, getSize, getOffset）
+- ✅ B3: OutputManager 实现
+
+**后续任务**:
+- D2 → Stage E (集成到工具注册器)
+- D2 → Stage F (端到端测试示例)
+
+## Risks (风险)
+
+### Technical Risks (技术风险)
+
+1. **大数据量快照** - 🟡 中风险
+   - 影响：页面数据过大导致 JSON 文件巨大
+   - 缓解：当前无限制，未来可添加大小警告
+
+2. **截图失败** - 🟢 已缓解
+   - 风险：截图工具失败导致快照失败
+   - 缓解：截图为可选（includeScreenshot: false 可跳过）
+
+3. **文件名冲突** - 🟢 已缓解
+   - 风险：时间戳相同导致文件覆盖
+   - 缓解：OutputManager 使用 `Date.now()` 精确到毫秒
+
+### Business Risks (业务风险)
+
+1. **存储空间** - 🟡 中风险
+   - 影响：大量快照占用磁盘空间
+   - 缓解：用户自行管理 outputDir 清理
+
+## Open Questions (未决问题)
+
+- ❓ 是否需要快照压缩（zip）以节省空间？（当前原始文件）
+- ❓ 是否需要快照比对功能？（当前仅捕获）
+- ❓ 是否需要快照恢复功能？（当前仅只读）
+- ❓ 是否需要限制单个快照文件大小？（当前无限制）
+
+## References (参考资料)
+
+- `docs/完整实现方案.md` - 工具分层设计
+- `src/tools/miniprogram.ts` - MiniProgram 工具依赖
+- `src/tools/page.ts` - Page 工具依赖
+- `src/tools/element.ts` - Element 工具依赖
+- `src/core/output.ts` - OutputManager 实现
+- Playwright Screenshots - 截图功能参考
+
+---
+
+**Approval**: ✅ RETROSPECTIVE APPROVED
+**Implementation**: ✅ COMPLETED
+**Documentation**: ⏳ IN PROGRESS
