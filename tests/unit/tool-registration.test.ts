@@ -58,8 +58,8 @@ describe('Tool Registration', () => {
       ])
     })
 
-    it('should have 11 element tools', () => {
-      expect(ELEMENT_TOOLS).toHaveLength(11)
+    it('should have 23 element tools', () => {
+      expect(ELEMENT_TOOLS).toHaveLength(23)
       expect(ELEMENT_TOOLS.map(t => t.name)).toEqual([
         'element_tap',
         'element_longpress',
@@ -72,11 +72,23 @@ describe('Tool Registration', () => {
         'element_get_offset',
         'element_trigger',
         'element_get_style',
+        'element_touchstart',
+        'element_touchmove',
+        'element_touchend',
+        'element_scroll_to',
+        'element_scroll_width',
+        'element_scroll_height',
+        'element_swipe_to',
+        'element_move_to',
+        'element_slide_to',
+        'element_call_context_method',
+        'element_set_data',
+        'element_call_method',
       ])
     })
 
-    it('should have 29 total core tools', () => {
-      expect(CORE_TOOLS).toHaveLength(29)
+    it('should have 41 total core tools', () => {
+      expect(CORE_TOOLS).toHaveLength(41)
     })
   })
 
@@ -111,8 +123,8 @@ describe('Tool Registration', () => {
       })
     })
 
-    it('should have 29 total handlers', () => {
-      expect(Object.keys(CORE_TOOL_HANDLERS)).toHaveLength(29)
+    it('should have 41 total handlers', () => {
+      expect(Object.keys(CORE_TOOL_HANDLERS)).toHaveLength(41)
     })
   })
 
@@ -154,9 +166,9 @@ describe('Tool Registration', () => {
     it('should have correct element category', () => {
       const category = TOOL_CATEGORIES.element
       expect(category.name).toBe('Element')
-      expect(category.description).toContain('11 tools')
-      expect(category.tools).toHaveLength(11)
-      expect(Object.keys(category.handlers)).toHaveLength(11)
+      expect(category.description).toContain('23 tools')
+      expect(category.tools).toHaveLength(23)
+      expect(Object.keys(category.handlers)).toHaveLength(23)
     })
   })
 
@@ -188,14 +200,14 @@ describe('Tool Registration', () => {
   describe('getToolStats', () => {
     it('should return correct statistics', () => {
       const stats = getToolStats()
-      expect(stats.total).toBe(29)
+      expect(stats.total).toBe(41)
       expect(stats.categories).toEqual({
         automator: 4,
         miniprogram: 6,
         page: 8,
-        element: 11,
+        element: 23,
       })
-      expect(stats.handlers).toBe(29)
+      expect(stats.handlers).toBe(41)
     })
   })
 
@@ -241,7 +253,7 @@ describe('Tool Registration', () => {
 
     it('should get element tools', () => {
       const tools = getToolsByCategory('element')
-      expect(tools).toHaveLength(11)
+      expect(tools).toHaveLength(23)
       expect(tools[0].name).toBe('element_tap')
     })
 

@@ -6,9 +6,9 @@
  * - Automator (4 tools): Connection and lifecycle management
  * - MiniProgram (6 tools): Mini program-level operations
  * - Page (8 tools): Page-level operations and data access
- * - Element (11 tools): Element-level interactions and properties
+ * - Element (23 tools): Element-level interactions, properties, and subclass operations
  *
- * Total: 29 tools
+ * Total: 41 tools
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
@@ -557,6 +557,244 @@ export const ELEMENT_TOOLS: Tool[] = [
       required: ['refId', 'name'],
     },
   },
+  {
+    name: 'element_touchstart',
+    description: 'Touch start on element',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        touches: {
+          type: 'array',
+          description: 'Touch points currently on screen',
+        },
+        changedTouches: {
+          type: 'array',
+          description: 'Changed touch points',
+        },
+      },
+      required: ['refId', 'touches', 'changedTouches'],
+    },
+  },
+  {
+    name: 'element_touchmove',
+    description: 'Touch move on element',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        touches: {
+          type: 'array',
+          description: 'Touch points currently on screen',
+        },
+        changedTouches: {
+          type: 'array',
+          description: 'Changed touch points',
+        },
+      },
+      required: ['refId', 'touches', 'changedTouches'],
+    },
+  },
+  {
+    name: 'element_touchend',
+    description: 'Touch end on element',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        touches: {
+          type: 'array',
+          description: 'Touch points currently on screen',
+        },
+        changedTouches: {
+          type: 'array',
+          description: 'Changed touch points',
+        },
+      },
+      required: ['refId', 'touches', 'changedTouches'],
+    },
+  },
+  {
+    name: 'element_scroll_to',
+    description: 'Scroll to position (ScrollView only)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        x: {
+          type: 'number',
+          description: 'X coordinate',
+        },
+        y: {
+          type: 'number',
+          description: 'Y coordinate',
+        },
+      },
+      required: ['refId', 'x', 'y'],
+    },
+  },
+  {
+    name: 'element_scroll_width',
+    description: 'Get scroll width (ScrollView only)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+      },
+      required: ['refId'],
+    },
+  },
+  {
+    name: 'element_scroll_height',
+    description: 'Get scroll height (ScrollView only)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+      },
+      required: ['refId'],
+    },
+  },
+  {
+    name: 'element_swipe_to',
+    description: 'Swipe to index (Swiper only)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        index: {
+          type: 'number',
+          description: 'Target swiper index',
+        },
+      },
+      required: ['refId', 'index'],
+    },
+  },
+  {
+    name: 'element_move_to',
+    description: 'Move to position (MovableView only)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        x: {
+          type: 'number',
+          description: 'X coordinate',
+        },
+        y: {
+          type: 'number',
+          description: 'Y coordinate',
+        },
+      },
+      required: ['refId', 'x', 'y'],
+    },
+  },
+  {
+    name: 'element_slide_to',
+    description: 'Slide to value (Slider only)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        value: {
+          type: 'number',
+          description: 'Target slider value',
+        },
+      },
+      required: ['refId', 'value'],
+    },
+  },
+  {
+    name: 'element_call_context_method',
+    description: 'Call context method (ContextElement only)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        method: {
+          type: 'string',
+          description: 'Context method name',
+        },
+        args: {
+          type: 'array',
+          description: 'Arguments to pass to the method',
+          items: {},
+        },
+      },
+      required: ['refId', 'method'],
+    },
+  },
+  {
+    name: 'element_set_data',
+    description: 'Set data on custom element (CustomElement only)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        data: {
+          type: 'object',
+          description: 'Data object to set',
+        },
+      },
+      required: ['refId', 'data'],
+    },
+  },
+  {
+    name: 'element_call_method',
+    description: 'Call method on custom element (CustomElement only)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        method: {
+          type: 'string',
+          description: 'Method name',
+        },
+        args: {
+          type: 'array',
+          description: 'Arguments to pass to the method',
+          items: {},
+        },
+      },
+      required: ['refId', 'method'],
+    },
+  },
 ]
 
 export const ELEMENT_TOOL_HANDLERS: Record<string, ToolHandler> = {
@@ -571,6 +809,18 @@ export const ELEMENT_TOOL_HANDLERS: Record<string, ToolHandler> = {
   element_get_offset: elementTools.getOffset,
   element_trigger: elementTools.trigger,
   element_get_style: elementTools.getStyle,
+  element_touchstart: elementTools.touchstart,
+  element_touchmove: elementTools.touchmove,
+  element_touchend: elementTools.touchend,
+  element_scroll_to: elementTools.scrollTo,
+  element_scroll_width: elementTools.scrollWidth,
+  element_scroll_height: elementTools.scrollHeight,
+  element_swipe_to: elementTools.swipeTo,
+  element_move_to: elementTools.moveTo,
+  element_slide_to: elementTools.slideTo,
+  element_call_context_method: elementTools.callContextMethod,
+  element_set_data: elementTools.setData,
+  element_call_method: elementTools.callMethod,
 }
 
 // ============================================================================
@@ -598,7 +848,7 @@ export const TOOL_CATEGORIES: Record<string, ToolCategory> = {
   },
   element: {
     name: 'Element',
-    description: 'Element-level interactions and properties (11 tools)',
+    description: 'Element-level interactions and properties (23 tools)',
     tools: ELEMENT_TOOLS,
     handlers: ELEMENT_TOOL_HANDLERS,
   },

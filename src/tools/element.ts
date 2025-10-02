@@ -464,3 +464,493 @@ export async function getStyle(
     throw new Error(`GetStyle failed: ${errorMessage}`)
   }
 }
+
+/**
+ * Touch start on element
+ */
+export async function touchstart(
+  session: SessionState,
+  args: {
+    refId: string
+    touches: any[]
+    changedTouches: any[]
+  }
+): Promise<{
+  success: boolean
+  message: string
+}> {
+  const { refId, touches, changedTouches } = args
+  const logger = session.logger
+
+  try {
+    logger?.info('Touch start on element', { refId, touches, changedTouches })
+
+    const element = getElement(session, refId)
+    await element.touchstart({ touches, changedTouches })
+
+    logger?.info('Touch start successful', { refId })
+
+    return {
+      success: true,
+      message: `Touch start on element: ${refId}`,
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    logger?.error('Touchstart failed', {
+      error: errorMessage,
+      refId,
+    })
+
+    throw new Error(`Touchstart failed: ${errorMessage}`)
+  }
+}
+
+/**
+ * Touch move on element
+ */
+export async function touchmove(
+  session: SessionState,
+  args: {
+    refId: string
+    touches: any[]
+    changedTouches: any[]
+  }
+): Promise<{
+  success: boolean
+  message: string
+}> {
+  const { refId, touches, changedTouches } = args
+  const logger = session.logger
+
+  try {
+    logger?.info('Touch move on element', { refId, touches, changedTouches })
+
+    const element = getElement(session, refId)
+    await element.touchmove({ touches, changedTouches })
+
+    logger?.info('Touch move successful', { refId })
+
+    return {
+      success: true,
+      message: `Touch move on element: ${refId}`,
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    logger?.error('Touchmove failed', {
+      error: errorMessage,
+      refId,
+    })
+
+    throw new Error(`Touchmove failed: ${errorMessage}`)
+  }
+}
+
+/**
+ * Touch end on element
+ */
+export async function touchend(
+  session: SessionState,
+  args: {
+    refId: string
+    touches: any[]
+    changedTouches: any[]
+  }
+): Promise<{
+  success: boolean
+  message: string
+}> {
+  const { refId, touches, changedTouches } = args
+  const logger = session.logger
+
+  try {
+    logger?.info('Touch end on element', { refId, touches, changedTouches })
+
+    const element = getElement(session, refId)
+    await element.touchend({ touches, changedTouches })
+
+    logger?.info('Touch end successful', { refId })
+
+    return {
+      success: true,
+      message: `Touch end on element: ${refId}`,
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    logger?.error('Touchend failed', {
+      error: errorMessage,
+      refId,
+    })
+
+    throw new Error(`Touchend failed: ${errorMessage}`)
+  }
+}
+
+/**
+ * Scroll to position (ScrollView only)
+ */
+export async function scrollTo(
+  session: SessionState,
+  args: {
+    refId: string
+    x: number
+    y: number
+  }
+): Promise<{
+  success: boolean
+  message: string
+}> {
+  const { refId, x, y } = args
+  const logger = session.logger
+
+  try {
+    logger?.info('Scrolling element to position', { refId, x, y })
+
+    const element = getElement(session, refId)
+    await element.scrollTo(x, y)
+
+    logger?.info('Scroll successful', { refId, x, y })
+
+    return {
+      success: true,
+      message: `Scrolled to (${x}, ${y})`,
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    logger?.error('ScrollTo failed', {
+      error: errorMessage,
+      refId,
+      x,
+      y,
+    })
+
+    throw new Error(`ScrollTo failed: ${errorMessage}`)
+  }
+}
+
+/**
+ * Get scroll width (ScrollView only)
+ */
+export async function scrollWidth(
+  session: SessionState,
+  args: {
+    refId: string
+  }
+): Promise<{
+  success: boolean
+  message: string
+  width: number
+}> {
+  const { refId } = args
+  const logger = session.logger
+
+  try {
+    logger?.info('Getting scroll width', { refId })
+
+    const element = getElement(session, refId)
+    const width = await element.scrollWidth()
+
+    logger?.info('Scroll width retrieved', { refId, width })
+
+    return {
+      success: true,
+      message: 'Scroll width retrieved',
+      width,
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    logger?.error('ScrollWidth failed', {
+      error: errorMessage,
+      refId,
+    })
+
+    throw new Error(`ScrollWidth failed: ${errorMessage}`)
+  }
+}
+
+/**
+ * Get scroll height (ScrollView only)
+ */
+export async function scrollHeight(
+  session: SessionState,
+  args: {
+    refId: string
+  }
+): Promise<{
+  success: boolean
+  message: string
+  height: number
+}> {
+  const { refId } = args
+  const logger = session.logger
+
+  try {
+    logger?.info('Getting scroll height', { refId })
+
+    const element = getElement(session, refId)
+    const height = await element.scrollHeight()
+
+    logger?.info('Scroll height retrieved', { refId, height })
+
+    return {
+      success: true,
+      message: 'Scroll height retrieved',
+      height,
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    logger?.error('ScrollHeight failed', {
+      error: errorMessage,
+      refId,
+    })
+
+    throw new Error(`ScrollHeight failed: ${errorMessage}`)
+  }
+}
+
+/**
+ * Swipe to index (Swiper only)
+ */
+export async function swipeTo(
+  session: SessionState,
+  args: {
+    refId: string
+    index: number
+  }
+): Promise<{
+  success: boolean
+  message: string
+}> {
+  const { refId, index } = args
+  const logger = session.logger
+
+  try {
+    logger?.info('Swiping to index', { refId, index })
+
+    const element = getElement(session, refId)
+    await element.swipeTo(index)
+
+    logger?.info('Swipe successful', { refId, index })
+
+    return {
+      success: true,
+      message: `Swiped to index ${index}`,
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    logger?.error('SwipeTo failed', {
+      error: errorMessage,
+      refId,
+      index,
+    })
+
+    throw new Error(`SwipeTo failed: ${errorMessage}`)
+  }
+}
+
+/**
+ * Move to position (MovableView only)
+ */
+export async function moveTo(
+  session: SessionState,
+  args: {
+    refId: string
+    x: number
+    y: number
+  }
+): Promise<{
+  success: boolean
+  message: string
+}> {
+  const { refId, x, y } = args
+  const logger = session.logger
+
+  try {
+    logger?.info('Moving element to position', { refId, x, y })
+
+    const element = getElement(session, refId)
+    await element.moveTo(x, y)
+
+    logger?.info('Move successful', { refId, x, y })
+
+    return {
+      success: true,
+      message: `Moved to (${x}, ${y})`,
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    logger?.error('MoveTo failed', {
+      error: errorMessage,
+      refId,
+      x,
+      y,
+    })
+
+    throw new Error(`MoveTo failed: ${errorMessage}`)
+  }
+}
+
+/**
+ * Slide to value (Slider only)
+ */
+export async function slideTo(
+  session: SessionState,
+  args: {
+    refId: string
+    value: number
+  }
+): Promise<{
+  success: boolean
+  message: string
+}> {
+  const { refId, value } = args
+  const logger = session.logger
+
+  try {
+    logger?.info('Sliding to value', { refId, value })
+
+    const element = getElement(session, refId)
+    await element.slideTo(value)
+
+    logger?.info('Slide successful', { refId, value })
+
+    return {
+      success: true,
+      message: `Slid to value ${value}`,
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    logger?.error('SlideTo failed', {
+      error: errorMessage,
+      refId,
+      value,
+    })
+
+    throw new Error(`SlideTo failed: ${errorMessage}`)
+  }
+}
+
+/**
+ * Call context method (ContextElement only)
+ */
+export async function callContextMethod(
+  session: SessionState,
+  args: {
+    refId: string
+    method: string
+    args?: any[]
+  }
+): Promise<{
+  success: boolean
+  message: string
+  result?: any
+}> {
+  const { refId, method, args: methodArgs = [] } = args
+  const logger = session.logger
+
+  try {
+    logger?.info('Calling context method', { refId, method, args: methodArgs })
+
+    const element = getElement(session, refId)
+    const result = await element.callContextMethod(method, ...methodArgs)
+
+    logger?.info('Context method called successfully', { refId, method, result })
+
+    return {
+      success: true,
+      message: `Context method "${method}" called successfully`,
+      result,
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    logger?.error('CallContextMethod failed', {
+      error: errorMessage,
+      refId,
+      method,
+    })
+
+    throw new Error(`CallContextMethod failed: ${errorMessage}`)
+  }
+}
+
+/**
+ * Set data on custom element (CustomElement only)
+ */
+export async function setData(
+  session: SessionState,
+  args: {
+    refId: string
+    data: Record<string, any>
+  }
+): Promise<{
+  success: boolean
+  message: string
+}> {
+  const { refId, data } = args
+  const logger = session.logger
+
+  try {
+    logger?.info('Setting element data', { refId, data })
+
+    const element = getElement(session, refId)
+    await element.setData(data)
+
+    logger?.info('Element data set successfully', { refId, keys: Object.keys(data) })
+
+    return {
+      success: true,
+      message: `Element data updated with ${Object.keys(data).length} keys`,
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    logger?.error('SetData failed', {
+      error: errorMessage,
+      refId,
+      data,
+    })
+
+    throw new Error(`SetData failed: ${errorMessage}`)
+  }
+}
+
+/**
+ * Call method on custom element (CustomElement only)
+ */
+export async function callMethod(
+  session: SessionState,
+  args: {
+    refId: string
+    method: string
+    args?: any[]
+  }
+): Promise<{
+  success: boolean
+  message: string
+  result?: any
+}> {
+  const { refId, method, args: methodArgs = [] } = args
+  const logger = session.logger
+
+  try {
+    logger?.info('Calling element method', { refId, method, args: methodArgs })
+
+    const element = getElement(session, refId)
+    const result = await element.callMethod(method, ...methodArgs)
+
+    logger?.info('Element method called successfully', { refId, method, result })
+
+    return {
+      success: true,
+      message: `Element method "${method}" called successfully`,
+      result,
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    logger?.error('CallMethod failed', {
+      error: errorMessage,
+      refId,
+      method,
+    })
+
+    throw new Error(`CallMethod failed: ${errorMessage}`)
+  }
+}
