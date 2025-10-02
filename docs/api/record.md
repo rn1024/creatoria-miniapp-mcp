@@ -6,16 +6,16 @@
 
 | 工具名称 | 描述 | 必需参数 |
 |---------|------|----------|
-| `record.start` | 开始录制动作序列 | 无 |
-| `record.stop` | 停止录制并保存 | 无 |
-| `record.list` | 列出所有已保存的序列 | 无 |
-| `record.get` | 获取指定序列的详细信息 | sequenceId |
-| `record.delete` | 删除指定序列 | sequenceId |
-| `record.replay` | 回放已保存的序列 | sequenceId |
+| `record_start` | 开始录制动作序列 | 无 |
+| `record_stop` | 停止录制并保存 | 无 |
+| `record_list` | 列出所有已保存的序列 | 无 |
+| `record_get` | 获取指定序列的详细信息 | sequenceId |
+| `record_delete` | 删除指定序列 | sequenceId |
+| `record_replay` | 回放已保存的序列 | sequenceId |
 
 ---
 
-## record.start
+## record_start
 
 开始录制自动化动作序列，录制期间所有工具调用都会被记录下来。
 
@@ -44,18 +44,18 @@
 
 ```javascript
 // 示例 1: 基础用法（使用默认名称）
-const result = await record.start()
+const result = await record_start()
 console.log(result.sequenceId) // "seq_1738425600000_abc123"
 
 // 示例 2: 指定名称和描述
-const result = await record.start({
+const result = await record_start({
   name: "用户登录流程",
   description: "测试用户登录并跳转到个人中心"
 })
 console.log(result.message) // "Recording started: 用户登录流程"
 
 // 示例 3: 录制复杂测试场景
-await record.start({
+await record_start({
   name: "购物车结算流程",
   description: "从商品列表到下单完成的完整流程"
 })
@@ -65,7 +65,7 @@ await miniprogram_navigate({ method: "navigateTo", url: "/pages/cart/cart" })
 await element_tap({ selector: ".checkout-btn" })
 // ... 更多操作
 
-await record.stop() // 停止录制
+await record_stop() // 停止录制
 ```
 
 ### 注意事项
@@ -77,12 +77,12 @@ await record.stop() // 停止录制
 
 ### 相关工具
 
-- [`record.stop`](#recordstop) - 停止录制并保存
-- [`record.replay`](#recordreplay) - 回放录制的序列
+- [`record_stop`](#record_stop) - 停止录制并保存
+- [`record_replay`](#record_replay) - 回放录制的序列
 
 ---
 
-## record.stop
+## record_stop
 
 停止当前录制并保存动作序列到文件。
 
@@ -113,20 +113,20 @@ await record.stop() // 停止录制
 
 ```javascript
 // 示例 1: 基础用法（保存序列）
-await record.start({ name: "登录测试" })
+await record_start({ name: "登录测试" })
 // ... 执行自动化操作
-const result = await record.stop()
+const result = await record_stop()
 console.log(result.message) // "Recording stopped: 登录测试 (8 actions)"
 console.log(result.filePath) // 序列文件路径
 
 // 示例 2: 丢弃录制（不保存）
-await record.start({ name: "临时测试" })
+await record_start({ name: "临时测试" })
 // ... 执行操作
-await record.stop({ save: false })
+await record_stop({ save: false })
 // 不会生成序列文件
 
 // 示例 3: 完整的录制流程
-const session = await record.start({
+const session = await record_start({
   name: "购物车操作",
   description: "添加商品到购物车并结算"
 })
@@ -138,7 +138,7 @@ await element_tap({ selector: ".cart-icon" })
 await element_tap({ selector: ".checkout-btn" })
 
 // 停止并保存
-const result = await record.stop()
+const result = await record_stop()
 console.log(`已保存 ${result.actionCount} 个动作`)
 console.log(`序列ID: ${result.sequenceId}`)
 ```
@@ -152,13 +152,13 @@ console.log(`序列ID: ${result.sequenceId}`)
 
 ### 相关工具
 
-- [`record.start`](#recordstart) - 开始录制
-- [`record.list`](#recordlist) - 查看已保存的序列
-- [`record.get`](#recordget) - 查看序列详情
+- [`record_start`](#record_start) - 开始录制
+- [`record_list`](#record_list) - 查看已保存的序列
+- [`record_get`](#record_get) - 查看序列详情
 
 ---
 
-## record.list
+## record_list
 
 列出当前会话中所有已保存的动作序列。
 
@@ -198,24 +198,24 @@ console.log(`序列ID: ${result.sequenceId}`)
 
 ```javascript
 // 示例 1: 基础用法
-const result = await record.list()
+const result = await record_list()
 console.log(result.message) // "Found 5 sequences"
 result.sequences.forEach(seq => {
   console.log(`${seq.name}: ${seq.actionCount} 个动作`)
 })
 
 // 示例 2: 查找特定序列
-const result = await record.list()
+const result = await record_list()
 const loginSeq = result.sequences.find(seq =>
   seq.name.includes("登录")
 )
 if (loginSeq) {
   console.log(`找到登录序列: ${loginSeq.id}`)
-  await record.replay({ sequenceId: loginSeq.id })
+  await record_replay({ sequenceId: loginSeq.id })
 }
 
 // 示例 3: 显示所有序列信息
-const result = await record.list()
+const result = await record_list()
 console.log(`共有 ${result.sequences.length} 个序列:\n`)
 result.sequences.forEach((seq, index) => {
   console.log(`${index + 1}. ${seq.name}`)
@@ -236,12 +236,12 @@ result.sequences.forEach((seq, index) => {
 
 ### 相关工具
 
-- [`record.get`](#recordget) - 获取序列详细信息
-- [`record.delete`](#recorddelete) - 删除序列
+- [`record_get`](#record_get) - 获取序列详细信息
+- [`record_delete`](#record_delete) - 删除序列
 
 ---
 
-## record.get
+## record_get
 
 获取指定序列的完整详细信息，包括所有动作记录。
 
@@ -292,14 +292,14 @@ result.sequences.forEach((seq, index) => {
 
 ```javascript
 // 示例 1: 基础用法
-const result = await record.get({
+const result = await record_get({
   sequenceId: "seq_1738425600000_abc123"
 })
 console.log(result.sequence.name) // "用户登录流程"
 console.log(result.sequence.actions.length) // 8
 
 // 示例 2: 分析序列内容
-const result = await record.get({ sequenceId: "seq_xxx" })
+const result = await record_get({ sequenceId: "seq_xxx" })
 const sequence = result.sequence
 
 console.log(`序列名称: ${sequence.name}`)
@@ -322,7 +322,7 @@ if (failures.length > 0) {
 }
 
 // 示例 3: 提取序列步骤
-const result = await record.get({ sequenceId: "seq_xxx" })
+const result = await record_get({ sequenceId: "seq_xxx" })
 console.log("序列步骤:")
 result.sequence.actions.forEach((action, index) => {
   const time = new Date(action.timestamp).toLocaleTimeString()
@@ -343,12 +343,12 @@ result.sequence.actions.forEach((action, index) => {
 
 ### 相关工具
 
-- [`record.list`](#recordlist) - 列出所有序列
-- [`record.replay`](#recordreplay) - 回放序列
+- [`record_list`](#record_list) - 列出所有序列
+- [`record_replay`](#record_replay) - 回放序列
 
 ---
 
-## record.delete
+## record_delete
 
 删除指定的动作序列文件。
 
@@ -376,31 +376,31 @@ result.sequence.actions.forEach((action, index) => {
 
 ```javascript
 // 示例 1: 基础用法
-const result = await record.delete({
+const result = await record_delete({
   sequenceId: "seq_1738425600000_abc123"
 })
 console.log(result.message) // "Sequence deleted: seq_1738425600000_abc123"
 
 // 示例 2: 批量删除旧序列
-const { sequences } = await record.list()
+const { sequences } = await record_list()
 const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
 
 for (const seq of sequences) {
   const createdAt = new Date(seq.createdAt).getTime()
   if (createdAt < oneWeekAgo) {
-    await record.delete({ sequenceId: seq.id })
+    await record_delete({ sequenceId: seq.id })
     console.log(`已删除旧序列: ${seq.name}`)
   }
 }
 
 // 示例 3: 删除前确认
 const sequenceId = "seq_xxx"
-const { sequence } = await record.get({ sequenceId })
+const { sequence } = await record_get({ sequenceId })
 
 console.log(`确定要删除序列 "${sequence.name}" 吗？`)
 console.log(`包含 ${sequence.actions.length} 个动作`)
 // 用户确认后...
-await record.delete({ sequenceId })
+await record_delete({ sequenceId })
 console.log("已删除")
 ```
 
@@ -413,12 +413,12 @@ console.log("已删除")
 
 ### 相关工具
 
-- [`record.list`](#recordlist) - 查看可删除的序列
-- [`record.get`](#recordget) - 删除前查看详情
+- [`record_list`](#record_list) - 查看可删除的序列
+- [`record_get`](#record_get) - 删除前查看详情
 
 ---
 
-## record.replay
+## record_replay
 
 回放已保存的动作序列，按顺序重新执行所有记录的工具调用。
 
@@ -463,7 +463,7 @@ console.log("已删除")
 
 ```javascript
 // 示例 1: 基础用法（遇错停止）
-const result = await record.replay({
+const result = await record_replay({
   sequenceId: "seq_1738425600000_abc123"
 })
 
@@ -479,7 +479,7 @@ if (result.success) {
 }
 
 // 示例 2: 持续执行模式（收集所有错误）
-const result = await record.replay({
+const result = await record_replay({
   sequenceId: "seq_xxx",
   continueOnError: true
 })
@@ -502,7 +502,7 @@ result.results.forEach((r, index) => {
 async function regressionTest(sequenceId) {
   console.log("开始回归测试...")
 
-  const result = await record.replay({
+  const result = await record_replay({
     sequenceId,
     continueOnError: true
   })
@@ -540,8 +540,8 @@ if (!passed) {
 
 ### 相关工具
 
-- [`record.start`](#recordstart) - 录制新序列
-- [`record.get`](#recordget) - 查看序列内容
+- [`record_start`](#record_start) - 录制新序列
+- [`record_get`](#record_get) - 查看序列内容
 
 ---
 
@@ -552,7 +552,7 @@ if (!passed) {
 async function recordAndReplayDemo() {
   try {
     // 1. 开始录制
-    const recordSession = await record.start({
+    const recordSession = await record_start({
       name: "商品搜索测试",
       description: "测试搜索功能并查看搜索结果"
     })
@@ -579,13 +579,13 @@ async function recordAndReplayDemo() {
     })
 
     // 3. 停止录制
-    const stopResult = await record.stop()
+    const stopResult = await record_stop()
     console.log(`✅ 录制已停止: ${stopResult.actionCount} 个动作`)
 
     const sequenceId = stopResult.sequenceId
 
     // 4. 查看录制内容
-    const { sequence } = await record.get({ sequenceId })
+    const { sequence } = await record_get({ sequenceId })
     console.log("\n录制的动作:")
     sequence.actions.forEach((action, i) => {
       console.log(`  ${i + 1}. ${action.toolName}`)
@@ -593,7 +593,7 @@ async function recordAndReplayDemo() {
 
     // 5. 回放序列
     console.log("\n开始回放...")
-    const replayResult = await record.replay({
+    const replayResult = await record_replay({
       sequenceId,
       continueOnError: true
     })
@@ -606,7 +606,7 @@ async function recordAndReplayDemo() {
     }
 
     // 7. 列出所有序列
-    const { sequences } = await record.list()
+    const { sequences } = await record_list()
     console.log(`\n当前共有 ${sequences.length} 个序列:`)
     sequences.forEach(seq => {
       console.log(`  - ${seq.name} (${seq.actionCount} 动作)`)
@@ -641,7 +641,7 @@ async function runTestSuite() {
   for (const suite of testSuites) {
     console.log(`\n运行测试: ${suite.name}`)
 
-    const result = await record.replay({
+    const result = await record_replay({
       sequenceId: suite.id,
       continueOnError: true
     })
@@ -671,7 +671,7 @@ async function runTestSuite() {
 // 对比两次执行结果
 async function compareExecutions(sequenceId) {
   // 第一次执行
-  const run1 = await record.replay({
+  const run1 = await record_replay({
     sequenceId,
     continueOnError: true
   })
@@ -680,7 +680,7 @@ async function compareExecutions(sequenceId) {
   await new Promise(resolve => setTimeout(resolve, 1000))
 
   // 第二次执行
-  const run2 = await record.replay({
+  const run2 = await record_replay({
     sequenceId,
     continueOnError: true
   })
@@ -718,7 +718,7 @@ async function compareExecutions(sequenceId) {
 ```javascript
 // 序列管理工具
 async function manageSequences() {
-  const { sequences } = await record.list()
+  const { sequences } = await record_list()
 
   // 按创建时间排序
   sequences.sort((a, b) =>
@@ -737,7 +737,7 @@ async function manageSequences() {
 
   for (const seq of sequences) {
     if (new Date(seq.createdAt).getTime() < thirtyDaysAgo) {
-      await record.delete({ sequenceId: seq.id })
+      await record_delete({ sequenceId: seq.id })
       console.log(`已删除旧序列: ${seq.name}`)
       deletedCount++
     }
@@ -886,13 +886,13 @@ async function manageSequences() {
 
 ```javascript
 // ✅ 推荐：清晰描述测试场景
-await record.start({
+await record_start({
   name: "用户登录-成功路径",
   description: "使用正确的用户名密码登录并验证跳转"
 })
 
 // ❌ 避免：模糊的名称
-await record.start({
+await record_start({
   name: "test1"
 })
 ```
@@ -901,18 +901,18 @@ await record.start({
 
 ```javascript
 // ✅ 推荐：单一功能点
-await record.start({ name: "商品搜索" })
+await record_start({ name: "商品搜索" })
 // 只录制搜索相关操作
-await record.stop()
+await record_stop()
 
-await record.start({ name: "商品详情" })
+await record_start({ name: "商品详情" })
 // 只录制详情页操作
-await record.stop()
+await record_stop()
 
 // ❌ 避免：混合多个无关功能
-await record.start({ name: "整个流程" })
+await record_start({ name: "整个流程" })
 // 搜索、详情、购物车、结算...
-await record.stop()
+await record_stop()
 ```
 
 ### 3. 使用 selector 而非 refId
@@ -942,12 +942,12 @@ await element_tap({ selector: ".next-btn" }) // 可能执行过快
 ```javascript
 // 定期清理旧序列（避免占用过多空间）
 async function cleanup() {
-  const { sequences } = await record.list()
+  const { sequences } = await record_list()
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
 
   for (const seq of sequences) {
     if (new Date(seq.createdAt).getTime() < sevenDaysAgo) {
-      await record.delete({ sequenceId: seq.id })
+      await record_delete({ sequenceId: seq.id })
     }
   }
 }

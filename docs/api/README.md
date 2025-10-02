@@ -30,10 +30,10 @@ Manage WeChat DevTools startup, connection, disconnection, and cleanup.
 
 | Tool | Description |
 |------|-------------|
-| `automator.launch` | Launch WeChat DevTools and load mini program |
-| `automator.connect` | Connect to running DevTools instance |
-| `automator.disconnect` | Disconnect but keep DevTools running |
-| `automator.close` | Close mini program and cleanup all resources |
+| `automator_launch` | Launch WeChat DevTools and load mini program |
+| `automator_connect` | Connect to running DevTools instance |
+| `automator_disconnect` | Disconnect but keep DevTools running |
+| `automator_close` | Close mini program and cleanup all resources |
 
 ---
 
@@ -43,12 +43,12 @@ Global mini program operations including navigation, screenshots, and script exe
 
 | Tool | Description |
 |------|-------------|
-| `miniprogram.navigate` | Navigate between pages (5 methods: navigateTo, redirectTo, etc.) |
-| `miniprogram.callWx` | Call WeChat APIs (wx.*) |
-| `miniprogram.evaluate` | Execute JavaScript in mini program context |
-| `miniprogram.screenshot` | Take screenshot (full page or custom region) |
-| `miniprogram.getPageStack` | Get current page stack information |
-| `miniprogram.getSystemInfo` | Get system info (platform, version, etc.) |
+| `miniprogram_navigate` | Navigate between pages (5 methods: navigateTo, redirectTo, etc.) |
+| `miniprogram_callWx` | Call WeChat APIs (wx.*) |
+| `miniprogram_evaluate` | Execute JavaScript in mini program context |
+| `miniprogram_screenshot` | Take screenshot (full page or custom region) |
+| `miniprogram_getPageStack` | Get current page stack information |
+| `miniprogram_getSystemInfo` | Get system info (platform, version, etc.) |
 
 ---
 
@@ -58,14 +58,14 @@ Query elements, manipulate page data, and call page methods.
 
 | Tool | Description |
 |------|-------------|
-| `page.query` | Query single element (returns ElementRef) |
-| `page.queryAll` | Query all matching elements |
-| `page.waitFor` | Wait for element to appear/disappear |
-| `page.getData` | Get page data by path |
-| `page.setData` | Set page data by path |
-| `page.callMethod` | Call page method |
-| `page.getSize` | Get page dimensions |
-| `page.getScrollTop` | Get page scroll position |
+| `page_query` | Query single element (returns ElementRef) |
+| `page_queryAll` | Query all matching elements |
+| `page_waitFor` | Wait for element to appear/disappear |
+| `page_getData` | Get page data by path |
+| `page_setData` | Set page data by path |
+| `page_callMethod` | Call page method |
+| `page_getSize` | Get page dimensions |
+| `page_getScrollTop` | Get page scroll position |
 
 ---
 
@@ -74,21 +74,21 @@ Query elements, manipulate page data, and call page methods.
 Interact with elements, get attributes, and control scrolling.
 
 **Tap & Input** (5 tools):
-- `element.tap`, `element.longPress`, `element.doubleTap`
-- `element.input`, `element.clearInput`
+- `element_tap`, `element_longPress`, `element_doubleTap`
+- `element_input`, `element_clearInput`
 
 **Touch Events** (8 tools):
-- `element.touchStart/Move/End` - Single-touch gestures
-- `element.multiTouchStart/Move/End` - Multi-touch gestures
-- `element.swipe`, `element.pinch` - Common gestures
+- `element_touchStart/Move/End` - Single-touch gestures
+- `element_multiTouchStart/Move/End` - Multi-touch gestures
+- `element_swipe`, `element_pinch` - Common gestures
 
 **Getters** (7 tools):
-- `element.getText`, `element.getValue`
-- `element.getAttribute`, `element.getProperty`
-- `element.getSize`, `element.getOffset`, `element.getBoundingClientRect`
+- `element_getText`, `element_getValue`
+- `element_getAttribute`, `element_getProperty`
+- `element_getSize`, `element_getOffset`, `element_getBoundingClientRect`
 
 **Scrolling** (3 tools):
-- `element.scroll`, `element.scrollTo`, `element.scrollIntoView`
+- `element_scroll`, `element_scrollTo`, `element_scrollIntoView`
 
 📖 **[Full Element API Documentation](./element.md)**
 
@@ -100,15 +100,15 @@ Automated testing assertions for element validation.
 
 | Tool | Description |
 |------|-------------|
-| `assert.exists` | Assert element exists |
-| `assert.notExists` | Assert element does not exist |
-| `assert.text` | Assert exact text match |
-| `assert.notText` | Assert text does not match |
-| `assert.attribute` | Assert attribute value |
-| `assert.notAttribute` | Assert attribute absence/mismatch |
-| `assert.data` | Assert page data value |
-| `assert.displayed` | Assert element is visible (non-zero size) |
-| `assert.count` | Assert element count |
+| `assert_exists` | Assert element exists |
+| `assert_notExists` | Assert element does not exist |
+| `assert_text` | Assert exact text match |
+| `assert_notText` | Assert text does not match |
+| `assert_attribute` | Assert attribute value |
+| `assert_notAttribute` | Assert attribute absence/mismatch |
+| `assert_data` | Assert page data value |
+| `assert_displayed` | Assert element is visible (non-zero size) |
+| `assert_count` | Assert element count |
 
 ---
 
@@ -118,9 +118,9 @@ Capture page, app, and element state for troubleshooting and debugging.
 
 | Tool | Description |
 |------|-------------|
-| `snapshot.capture` | Capture current state (page data + optional screenshot) |
-| `snapshot.restore` | Restore previously captured state |
-| `snapshot.compare` | Compare two snapshots and report differences |
+| `snapshot_capture` | Capture current state (page data + optional screenshot) |
+| `snapshot_restore` | Restore previously captured state |
+| `snapshot_compare` | Compare two snapshots and report differences |
 
 ---
 
@@ -130,12 +130,12 @@ Record user actions and replay for regression testing.
 
 | Tool | Description |
 |------|-------------|
-| `record.start` | Start recording user actions |
-| `record.stop` | Stop recording and save sequence |
-| `record.list` | List all saved action sequences |
-| `record.get` | Get specific sequence details |
-| `record.delete` | Delete a saved sequence |
-| `record.replay` | Replay recorded sequence with optional error handling |
+| `record_start` | Start recording user actions |
+| `record_stop` | Stop recording and save sequence |
+| `record_list` | List all saved action sequences |
+| `record_get` | Get specific sequence details |
+| `record_delete` | Delete a saved sequence |
+| `record_replay` | Replay recorded sequence with optional error handling |
 
 ---
 
@@ -145,7 +145,7 @@ Record user actions and replay for regression testing.
 
 ```javascript
 // 1. 启动或连接
-miniprogram_launch({ projectPath: "/path/to/project" })
+automator_launch({ projectPath: "/path/to/project" })
 
 // 2. 导航
 miniprogram_navigate({ method: "navigateTo", url: "/pages/index/index" })
@@ -160,7 +160,7 @@ element_tap({ refId: result.refId })
 assert_exists({ selector: ".success-message" })
 
 // 6. 快照（可选）
-snapshot_page({ includeScreenshot: true })
+snapshot_capture({ includeScreenshot: true })
 ```
 
 ### 元素引用（refId）
