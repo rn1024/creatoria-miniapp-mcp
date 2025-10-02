@@ -3,7 +3,7 @@
   "repo": "git@github.com:rn1024/creatoria-miniapp-mcp.git",
   "branch": "main",
   "stage": "Automate",
-  "task_id": "TASK-2025-001-C3",
+  "task_id": "TASK-2025-001-C4",
   "agent": {
     "name": "ClaudeCode",
     "mode": "generalist",
@@ -11,10 +11,9 @@
     "session_ttl_minutes": 270,
     "handoff_planned_at": "2025-10-02T07:45:00Z"
   },
-  "context_digest": "✅ 已完成 Stage A-B-C1-C2-C3: A2 DevTools 启动脚本，B1 工具注册器重构，B2 SessionStore 配置，C1 Automator 工具，C2 MiniProgram 工具，C3 Page 工具（query/queryAll/waitFor/getData/setData/callMethod/getSize/getScrollTop），145 个测试全部通过",
+  "context_digest": "✅ 已完成 Stage A-B-C1-C2-C3-C4: A2 DevTools 启动脚本，B1 工具注册器重构，B2 SessionStore 配置，C1 Automator 工具，C2 MiniProgram 工具，C3 Page 工具，C4 Element 工具（tap/longpress/input/getText/getAttribute/getProperty/getValue/getSize/getOffset/trigger/getStyle），181 个测试全部通过",
   "open_questions": [
-    "C4 Element 工具需要实现哪些交互方法（tap/longpress/input/swipe）？",
-    "C4 是否需要支持元素子类（Input/ScrollView/Swiper/MovableView/Slider）？"
+    "C5 是否需要添加更多工具分类能力（如 assert、mock）？"
   ],
   "artifacts": [
     {"path": ".llm/state.json", "type": "config", "change": "updated", "note": "更新为 A2+B2+C1+C2 完成状态"},
@@ -36,6 +35,9 @@
     {"path": "src/tools/page.ts", "type": "code", "change": "created", "note": "C3: 实现 8 个 Page 工具（query/queryAll/waitFor/getData/setData/callMethod/getSize/getScrollTop，468 行）"},
     {"path": "tests/unit/page.test.ts", "type": "test", "change": "created", "note": "C3: Page 工具单元测试（27 个测试，总计 145 个）"},
     {"path": "src/tools/index.ts", "type": "code", "change": "updated", "note": "C3: 添加 8 个 Page 工具注册和处理器"},
+    {"path": "src/tools/element.ts", "type": "code", "change": "created", "note": "C4: 实现 11 个 Element 工具（tap/longpress/input/getText/getAttribute/getProperty/getValue/getSize/getOffset/trigger/getStyle，467 行）"},
+    {"path": "tests/unit/element.test.ts", "type": "test", "change": "created", "note": "C4: Element 工具单元测试（36 个测试，总计 181 个）"},
+    {"path": "src/tools/index.ts", "type": "code", "change": "updated", "note": "C4: 添加 11 个 Element 工具注册到 CORE_TOOLS 和 CORE_TOOL_HANDLERS"},
     {"path": "dist/", "type": "dir", "change": "updated", "note": "TypeScript 编译输出"}
   ],
   "risks": [
@@ -50,11 +52,6 @@
   "next_actions": [
     {
       "owner": "ClaudeCode",
-      "action": "[C4] Element 工具实现（tap、longpress、input、query、attribute、text）",
-      "depends_on": ["C3"]
-    },
-    {
-      "owner": "ClaudeCode",
       "action": "[C5] 工具注册器优化（完成 Stage C）",
       "depends_on": ["C4"]
     },
@@ -62,6 +59,11 @@
       "owner": "ClaudeCode",
       "action": "[D1] 断言工具集（assert.exists/text/data）",
       "depends_on": ["C5"]
+    },
+    {
+      "owner": "ClaudeCode",
+      "action": "[D2] 集成测试框架",
+      "depends_on": ["D1"]
     }
   ],
   "handoff": {
@@ -70,5 +72,5 @@
     "to": "",
     "package": []
   },
-  "timestamp": "2025-10-02T16:00:00Z"
+  "timestamp": "2025-10-02T17:30:00Z"
 }
