@@ -1,0 +1,14 @@
+{
+  "projectPath": "/path/to/your/miniprogram",
+  "port": 9420,
+  "capabilities": [
+    "automator",
+    "miniprogram",
+    "page",
+    "element",
+    "assert",
+    "network"
+  ],
+  "outputDir": ".mcp-artifacts",
+  "timeout": 30000
+}

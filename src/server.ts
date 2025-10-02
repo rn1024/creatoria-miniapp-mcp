@@ -8,9 +8,12 @@ import { ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 import type { ServerConfig } from './types.js'
 import { SessionStore } from './core/session.js'
 import { registerTools } from './tools/index.js'
+import { mergeServerConfig } from './config/defaults.js'
 
-export async function startServer(config: ServerConfig = {}) {
-  const { capabilities = ['core'], outputDir, sessionTimeout } = config
+export async function startServer(config: Partial<ServerConfig> = {}) {
+  // Merge config with defaults to ensure all fields are present
+  const fullConfig = mergeServerConfig(config)
+  const { capabilities, outputDir, sessionTimeout } = fullConfig
 
   // Generate unique session ID for this server instance
   // Each stdio transport connection gets a unique session

@@ -1,0 +1,8 @@
+{
+  "projectPath": "/path/to/your/miniprogram",
+  "port": 9420,
+  "capabilities": ["automator", "assert", "network"],
+  "outputDir": ".test-artifacts",
+  "timeout": 5000,
+  "sessionTimeout": 600000
+}

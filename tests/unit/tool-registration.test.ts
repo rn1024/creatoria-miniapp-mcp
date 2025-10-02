@@ -10,6 +10,7 @@ import {
   ASSERT_TOOLS,
   SNAPSHOT_TOOLS,
   RECORD_TOOLS,
+  NETWORK_TOOLS,
   CORE_TOOLS,
   AUTOMATOR_TOOL_HANDLERS,
   MINIPROGRAM_TOOL_HANDLERS,
@@ -18,6 +19,7 @@ import {
   ASSERT_TOOL_HANDLERS,
   SNAPSHOT_TOOL_HANDLERS,
   RECORD_TOOL_HANDLERS,
+  NETWORK_TOOL_HANDLERS,
   CORE_TOOL_HANDLERS,
   TOOL_CATEGORIES,
   validateToolRegistration,
@@ -129,8 +131,20 @@ describe('Tool Registration', () => {
       ])
     })
 
-    it('should have 59 total core tools', () => {
-      expect(CORE_TOOLS).toHaveLength(59)
+    it('should have 6 network tools', () => {
+      expect(NETWORK_TOOLS).toHaveLength(6)
+      expect(NETWORK_TOOLS.map((t) => t.name)).toEqual([
+        'network_mock_wx_method',
+        'network_restore_wx_method',
+        'network_mock_request',
+        'network_mock_request_failure',
+        'network_restore_request',
+        'network_restore_all_mocks',
+      ])
+    })
+
+    it('should have 65 total core tools', () => {
+      expect(CORE_TOOLS).toHaveLength(65)
     })
   })
 
@@ -177,20 +191,26 @@ describe('Tool Registration', () => {
       })
     })
 
+    it('should have handler for every network tool', () => {
+      NETWORK_TOOLS.forEach((tool) => {
+        expect(NETWORK_TOOL_HANDLERS[tool.name]).toBeDefined()
+      })
+    })
+
     it('should have handler for every core tool', () => {
       CORE_TOOLS.forEach((tool) => {
         expect(CORE_TOOL_HANDLERS[tool.name]).toBeDefined()
       })
     })
 
-    it('should have 59 total handlers', () => {
-      expect(Object.keys(CORE_TOOL_HANDLERS)).toHaveLength(59)
+    it('should have 65 total handlers', () => {
+      expect(Object.keys(CORE_TOOL_HANDLERS)).toHaveLength(65)
     })
   })
 
   describe('Tool Categories Metadata', () => {
-    it('should have 7 categories', () => {
-      expect(Object.keys(TOOL_CATEGORIES)).toHaveLength(7)
+    it('should have 8 categories', () => {
+      expect(Object.keys(TOOL_CATEGORIES)).toHaveLength(8)
       expect(Object.keys(TOOL_CATEGORIES)).toEqual([
         'automator',
         'miniprogram',
@@ -199,6 +219,7 @@ describe('Tool Registration', () => {
         'assert',
         'snapshot',
         'record',
+        'network',
       ])
     })
 
@@ -257,6 +278,14 @@ describe('Tool Registration', () => {
       expect(category.tools).toHaveLength(6)
       expect(Object.keys(category.handlers)).toHaveLength(6)
     })
+
+    it('should have correct network category', () => {
+      const category = TOOL_CATEGORIES.network
+      expect(category.name).toBe('Network')
+      expect(category.description).toContain('6 tools')
+      expect(category.tools).toHaveLength(6)
+      expect(Object.keys(category.handlers)).toHaveLength(6)
+    })
   })
 
   describe('validateToolRegistration', () => {
@@ -287,7 +316,7 @@ describe('Tool Registration', () => {
   describe('getToolStats', () => {
     it('should return correct statistics', () => {
       const stats = getToolStats()
-      expect(stats.total).toBe(59)
+      expect(stats.total).toBe(65)
       expect(stats.categories).toEqual({
         automator: 4,
         miniprogram: 6,
@@ -296,8 +325,9 @@ describe('Tool Registration', () => {
         assert: 9,
         snapshot: 3,
         record: 6,
+        network: 6,
       })
-      expect(stats.handlers).toBe(59)
+      expect(stats.handlers).toBe(65)
     })
   })
 
@@ -322,6 +352,7 @@ describe('Tool Registration', () => {
       expect(getToolByName('assert_exists')).toBeDefined() // assert
       expect(getToolByName('snapshot_page')).toBeDefined() // snapshot
       expect(getToolByName('record_start')).toBeDefined() // record
+      expect(getToolByName('network_mock_request')).toBeDefined() // network
     })
   })
 
@@ -366,6 +397,12 @@ describe('Tool Registration', () => {
       const tools = getToolsByCategory('record')
       expect(tools).toHaveLength(6)
       expect(tools[0].name).toBe('record_start')
+    })
+
+    it('should get network tools', () => {
+      const tools = getToolsByCategory('network')
+      expect(tools).toHaveLength(6)
+      expect(tools[0].name).toBe('network_mock_wx_method')
     })
 
     it('should return empty array for invalid category', () => {

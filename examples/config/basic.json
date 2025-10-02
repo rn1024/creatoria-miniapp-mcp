@@ -1,0 +1,8 @@
+{
+  "projectPath": "/path/to/your/miniprogram",
+  "port": 9420,
+  "capabilities": ["core"],
+  "outputDir": ".mcp-artifacts",
+  "timeout": 30000,
+  "sessionTimeout": 1800000
+}

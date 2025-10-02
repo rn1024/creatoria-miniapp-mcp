@@ -10,8 +10,9 @@
  * - Assert (9 tools): Testing and verification utilities
  * - Snapshot (3 tools): State capture and diagnostic utilities
  * - Record (6 tools): Action recording and replay utilities
+ * - Network (6 tools): Network mock and testing utilities
  *
- * Total: 59 tools
+ * Total: 65 tools
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
@@ -24,6 +25,7 @@ import * as elementTools from './element.js'
 import * as assertTools from './assert.js'
 import * as snapshotTools from './snapshot.js'
 import * as recordTools from './record.js'
+import * as networkTools from './network.js'
 
 // Tool handler type
 export type ToolHandler = (session: SessionState, args: any) => Promise<any>
@@ -1200,6 +1202,116 @@ export const RECORD_TOOL_HANDLERS: Record<string, ToolHandler> = {
 }
 
 // ============================================================================
+// NETWORK TOOLS (Network Mock & Testing)
+// ============================================================================
+
+export const NETWORK_TOOLS: Tool[] = [
+  {
+    name: 'network_mock_wx_method',
+    description: 'Mock a WeChat API method (wx.*) for testing',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        method: {
+          type: 'string',
+          description: 'WeChat API method name (e.g., "request", "getStorage")',
+        },
+        result: {
+          description: 'Mock result to return',
+        },
+        type: {
+          type: 'string',
+          enum: ['success', 'fail'],
+          description: 'Whether to mock as success or failure (default: success)',
+        },
+      },
+      required: ['method', 'result'],
+    },
+  },
+  {
+    name: 'network_restore_wx_method',
+    description: 'Restore a previously mocked WeChat API method',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        method: {
+          type: 'string',
+          description: 'WeChat API method name to restore',
+        },
+      },
+      required: ['method'],
+    },
+  },
+  {
+    name: 'network_mock_request',
+    description: 'Mock wx.request to return specific data (convenience wrapper)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        data: {
+          description: 'Response data to return (default: {})',
+        },
+        statusCode: {
+          type: 'number',
+          description: 'HTTP status code (default: 200)',
+        },
+        header: {
+          type: 'object',
+          description: 'Response headers (default: {})',
+        },
+        type: {
+          type: 'string',
+          enum: ['success', 'fail'],
+          description: 'Whether to mock as success or failure (default: success)',
+        },
+      },
+    },
+  },
+  {
+    name: 'network_mock_request_failure',
+    description: 'Mock wx.request to fail with specific error',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        errMsg: {
+          type: 'string',
+          description: 'Error message (default: "request:fail")',
+        },
+        errno: {
+          type: 'number',
+          description: 'Error code (default: -1)',
+        },
+      },
+    },
+  },
+  {
+    name: 'network_restore_request',
+    description: 'Restore wx.request to original behavior',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+    },
+  },
+  {
+    name: 'network_restore_all_mocks',
+    description: 'Restore all mocked WeChat API methods at once',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+    },
+  },
+]
+
+export const NETWORK_TOOL_HANDLERS: Record<string, ToolHandler> = {
+  network_mock_wx_method: networkTools.mockWxMethod,
+  network_restore_wx_method: networkTools.restoreWxMethod,
+  network_mock_request: networkTools.mockRequest,
+  network_mock_request_failure: networkTools.mockRequestFailure,
+  network_restore_request: networkTools.restoreRequest,
+  network_restore_all_mocks: networkTools.restoreAllMocks,
+}
+
+// ============================================================================
 // TOOL CATEGORIES
 // ============================================================================
 
@@ -1246,6 +1358,12 @@ export const TOOL_CATEGORIES: Record<string, ToolCategory> = {
     tools: RECORD_TOOLS,
     handlers: RECORD_TOOL_HANDLERS,
   },
+  network: {
+    name: 'Network',
+    description: 'Network mock and testing utilities (6 tools)',
+    tools: NETWORK_TOOLS,
+    handlers: NETWORK_TOOL_HANDLERS,
+  },
 }
 
 // ============================================================================
@@ -1260,6 +1378,7 @@ export const CORE_TOOLS: Tool[] = [
   ...ASSERT_TOOLS,
   ...SNAPSHOT_TOOLS,
   ...RECORD_TOOLS,
+  ...NETWORK_TOOLS,
 ]
 
 export const CORE_TOOL_HANDLERS: Record<string, ToolHandler> = {
@@ -1270,6 +1389,7 @@ export const CORE_TOOL_HANDLERS: Record<string, ToolHandler> = {
   ...ASSERT_TOOL_HANDLERS,
   ...SNAPSHOT_TOOL_HANDLERS,
   ...RECORD_TOOL_HANDLERS,
+  ...NETWORK_TOOL_HANDLERS,
 }
 
 // ============================================================================
@@ -1315,6 +1435,7 @@ export function getToolStats() {
       assert: ASSERT_TOOLS.length,
       snapshot: SNAPSHOT_TOOLS.length,
       record: RECORD_TOOLS.length,
+      network: NETWORK_TOOLS.length,
     },
     handlers: Object.keys(CORE_TOOL_HANDLERS).length,
   }
@@ -1346,6 +1467,23 @@ export interface ToolRegistrationOptions {
 }
 
 /**
+ * Supported capability names for tool registration
+ */
+export const SUPPORTED_CAPABILITIES = [
+  'core', // All tools (default)
+  'automator', // Connection and lifecycle
+  'miniprogram', // MiniProgram-level operations
+  'page', // Page-level operations
+  'element', // Element interactions
+  'assert', // Testing and verification
+  'snapshot', // State capture
+  'record', // Recording and replay
+  'network', // Network mocking
+] as const
+
+export type Capability = (typeof SUPPORTED_CAPABILITIES)[number]
+
+/**
  * Register tools based on enabled capabilities
  * This function actually registers the tool handlers with the MCP server
  */
@@ -1363,25 +1501,70 @@ export function registerTools(server: Server, options: ToolRegistrationOptions):
     throw new Error('Tool registration validation failed')
   }
 
-  // Core tools (always included)
+  // Register tools based on capabilities
+  // 'core' includes all tools
   if (capabilities.includes('core')) {
     tools.push(...CORE_TOOLS)
     Object.assign(handlers, CORE_TOOL_HANDLERS)
+  } else {
+    // Register individual capability groups
+    if (capabilities.includes('automator')) {
+      tools.push(...AUTOMATOR_TOOLS)
+      Object.assign(handlers, AUTOMATOR_TOOL_HANDLERS)
+    }
+    if (capabilities.includes('miniprogram')) {
+      tools.push(...MINIPROGRAM_TOOLS)
+      Object.assign(handlers, MINIPROGRAM_TOOL_HANDLERS)
+    }
+    if (capabilities.includes('page')) {
+      tools.push(...PAGE_TOOLS)
+      Object.assign(handlers, PAGE_TOOL_HANDLERS)
+    }
+    if (capabilities.includes('element')) {
+      tools.push(...ELEMENT_TOOLS)
+      Object.assign(handlers, ELEMENT_TOOL_HANDLERS)
+    }
+    if (capabilities.includes('assert')) {
+      tools.push(...ASSERT_TOOLS)
+      Object.assign(handlers, ASSERT_TOOL_HANDLERS)
+    }
+    if (capabilities.includes('snapshot')) {
+      tools.push(...SNAPSHOT_TOOLS)
+      Object.assign(handlers, SNAPSHOT_TOOL_HANDLERS)
+    }
+    if (capabilities.includes('record')) {
+      tools.push(...RECORD_TOOLS)
+      Object.assign(handlers, RECORD_TOOL_HANDLERS)
+    }
+    if (capabilities.includes('network')) {
+      tools.push(...NETWORK_TOOLS)
+      Object.assign(handlers, NETWORK_TOOL_HANDLERS)
+    }
   }
 
-  // Future: Add more capability-based tools
-  // if (capabilities.includes('assert')) {
-  //   tools.push(...ASSERT_TOOLS)
-  //   Object.assign(handlers, ASSERT_TOOL_HANDLERS)
-  // }
-
   // Log registration stats
-  const stats = getToolStats()
-  console.error(`Registering ${stats.total} tools:`)
-  console.error(`  - Automator: ${stats.categories.automator}`)
-  console.error(`  - MiniProgram: ${stats.categories.miniprogram}`)
-  console.error(`  - Page: ${stats.categories.page}`)
-  console.error(`  - Element: ${stats.categories.element}`)
+  console.error(`Registering ${tools.length} tools (capabilities: ${capabilities.join(', ')}):`)
+
+  // Count tools by category in registered set
+  const registeredCounts = {
+    automator: tools.filter(t => t.name.startsWith('miniprogram_launch') || t.name.startsWith('miniprogram_connect') || t.name.startsWith('miniprogram_disconnect') || t.name.startsWith('miniprogram_close')).length,
+    miniprogram: tools.filter(t => t.name.startsWith('miniprogram_') && !t.name.includes('launch') && !t.name.includes('connect') && !t.name.includes('disconnect') && !t.name.includes('close')).length,
+    page: tools.filter(t => t.name.startsWith('page_')).length,
+    element: tools.filter(t => t.name.startsWith('element_')).length,
+    assert: tools.filter(t => t.name.startsWith('assert_')).length,
+    snapshot: tools.filter(t => t.name.startsWith('snapshot_')).length,
+    record: tools.filter(t => t.name.startsWith('record_')).length,
+    network: tools.filter(t => t.name.startsWith('network_')).length,
+  }
+
+  if (registeredCounts.automator > 0) console.error(`  - Automator: ${registeredCounts.automator}`)
+  if (registeredCounts.miniprogram > 0) console.error(`  - MiniProgram: ${registeredCounts.miniprogram}`)
+  if (registeredCounts.page > 0) console.error(`  - Page: ${registeredCounts.page}`)
+  if (registeredCounts.element > 0) console.error(`  - Element: ${registeredCounts.element}`)
+  if (registeredCounts.assert > 0) console.error(`  - Assert: ${registeredCounts.assert}`)
+  if (registeredCounts.snapshot > 0) console.error(`  - Snapshot: ${registeredCounts.snapshot}`)
+  if (registeredCounts.record > 0) console.error(`  - Record: ${registeredCounts.record}`)
+  if (registeredCounts.network > 0) console.error(`  - Network: ${registeredCounts.network}`)
 
   // Register CallToolRequest handler
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
