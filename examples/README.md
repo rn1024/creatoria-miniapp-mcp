@@ -13,7 +13,7 @@
 | 示例 | 描述 | 难度 | 涵盖工具 |
 |------|------|------|----------|
 | [01-basic-navigation](./01-basic-navigation.md) | 页面导航基础 | ⭐ | launch, navigate, screenshot |
-| [02-form-interaction](./02-form-interaction.md) | 表单交互操作 | ⭐ | query, input, tap, getValue |
+| [02-element-interaction](./02-element-interaction.md) | 元素查询与交互 | ⭐ | query, queryAll, tap, input, getText |
 
 ### 进阶示例（Advanced）
 
@@ -74,21 +74,24 @@ Claude 会读取示例文档并依次调用对应的 MCP 工具
 
 ---
 
-### [02-form-interaction](./02-form-interaction.md)
+### [02-element-interaction](./02-element-interaction.md)
 
 **学习目标**:
-- 查询表单元素
-- 填写输入框
-- 点击按钮提交
-- 验证表单数据
+- 查询单个和多个元素
+- 缓存元素引用（refId）
+- 执行点击、长按、输入操作
+- 获取元素文本、属性和尺寸
+- 理解 Attribute vs Property
 
 **关键步骤**:
-1. 查询表单元素 (`page_query`)
-2. 输入文本 (`element_input`)
-3. 点击提交 (`element_tap`)
-4. 验证结果 (`element_get_value`)
+1. 查询单个元素 (`page_query`)
+2. 查询多个元素 (`page_queryAll`)
+3. 输入文本 (`element_input`)
+4. 点击和长按 (`element_tap`, `element_longPress`)
+5. 获取内容 (`element_getText`, `element_getValue`)
+6. 获取属性 (`element_getAttribute`, `element_getProperty`)
 
-**适合场景**: 登录表单、注册流程、数据提交
+**适合场景**: 登录表单、商品列表、搜索功能、元素信息获取
 
 ---
 
