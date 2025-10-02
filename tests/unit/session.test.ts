@@ -24,6 +24,19 @@ describe('SessionStore', () => {
       expect(session.elements.size).toBe(0)
     })
 
+    it('should respect custom outputDir configuration', () => {
+      const customStore = new SessionStore({
+        sessionTimeout: 1000,
+        outputDir: '/custom/output/path',
+      })
+
+      const session = customStore.getOrCreate('test-session')
+      expect(session.outputDir).toContain('/custom/output/path')
+      expect(session.outputDir).toContain('test-session')
+
+      customStore.dispose()
+    })
+
     it('should return existing session on getOrCreate', () => {
       const session1 = store.getOrCreate('test-session')
       const session2 = store.getOrCreate('test-session')

@@ -11,23 +11,23 @@
     "session_ttl_minutes": 270,
     "handoff_planned_at": "2025-10-02T07:45:00Z"
   },
-  "context_digest": "✅ 已完成 [C1] Automator 工具实现: 实现 launch/connect/disconnect/close 四个核心工具（253 行），20 个新测试全部通过（总计 92 个），完整生命周期管理",
+  "context_digest": "✅ 已完成 Stage A-B-C1: A2 端口配置脚本，B2 outputDir 配置修复，C1 Automator 工具（launch/connect/disconnect/close），93 个测试全部通过",
   "open_questions": [
+    "A1 环境已安装完成（Node 18+、pnpm 9.0、微信开发者工具）？",
     "C2 工具需要实现哪些导航方法（navigateTo/redirectTo/reLaunch/switchTab）？",
     "screenshot 工具是否需要支持全屏/元素截图两种模式？",
     "callWx 工具如何处理异步 API 的返回值？"
   ],
   "artifacts": [
-    {"path": ".llm/state.json", "type": "config", "change": "updated", "note": "更新为 C1 任务完成状态"},
-    {"path": "src/tools/automator.ts", "type": "code", "change": "created", "note": "实现 launch/connect/disconnect/close 工具（253 行）"},
-    {"path": "src/tools/index.ts", "type": "code", "change": "updated", "note": "添加 miniprogram_disconnect 工具注册"},
-    {"path": "src/server.ts", "type": "code", "change": "updated", "note": "替换占位符实现为真实工具处理器"},
-    {"path": "tests/unit/automator.test.ts", "type": "test", "change": "created", "note": "Automator 工具单元测试（20 个测试）"},
-    {"path": "src/types.ts", "type": "code", "change": "unchanged", "note": "B4 的 Logger、OutputManager 接口"},
-    {"path": "src/core/logger.ts", "type": "code", "change": "unchanged", "note": "B4 的 ConsoleLogger 实现"},
-    {"path": "src/core/output.ts", "type": "code", "change": "unchanged", "note": "B4 的 FileOutputManager 实现"},
-    {"path": "src/core/session.ts", "type": "code", "change": "unchanged", "note": "B2/B4 的 SessionStore 实现"},
-    {"path": "src/core/element-ref.ts", "type": "code", "change": "unchanged", "note": "B3 的元素解析器"},
+    {"path": ".llm/state.json", "type": "config", "change": "updated", "note": "更新为 A2+B2+C1 修复完成状态"},
+    {"path": "scripts/setup-devtools-port.sh", "type": "script", "change": "created", "note": "A2: 微信开发者工具端口配置脚本"},
+    {"path": "docs/setup-guide.md", "type": "docs", "change": "created", "note": "A2: 环境配置和快速开始指南"},
+    {"path": "src/core/session.ts", "type": "code", "change": "updated", "note": "B2 修复: outputDir 配置穿透"},
+    {"path": "tests/unit/session.test.ts", "type": "test", "change": "updated", "note": "B2: 新增 outputDir 配置测试（93 个测试）"},
+    {"path": "src/tools/automator.ts", "type": "code", "change": "created", "note": "C1: 实现 launch/connect/disconnect/close 工具（253 行）"},
+    {"path": "src/tools/index.ts", "type": "code", "change": "updated", "note": "C1: 添加 miniprogram_disconnect 工具注册"},
+    {"path": "src/server.ts", "type": "code", "change": "updated", "note": "C1: 替换占位符实现为真实工具处理器"},
+    {"path": "tests/unit/automator.test.ts", "type": "test", "change": "created", "note": "C1: Automator 工具单元测试（20 个测试）"},
     {"path": "dist/", "type": "dir", "change": "updated", "note": "TypeScript 编译输出"}
   ],
   "risks": [

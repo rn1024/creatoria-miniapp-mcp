@@ -14,10 +14,12 @@ const DEFAULT_OUTPUT_DIR = '.mcp-artifacts'
 export class SessionStore {
   private sessions = new Map<string, SessionState>()
   private sessionTimeout: number
+  private outputDir: string
   private cleanupInterval?: NodeJS.Timeout
 
   constructor(config: { sessionTimeout?: number; outputDir?: string } = {}) {
     this.sessionTimeout = config.sessionTimeout || DEFAULT_SESSION_TIMEOUT
+    this.outputDir = config.outputDir || DEFAULT_OUTPUT_DIR
 
     // Start periodic cleanup of timed-out sessions
     this.startCleanupTimer()
@@ -110,7 +112,7 @@ export class SessionStore {
     let session = this.get(sessionId)
     if (!session) {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-      const outputDir = join(DEFAULT_OUTPUT_DIR, `${sessionId}-${timestamp}`)
+      const outputDir = join(this.outputDir, `${sessionId}-${timestamp}`)
 
       session = {
         sessionId,
