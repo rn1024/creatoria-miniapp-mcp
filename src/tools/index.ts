@@ -8,6 +8,7 @@ import { Tool, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 import type { SessionState } from '../types.js'
 import * as automatorTools from './automator.js'
 import * as miniprogramTools from './miniprogram.js'
+import * as pageTools from './page.js'
 
 // Tool handler type
 export type ToolHandler = (session: SessionState, args: any) => Promise<any>
@@ -159,6 +160,155 @@ export const CORE_TOOLS: Tool[] = [
       properties: {},
     },
   },
+  {
+    name: 'page_query',
+    description: 'Query a single element on the page',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        selector: {
+          type: 'string',
+          description: 'CSS selector to query',
+        },
+        pagePath: {
+          type: 'string',
+          description: 'Page path (optional, defaults to current page)',
+        },
+        save: {
+          type: 'boolean',
+          description: 'Whether to save element reference (default: true)',
+        },
+      },
+      required: ['selector'],
+    },
+  },
+  {
+    name: 'page_query_all',
+    description: 'Query all matching elements on the page',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        selector: {
+          type: 'string',
+          description: 'CSS selector to query',
+        },
+        pagePath: {
+          type: 'string',
+          description: 'Page path (optional, defaults to current page)',
+        },
+        save: {
+          type: 'boolean',
+          description: 'Whether to save element references (default: true)',
+        },
+      },
+      required: ['selector'],
+    },
+  },
+  {
+    name: 'page_wait_for',
+    description: 'Wait for a condition to be met (selector or timeout)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        condition: {
+          description: 'Selector (string) or timeout in ms (number)',
+        },
+        pagePath: {
+          type: 'string',
+          description: 'Page path (optional, defaults to current page)',
+        },
+        timeout: {
+          type: 'number',
+          description: 'Maximum wait time in ms (optional)',
+        },
+      },
+      required: ['condition'],
+    },
+  },
+  {
+    name: 'page_get_data',
+    description: 'Get page data (optionally at a specific path)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: {
+          type: 'string',
+          description: 'Data path (optional, returns all data if not specified)',
+        },
+        pagePath: {
+          type: 'string',
+          description: 'Page path (optional, defaults to current page)',
+        },
+      },
+    },
+  },
+  {
+    name: 'page_set_data',
+    description: 'Set page data',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'object',
+          description: 'Data object to set',
+        },
+        pagePath: {
+          type: 'string',
+          description: 'Page path (optional, defaults to current page)',
+        },
+      },
+      required: ['data'],
+    },
+  },
+  {
+    name: 'page_call_method',
+    description: 'Call a method on the page',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        method: {
+          type: 'string',
+          description: 'Method name to call',
+        },
+        args: {
+          type: 'array',
+          description: 'Arguments to pass to the method',
+          items: {},
+        },
+        pagePath: {
+          type: 'string',
+          description: 'Page path (optional, defaults to current page)',
+        },
+      },
+      required: ['method'],
+    },
+  },
+  {
+    name: 'page_get_size',
+    description: 'Get page size (width, height, scrollHeight)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        pagePath: {
+          type: 'string',
+          description: 'Page path (optional, defaults to current page)',
+        },
+      },
+    },
+  },
+  {
+    name: 'page_get_scroll_top',
+    description: 'Get page scroll position',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        pagePath: {
+          type: 'string',
+          description: 'Page path (optional, defaults to current page)',
+        },
+      },
+    },
+  },
 ]
 
 // Tool handlers mapping
@@ -173,6 +323,14 @@ export const CORE_TOOL_HANDLERS: Record<string, ToolHandler> = {
   miniprogram_screenshot: miniprogramTools.screenshot,
   miniprogram_get_page_stack: miniprogramTools.getPageStack,
   miniprogram_get_system_info: miniprogramTools.getSystemInfo,
+  page_query: pageTools.query,
+  page_query_all: pageTools.queryAll,
+  page_wait_for: pageTools.waitFor,
+  page_get_data: pageTools.getData,
+  page_set_data: pageTools.setData,
+  page_call_method: pageTools.callMethod,
+  page_get_size: pageTools.getSize,
+  page_get_scroll_top: pageTools.getScrollTop,
 }
 
 export interface ToolRegistrationOptions {
