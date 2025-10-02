@@ -12,6 +12,7 @@ import type { ServerConfig } from './types.js'
 import { sessionStore } from './core/session.js'
 import { registerTools } from './tools/index.js'
 import * as automatorTools from './tools/automator.js'
+import * as miniprogramTools from './tools/miniprogram.js'
 
 export async function startServer(config: ServerConfig = {}) {
   const { capabilities = ['core'] } = config
@@ -87,6 +88,78 @@ export async function startServer(config: ServerConfig = {}) {
         case 'miniprogram_close': {
           const result = await automatorTools.close(session)
           sessionStore.delete(sessionId)
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          }
+        }
+
+        case 'miniprogram_navigate': {
+          const result = await miniprogramTools.navigate(session, args as any)
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          }
+        }
+
+        case 'miniprogram_call_wx': {
+          const result = await miniprogramTools.callWx(session, args as any)
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          }
+        }
+
+        case 'miniprogram_evaluate': {
+          const result = await miniprogramTools.evaluate(session, args as any)
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          }
+        }
+
+        case 'miniprogram_screenshot': {
+          const result = await miniprogramTools.screenshot(session, args as any)
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          }
+        }
+
+        case 'miniprogram_get_page_stack': {
+          const result = await miniprogramTools.getPageStack(session)
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          }
+        }
+
+        case 'miniprogram_get_system_info': {
+          const result = await miniprogramTools.getSystemInfo(session)
           return {
             content: [
               {
