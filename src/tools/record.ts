@@ -150,6 +150,8 @@ export async function stopRecording(
 
 /**
  * Record an action (internal helper, called by tool wrapper)
+ *
+ * Thread-safe: Captures recording state atomically to prevent race conditions
  */
 export function recordAction(
   session: SessionState,
@@ -159,20 +161,37 @@ export function recordAction(
   duration?: number,
   error?: string
 ): void {
-  if (!session.recording?.isRecording || !session.recording.currentSequence) {
+  // Atomically capture recording state
+  const recording = session.recording
+  if (!recording || !recording.isRecording) {
     return
   }
 
-  const action: RecordedAction = {
-    timestamp: new Date(),
-    toolName,
-    args,
-    duration,
-    success,
-    error,
+  const currentSequence = recording.currentSequence
+  if (!currentSequence) {
+    return
   }
 
-  session.recording.currentSequence.actions.push(action)
+  try {
+    const action: RecordedAction = {
+      timestamp: new Date(),
+      toolName,
+      args,
+      duration,
+      success,
+      error,
+    }
+
+    // Atomically push action
+    // If recording was stopped between the checks above and here,
+    // the action will still be recorded (which is acceptable - better than losing it)
+    currentSequence.actions.push(action)
+  } catch (error) {
+    // Handle potential race condition where currentSequence becomes invalid
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error(`Failed to record action for ${toolName}:`, errorMessage)
+    // Silently fail - don't break the actual tool execution
+  }
 }
 
 /**

@@ -12,6 +12,10 @@ import { registerTools } from './tools/index.js'
 export async function startServer(config: ServerConfig = {}) {
   const { capabilities = ['core'], outputDir, sessionTimeout } = config
 
+  // Generate unique session ID for this server instance
+  // Each stdio transport connection gets a unique session
+  const sessionId = `session-${process.pid}-${Date.now()}`
+
   // Create session store with configuration
   const sessionStore = new SessionStore({
     outputDir,
@@ -34,12 +38,13 @@ export async function startServer(config: ServerConfig = {}) {
   // registerTools now actually registers the CallToolRequestSchema handler
   const tools = registerTools(server, {
     capabilities,
-    getSession: (sessionId) => {
-      const session = sessionStore.getOrCreate(sessionId)
-      sessionStore.updateActivity(sessionId)
+    sessionId, // Pass the unique session ID
+    getSession: (sid) => {
+      const session = sessionStore.getOrCreate(sid)
+      sessionStore.updateActivity(sid)
       return session
     },
-    deleteSession: (sessionId) => sessionStore.delete(sessionId),
+    deleteSession: (sid) => sessionStore.delete(sid),
   })
 
   // List available tools
@@ -48,15 +53,25 @@ export async function startServer(config: ServerConfig = {}) {
   })
 
   // Cleanup on shutdown
-  process.on('SIGINT', () => {
+  process.on('SIGINT', async () => {
     console.error('\nShutting down MCP server...')
-    sessionStore.dispose()
+    try {
+      await sessionStore.dispose()
+      console.error('Cleanup completed')
+    } catch (error) {
+      console.error('Error during cleanup:', error)
+    }
     process.exit(0)
   })
 
-  process.on('SIGTERM', () => {
+  process.on('SIGTERM', async () => {
     console.error('\nShutting down MCP server...')
-    sessionStore.dispose()
+    try {
+      await sessionStore.dispose()
+      console.error('Cleanup completed')
+    } catch (error) {
+      console.error('Error during cleanup:', error)
+    }
     process.exit(0)
   })
 

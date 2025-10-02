@@ -1340,8 +1340,9 @@ export function getToolsByCategory(category: keyof typeof TOOL_CATEGORIES): Tool
 
 export interface ToolRegistrationOptions {
   capabilities?: string[]
+  sessionId: string // Unique session ID for this server instance
   getSession: (sessionId: string) => SessionState
-  deleteSession?: (sessionId: string) => void
+  deleteSession?: (sessionId: string) => Promise<void> // Async cleanup
 }
 
 /**
@@ -1349,7 +1350,7 @@ export interface ToolRegistrationOptions {
  * This function actually registers the tool handlers with the MCP server
  */
 export function registerTools(server: Server, options: ToolRegistrationOptions): Tool[] {
-  const { capabilities = ['core'], getSession, deleteSession } = options
+  const { capabilities = ['core'], sessionId, getSession, deleteSession } = options
 
   const tools: Tool[] = []
   const handlers: Record<string, ToolHandler> = {}
@@ -1386,8 +1387,8 @@ export function registerTools(server: Server, options: ToolRegistrationOptions):
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params
 
-    // Get or create session (using default for now, will be enhanced in future)
-    const sessionId = 'default'
+    // Get or create session using the unique session ID for this server instance
+    // Each stdio transport connection has its own session
     const session = getSession(sessionId)
 
     try {
@@ -1402,7 +1403,13 @@ export function registerTools(server: Server, options: ToolRegistrationOptions):
 
       // Handle session deletion for close tool
       if (name === 'miniprogram_close' && deleteSession) {
-        deleteSession(sessionId)
+        try {
+          await deleteSession(sessionId)
+          console.error(`Session ${sessionId} deleted after close`)
+        } catch (error) {
+          console.error(`Failed to delete session ${sessionId} after close:`, error)
+          // Don't fail the close operation if cleanup fails
+        }
       }
 
       // Return formatted response

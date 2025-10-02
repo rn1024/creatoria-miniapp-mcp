@@ -47,6 +47,17 @@ export async function snapshotPage(
 
     logger?.info('Capturing page snapshot', { pagePath, includeScreenshot })
 
+    // Validate filename if provided (security: prevent path traversal)
+    if (filename) {
+      const { validateFilename } = await import('../core/validation.js')
+      try {
+        validateFilename(filename, ['json'])
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        throw new Error(`Invalid filename: ${errorMessage}`)
+      }
+    }
+
     // Get current page from session or specified path
     const pageStackResult = await miniprogramTools.getPageStack(session)
     const currentPageInfo = pageStackResult.pages[pageStackResult.pages.length - 1]
@@ -154,6 +165,17 @@ export async function snapshotFull(
     }
 
     logger?.info('Capturing full application snapshot', { includeScreenshot })
+
+    // Validate filename if provided (security: prevent path traversal)
+    if (filename) {
+      const { validateFilename } = await import('../core/validation.js')
+      try {
+        validateFilename(filename, ['json'])
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        throw new Error(`Invalid filename: ${errorMessage}`)
+      }
+    }
 
     // Get system info
     const systemInfoResult = await miniprogramTools.getSystemInfo(session)
@@ -269,6 +291,17 @@ export async function snapshotElement(
     }
 
     logger?.info('Capturing element snapshot', { refId, includeScreenshot })
+
+    // Validate filename if provided (security: prevent path traversal)
+    if (filename) {
+      const { validateFilename } = await import('../core/validation.js')
+      try {
+        validateFilename(filename, ['json'])
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        throw new Error(`Invalid filename: ${errorMessage}`)
+      }
+    }
 
     // Import element tools dynamically to avoid circular dependency
     const elementTools = await import('./element.js')

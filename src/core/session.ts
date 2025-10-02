@@ -47,40 +47,87 @@ export class SessionStore {
 
   /**
    * Delete session and cleanup resources
+   *
+   * Properly cleans up all async resources:
+   * - Disconnects from miniProgram
+   * - Kills IDE process and waits for exit
+   * - Clears element cache
+   *
+   * @throws AggregateError if cleanup operations fail
    */
-  delete(sessionId: string): void {
+  async delete(sessionId: string): Promise<void> {
     const session = this.sessions.get(sessionId)
-    if (session) {
-      // Clean up miniProgram instance
-      if (session.miniProgram) {
-        try {
-          if (typeof session.miniProgram.disconnect === 'function') {
-            session.miniProgram.disconnect()
-          }
-          console.error(`Disconnected miniProgram for session ${sessionId}`)
-        } catch (error) {
-          console.error(`Failed to disconnect miniProgram for session ${sessionId}:`, error)
-        }
-      }
-
-      // Clean up IDE process
-      if (session.ideProcess) {
-        try {
-          if (typeof session.ideProcess.kill === 'function') {
-            session.ideProcess.kill()
-          }
-          console.error(`Killed IDE process for session ${sessionId}`)
-        } catch (error) {
-          console.error(`Failed to kill IDE process for session ${sessionId}:`, error)
-        }
-      }
-
-      // Clear element cache
-      session.elements.clear()
-
-      console.error(`Session ${sessionId} cleaned up successfully`)
+    if (!session) {
+      this.sessions.delete(sessionId)
+      return
     }
+
+    const errors: Error[] = []
+
+    // Clean up miniProgram instance (async operation)
+    if (session.miniProgram) {
+      try {
+        if (typeof session.miniProgram.disconnect === 'function') {
+          await session.miniProgram.disconnect() // ✅ Await async operation
+        }
+        console.error(`Disconnected miniProgram for session ${sessionId}`)
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error(String(error))
+        errors.push(new Error(`Failed to disconnect miniProgram: ${err.message}`))
+        console.error(`Failed to disconnect miniProgram for session ${sessionId}:`, error)
+      }
+    }
+
+    // Clean up IDE process (async operation - wait for exit)
+    const ideProcess = session.ideProcess
+    if (ideProcess) {
+      try {
+        if (typeof ideProcess.kill === 'function') {
+          // Wait for process to actually exit (only if once method exists)
+          if (typeof ideProcess.once === 'function') {
+            await new Promise<void>((resolve, reject) => {
+              const timeout = setTimeout(() => {
+                reject(new Error('IDE process did not exit within 5 seconds'))
+              }, 5000)
+
+              ideProcess.once('exit', () => {
+                clearTimeout(timeout)
+                resolve()
+              })
+
+              ideProcess.kill()
+            })
+          } else {
+            // For test mocks or processes without event emitter
+            ideProcess.kill()
+          }
+        }
+        console.error(`Killed IDE process for session ${sessionId}`)
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error(String(error))
+        errors.push(new Error(`Failed to kill IDE process: ${err.message}`))
+        console.error(`Failed to kill IDE process for session ${sessionId}:`, error)
+      }
+    }
+
+    // Clear element cache (sync operation)
+    try {
+      session.elements.clear()
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error))
+      errors.push(new Error(`Failed to clear element cache: ${err.message}`))
+    }
+
+    // Remove from session map
     this.sessions.delete(sessionId)
+
+    // If there were any errors, throw AggregateError
+    if (errors.length > 0) {
+      console.error(`Session ${sessionId} cleanup completed with ${errors.length} error(s)`)
+      throw new AggregateError(errors, `Session cleanup had ${errors.length} error(s)`)
+    }
+
+    console.error(`Session ${sessionId} cleaned up successfully`)
   }
 
   /**
@@ -92,16 +139,23 @@ export class SessionStore {
 
   /**
    * Dispose all sessions
+   *
+   * Async method to properly cleanup all resources
    */
-  dispose(): void {
+  async dispose(): Promise<void> {
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval)
       this.cleanupInterval = undefined
     }
 
-    for (const sessionId of this.sessions.keys()) {
-      this.delete(sessionId)
-    }
+    // Delete all sessions in parallel
+    const deletions = Array.from(this.sessions.keys()).map((sessionId) =>
+      this.delete(sessionId).catch((error) => {
+        console.error(`Failed to delete session ${sessionId} during dispose:`, error)
+      })
+    )
+
+    await Promise.all(deletions)
     console.error('All sessions disposed')
   }
 
@@ -156,7 +210,7 @@ export class SessionStore {
   private startCleanupTimer(): void {
     // Check every 5 minutes
     this.cleanupInterval = setInterval(
-      () => {
+      async () => {
         const now = Date.now()
         const expiredSessions: string[] = []
 
@@ -168,9 +222,13 @@ export class SessionStore {
 
         if (expiredSessions.length > 0) {
           console.error(`Cleaning up ${expiredSessions.length} expired sessions`)
-          for (const sessionId of expiredSessions) {
-            this.delete(sessionId)
-          }
+          // Delete expired sessions in parallel with error handling
+          const deletions = expiredSessions.map((sessionId) =>
+            this.delete(sessionId).catch((error) => {
+              console.error(`Failed to delete expired session ${sessionId}:`, error)
+            })
+          )
+          await Promise.all(deletions)
         }
       },
       5 * 60 * 1000

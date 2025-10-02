@@ -126,6 +126,14 @@ export async function callWx(
 
 /**
  * Evaluate JavaScript code in the mini program context
+ *
+ * ⚠️ SECURITY WARNING:
+ * This tool executes arbitrary JavaScript code in the mini program context.
+ * Use with caution:
+ * - All evaluations are logged for audit
+ * - Evaluations are limited by timeout (default: 5s)
+ * - Consider restricting this tool in production environments
+ * - Never pass untrusted user input directly to this function
  */
 export async function evaluate(
   session: SessionState,
@@ -148,10 +156,28 @@ export async function evaluate(
       )
     }
 
-    logger?.info('Evaluating expression', { expression })
+    // Security: Log all evaluate calls for audit
+    logger?.info('[SECURITY] Evaluating expression', {
+      expression,
+      argsCount: evalArgs.length,
+      timestamp: new Date().toISOString(),
+    })
 
-    // Evaluate expression in mini program context
-    const result = await session.miniProgram.evaluate(expression, ...evalArgs)
+    // Import timeout utilities
+    const { withTimeout, getTimeout, DEFAULT_TIMEOUTS } = await import('../core/timeout.js')
+
+    // Get timeout from config or use default (5 seconds for evaluate)
+    const timeoutMs = getTimeout(
+      session.config?.evaluateTimeout,
+      DEFAULT_TIMEOUTS.evaluate
+    )
+
+    // Evaluate expression with timeout protection
+    const result = await withTimeout(
+      session.miniProgram.evaluate(expression, ...evalArgs),
+      timeoutMs,
+      'Evaluate expression'
+    )
 
     logger?.info('Evaluation successful', { result })
 
@@ -162,9 +188,12 @@ export async function evaluate(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    logger?.error('Evaluation failed', {
+
+    // Security: Log failed evaluations
+    logger?.error('[SECURITY] Evaluation failed', {
       error: errorMessage,
       expression,
+      timestamp: new Date().toISOString(),
     })
 
     throw new Error(`Evaluation failed: ${errorMessage}`)
@@ -201,6 +230,17 @@ export async function screenshot(
     }
 
     logger?.info('Taking screenshot', { filename, fullPage })
+
+    // Validate filename if provided (security: prevent path traversal)
+    if (filename) {
+      const { validateFilename } = await import('../core/validation.js')
+      try {
+        validateFilename(filename, ['png', 'jpg', 'jpeg'])
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        throw new Error(`Invalid filename: ${errorMessage}`)
+      }
+    }
 
     // Ensure output directory exists
     await outputManager.ensureOutputDir()
