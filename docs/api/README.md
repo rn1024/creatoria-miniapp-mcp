@@ -1,6 +1,6 @@
 # API Reference - creatoria-miniapp-mcp
 
-> Complete API documentation for all 59 tools across 7 categories
+> Complete API documentation for all 65 tools across 8 categories
 
 Enable AI assistants to orchestrate WeChat Mini Program testing through natural language. Each tool is designed for LLM consumption with clear parameters, return values, and usage examples.
 
@@ -8,17 +8,18 @@ Enable AI assistants to orchestrate WeChat Mini Program testing through natural 
 
 ## 📊 Tool Catalog
 
-**Total**: 59 tools across 7 categories
+**Total**: 65 tools across 8 categories
 
 | Category | Tools | Description |
 |----------|-------|-------------|
 | [Automator](#automator) | 4 | Connection & lifecycle management |
-| [MiniProgram](#miniprogram) | 6 | App-level operations (navigation, screenshots, etc.) |
+| [MiniProgram](#miniprogram) | 16 | App-level operations (navigation, screenshots, wx.* APIs) |
 | [Page](#page) | 8 | Page-level queries and data manipulation |
 | [Element](#element) | 23 | Element interactions, attributes, scrolling |
 | [Assert](#assert) | 9 | Testing assertions and validation |
 | [Snapshot](#snapshot) | 3 | State capture for debugging |
 | [Record](#record) | 6 | Action recording and replay for regression testing |
+| [Network](#network) | 6 | Network mocking and wx.* API testing |
 
 ---
 
@@ -136,6 +137,21 @@ Record user actions and replay for regression testing.
 | `record_get` | Get specific sequence details |
 | `record_delete` | Delete a saved sequence |
 | `record_replay` | Replay recorded sequence with optional error handling |
+
+---
+
+### <a name="network"></a>[Network](./network.md) - Network Mocking & Testing (6 tools)
+
+Mock WeChat APIs (wx.*) for testing without real network calls.
+
+| Tool | Description |
+|------|-------------|
+| `network_mock_wx_method` | Mock any wx.* API method (success/fail) |
+| `network_restore_wx_method` | Restore a mocked wx.* method |
+| `network_mock_request` | Convenience wrapper for wx.request mock |
+| `network_mock_request_failure` | Mock wx.request failure |
+| `network_restore_request` | Restore wx.request to original behavior |
+| `network_restore_all_mocks` | Restore all mocked methods at once |
 
 ---
 

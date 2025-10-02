@@ -1,0 +1,22 @@
+{
+  "projectPath": "/path/to/your/miniprogram",
+  "cliPath": "/Applications/wechatwebdevtools.app/Contents/MacOS/cli",
+  "port": 9420,
+  "capabilities": ["core"],
+  "outputDir": ".mcp-artifacts",
+  "timeout": 30000,
+  "sessionTimeout": 1800000,
+  "_comment": "Multi-project setup: Use different ports for parallel testing",
+  "_examples": {
+    "project_a": {
+      "projectPath": "/path/to/project-a",
+      "port": 9420,
+      "outputDir": ".mcp-artifacts/project-a"
+    },
+    "project_b": {
+      "projectPath": "/path/to/project-b",
+      "port": 9421,
+      "outputDir": ".mcp-artifacts/project-b"
+    }
+  }
+}

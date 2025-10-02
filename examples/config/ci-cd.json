@@ -1,0 +1,15 @@
+{
+  "projectPath": "${PROJECT_PATH}",
+  "port": 9420,
+  "capabilities": ["automator", "miniprogram", "page", "element", "assert"],
+  "outputDir": "./test-artifacts",
+  "timeout": 10000,
+  "sessionTimeout": 600000,
+  "_comment": "CI/CD configuration with environment variable support",
+  "_notes": [
+    "Use MCP_PROJECT_PATH env var to set projectPath",
+    "Reduced timeouts for faster CI feedback",
+    "Limited capabilities for CI performance",
+    "Artifacts stored in ./test-artifacts for CI archival"
+  ]
+}

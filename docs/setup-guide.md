@@ -239,7 +239,7 @@ Choose one of the following MCP clients to connect to the server.
 **Verification:**
 - Open Claude Desktop
 - Type: "List available MCP servers"
-- You should see `miniprogram` server with 59 tools
+- You should see `miniprogram` server with 65 tools
 
 ---
 
@@ -303,7 +303,7 @@ await client.connect(transport)
 
 // List available tools
 const tools = await client.request({ method: 'tools/list' }, {})
-console.log(tools) // 59 tools
+console.log(tools) // 65 tools
 ```
 
 ---
@@ -345,7 +345,20 @@ Add to your MCP client's `env` section:
 
 ### 5.2 Configuration File (.mcp.json)
 
-Create `.mcp.json` in project root (optional, for advanced users):
+Create `.mcp.json` in project root (optional, for advanced users).
+
+**Configuration Templates**: See `examples/config/` for ready-to-use templates:
+- `basic.json`: Complete configuration with all options
+- `minimal.json`: Only required `projectPath`
+- `custom-capabilities.json`: Selective tool registration
+- `macos.json`: macOS-specific with CLI path
+- `testing.json`: Testing-focused configuration
+- `multi-project.json`: Multi-project setup with different ports
+- `ci-cd.json`: CI/CD configuration with environment variables
+
+**Configuration Priority**: CLI Arguments > Environment Variables > Config File > Defaults
+
+**Example (.mcp.json)**:
 
 ```json
 {
@@ -366,21 +379,26 @@ Create `.mcp.json` in project root (optional, for advanced users):
 Control which tool categories are loaded:
 
 **Available Capabilities:**
-- `core`: Automator, MiniProgram, Page, Element tools (4+6+8+23 = 41 tools)
+- `core`: All 65 tools (default, includes all categories below)
+- `automator`: Connection & lifecycle (4 tools)
+- `miniprogram`: App-level operations (16 tools)
+- `page`: Page-level operations (8 tools)
+- `element`: Element interactions (23 tools)
 - `assert`: Assertion tools (9 tools)
 - `snapshot`: Snapshot tools (3 tools)
 - `record`: Recording/replay tools (6 tools)
+- `network`: Network mocking tools (6 tools)
 
 **Examples:**
 ```json
-// Load all tools (default)
-"CAPABILITIES": "core,assert,snapshot,record"
+// Load all 65 tools (default)
+"capabilities": ["core"]
 
-// Load only core tools
-"CAPABILITIES": "core"
+// Load specific categories (selective registration)
+"capabilities": ["automator", "miniprogram", "page", "element"]
 
-// Load core + assertions only
-"CAPABILITIES": "core,assert"
+// Load only testing tools
+"capabilities": ["automator", "assert", "network"]
 ```
 
 ---
@@ -438,7 +456,7 @@ Open your MCP client (Claude Desktop or Cline) and try:
 You: List all available Mini Program tools
 
 Claude: [Calls tools/list]
-I found 59 tools across 7 categories:
+I found 65 tools across 8 categories:
 - Automator (4): launch, connect, disconnect, close
 - MiniProgram (6): navigate, callWx, evaluate, ...
 - Page (8): query, queryAll, waitFor, ...

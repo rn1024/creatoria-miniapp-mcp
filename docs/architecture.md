@@ -20,7 +20,7 @@ AI Assistant (Claude) → MCP Client → stdio → MCP Server (this project)
 **Key Characteristics**:
 - Protocol: Model Context Protocol (MCP) 1.0 via stdio
 - Language: TypeScript (ESNext + ESM)
-- Tools: 59 tools across 7 categories
+- Tools: 65 tools across 8 categories
 - Sessions: Multi-session isolation, 30-min auto-cleanup
 - Backend: WeChat official `miniprogram-automator` v0.12.1
 
@@ -50,7 +50,7 @@ Unified element location supporting refId, selector, xpath, with caching and inv
 ### 4. Tool Layer
 **Files**: `src/tools/*.ts`
 
-59 tools across 7 categories with Zod validation and modular capabilities loading.
+65 tools across 8 categories with Zod validation and modular capabilities loading.
 
 ---
 
