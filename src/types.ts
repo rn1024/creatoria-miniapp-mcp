@@ -2,6 +2,12 @@
  * Core type definitions for creatoria-miniapp-mcp
  */
 
+import type { MiniProgram, Page } from './miniprogram-automator.js'
+import type { ChildProcess } from 'child_process'
+
+// Re-export miniprogram-automator types for easier imports
+export type { MiniProgram, Page, Element, SystemInfo } from './miniprogram-automator.js'
+
 export interface ServerConfig {
   projectPath?: string
   cliPath?: string
@@ -12,12 +18,22 @@ export interface ServerConfig {
   sessionTimeout?: number // Session timeout in milliseconds (default: 30 minutes)
 }
 
+/**
+ * Cached element with page metadata for invalidation
+ */
+export interface CachedElement {
+  element: import('./miniprogram-automator.js').Element // The actual element object
+  pagePath: string // Page path where element was cached
+  cachedAt: Date // When the element was cached
+}
+
 export interface SessionState {
   sessionId: string
-  miniProgram?: any // miniprogram-automator MiniProgram instance
-  ideProcess?: any // IDE process handle
-  pages: any[] // Page stack
-  elements: Map<string, any> // Element cache (refId -> Element)
+  miniProgram?: MiniProgram // miniprogram-automator MiniProgram instance
+  ideProcess?: ChildProcess // IDE process handle
+  pages: Page[] // Page stack
+  elements: Map<string, CachedElement> // Element cache (refId -> CachedElement)
+  currentPagePath?: string // Current page path for cache invalidation
   outputDir: string // Session-specific output directory
   createdAt: Date
   lastActivity: Date
@@ -31,7 +47,14 @@ export interface SessionConfig {
   projectPath?: string
   cliPath?: string
   port?: number
+  /** Global timeout for all operations (ms). Defaults to 30000 (30s) */
   timeout?: number
+  /** Timeout for evaluate operations (ms). Defaults to 5000 (5s) */
+  evaluateTimeout?: number
+  /** Timeout for launch operations (ms). Defaults to 60000 (60s) */
+  launchTimeout?: number
+  /** Timeout for screenshot operations (ms). Defaults to 10000 (10s) */
+  screenshotTimeout?: number
 }
 
 export interface SessionMetrics {
@@ -60,8 +83,8 @@ export interface ElementRefInput {
  * Resolved element result
  */
 export interface ResolvedElement {
-  page: any // Page object from miniprogram-automator
-  element: any // Element object from miniprogram-automator
+  page: Page // Page object from miniprogram-automator
+  element: import('./miniprogram-automator.js').Element // Element object from miniprogram-automator
   refId?: string // Generated refId if save=true
 }
 

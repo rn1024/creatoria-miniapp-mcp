@@ -1,9 +1,15 @@
 /**
  * ElementRef resolver for locating elements in miniProgram pages
  * Supports multiple location strategies: refId, selector, xpath, index
+ *
+ * Cache Invalidation:
+ * - Element cache is automatically cleared when page navigation is detected
+ * - Cached elements are validated against current page before use
+ * - Stale elements (from different pages) are removed automatically
  */
 
 import type { SessionState, ElementRefInput, ResolvedElement } from '../types.js'
+import type { Page, Element } from '../types/miniprogram-automator.js'
 
 /**
  * Generate a unique reference ID for caching elements
@@ -13,13 +19,38 @@ export function generateRefId(): string {
 }
 
 /**
+ * Check if page has changed and clear stale element cache
+ * Called before each element resolution to ensure cache validity
+ *
+ * @param state - Session state with element cache
+ * @param currentPagePath - Current page path
+ */
+export function invalidateStaleCacheEntries(state: SessionState, currentPagePath: string): void {
+  // If page has changed, clear entire cache (safe approach)
+  if (state.currentPagePath && state.currentPagePath !== currentPagePath) {
+    const previousPath = state.currentPagePath
+    const clearedCount = state.elements.size
+
+    state.elements.clear()
+    state.logger?.info('Element cache cleared due to page navigation', {
+      previousPage: previousPath,
+      currentPage: currentPagePath,
+      clearedElements: clearedCount,
+    })
+  }
+
+  // Update current page path
+  state.currentPagePath = currentPagePath
+}
+
+/**
  * Resolve page object from sessionState
  * @param state - Session state containing miniProgram instance
  * @param pagePath - Optional page path. If not provided, uses currentPage
  * @returns Page object
  * @throws Error if miniProgram not connected or page not found
  */
-export async function resolvePage(state: SessionState, pagePath?: string): Promise<any> {
+export async function resolvePage(state: SessionState, pagePath?: string): Promise<Page> {
   if (!state.miniProgram) {
     throw new Error(
       'MiniProgram not launched or connected. Call miniprogram_launch or miniprogram_connect first.'
@@ -67,12 +98,20 @@ export async function resolveElement(
   // Get the page first
   const page = await resolvePage(state, ref.pagePath)
 
-  let element: any = null
+  // Get current page path for cache validation
+  const currentPagePath = page.path || (await state.miniProgram?.currentPage())?.path
+
+  // Invalidate stale cache entries if page has changed
+  if (currentPagePath) {
+    invalidateStaleCacheEntries(state, currentPagePath)
+  }
+
+  let element: Element | null = null
 
   // Strategy 1: Use cached refId
   if (ref.refId) {
-    element = state.elements.get(ref.refId)
-    if (!element) {
+    const cached = state.elements.get(ref.refId)
+    if (!cached) {
       const availableRefs = Array.from(state.elements.keys()).join(', ')
       throw new Error(
         `Invalid refId: ${ref.refId}. ` +
@@ -80,6 +119,19 @@ export async function resolveElement(
           `The element may have been removed or the page has changed.`
       )
     }
+
+    // Validate that cached element is from current page
+    if (currentPagePath && cached.pagePath !== currentPagePath) {
+      // Remove stale entry
+      state.elements.delete(ref.refId)
+      throw new Error(
+        `Cached element refId ${ref.refId} is stale. ` +
+          `Element was cached on page '${cached.pagePath}' but current page is '${currentPagePath}'. ` +
+          `Please re-query the element on the current page.`
+      )
+    }
+
+    element = cached.element
   }
   // Strategy 2: Use XPath (requires SDK 0.11.0+)
   else if (ref.xpath) {
@@ -155,8 +207,18 @@ export async function resolveElement(
   let newRefId: string | undefined
   if (ref.save && element) {
     newRefId = generateRefId()
-    state.elements.set(newRefId, element)
-    console.error(`Cached element with refId: ${newRefId}`)
+
+    // Store element with page metadata for cache invalidation
+    state.elements.set(newRefId, {
+      element,
+      pagePath: currentPagePath || page.path || 'unknown',
+      cachedAt: new Date(),
+    })
+
+    state.logger?.info('Element cached with refId', {
+      refId: newRefId,
+      pagePath: currentPagePath || page.path,
+    })
   }
 
   return {

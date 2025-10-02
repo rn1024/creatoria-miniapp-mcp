@@ -4,18 +4,19 @@
  */
 
 import type { SessionState } from '../types.js'
+import type { Element } from '../types/miniprogram-automator.js'
 
 /**
  * Get element from session by refId
  */
-function getElement(session: SessionState, refId: string): any {
-  const element = session.elements.get(refId)
-  if (!element) {
+function getElement(session: SessionState, refId: string): Element {
+  const cached = session.elements.get(refId)
+  if (!cached) {
     throw new Error(
       `Element not found with refId: ${refId}. Use page_query to get element reference first.`
     )
   }
-  return element
+  return cached.element
 }
 
 /**
@@ -186,7 +187,7 @@ export async function getAttribute(
 ): Promise<{
   success: boolean
   message: string
-  value: string
+  value: string | null
 }> {
   const { refId, name } = args
   const logger = session.logger

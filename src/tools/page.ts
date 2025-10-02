@@ -55,8 +55,12 @@ export async function query(
     let refId: string | undefined
     if (save) {
       refId = generateRefId()
-      session.elements.set(refId, element)
-      logger?.info(`Cached element with refId: ${refId}`, { selector })
+      session.elements.set(refId, {
+        element,
+        pagePath: page.path || 'unknown',
+        cachedAt: new Date(),
+      })
+      logger?.info(`Cached element with refId: ${refId}`, { selector, pagePath: page.path })
     }
 
     logger?.info('Element queried successfully', { selector, refId })
@@ -122,10 +126,14 @@ export async function queryAll(
       refIds = []
       for (const element of elements) {
         const refId = generateRefId()
-        session.elements.set(refId, element)
+        session.elements.set(refId, {
+          element,
+          pagePath: page.path || 'unknown',
+          cachedAt: new Date(),
+        })
         refIds.push(refId)
       }
-      logger?.info(`Cached ${count} elements`, { selector, refIds })
+      logger?.info(`Cached ${count} elements`, { selector, refIds, pagePath: page.path })
     }
 
     return {
