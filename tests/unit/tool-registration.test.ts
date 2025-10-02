@@ -8,12 +8,14 @@ import {
   PAGE_TOOLS,
   ELEMENT_TOOLS,
   ASSERT_TOOLS,
+  SNAPSHOT_TOOLS,
   CORE_TOOLS,
   AUTOMATOR_TOOL_HANDLERS,
   MINIPROGRAM_TOOL_HANDLERS,
   PAGE_TOOL_HANDLERS,
   ELEMENT_TOOL_HANDLERS,
   ASSERT_TOOL_HANDLERS,
+  SNAPSHOT_TOOL_HANDLERS,
   CORE_TOOL_HANDLERS,
   TOOL_CATEGORIES,
   validateToolRegistration,
@@ -104,8 +106,17 @@ describe('Tool Registration', () => {
       ])
     })
 
-    it('should have 50 total core tools', () => {
-      expect(CORE_TOOLS).toHaveLength(50)
+    it('should have 3 snapshot tools', () => {
+      expect(SNAPSHOT_TOOLS).toHaveLength(3)
+      expect(SNAPSHOT_TOOLS.map(t => t.name)).toEqual([
+        'snapshot_page',
+        'snapshot_full',
+        'snapshot_element',
+      ])
+    })
+
+    it('should have 53 total core tools', () => {
+      expect(CORE_TOOLS).toHaveLength(53)
     })
   })
 
@@ -140,26 +151,33 @@ describe('Tool Registration', () => {
       })
     })
 
+    it('should have handler for every snapshot tool', () => {
+      SNAPSHOT_TOOLS.forEach(tool => {
+        expect(SNAPSHOT_TOOL_HANDLERS[tool.name]).toBeDefined()
+      })
+    })
+
     it('should have handler for every core tool', () => {
       CORE_TOOLS.forEach(tool => {
         expect(CORE_TOOL_HANDLERS[tool.name]).toBeDefined()
       })
     })
 
-    it('should have 50 total handlers', () => {
-      expect(Object.keys(CORE_TOOL_HANDLERS)).toHaveLength(50)
+    it('should have 53 total handlers', () => {
+      expect(Object.keys(CORE_TOOL_HANDLERS)).toHaveLength(53)
     })
   })
 
   describe('Tool Categories Metadata', () => {
-    it('should have 5 categories', () => {
-      expect(Object.keys(TOOL_CATEGORIES)).toHaveLength(5)
+    it('should have 6 categories', () => {
+      expect(Object.keys(TOOL_CATEGORIES)).toHaveLength(6)
       expect(Object.keys(TOOL_CATEGORIES)).toEqual([
         'automator',
         'miniprogram',
         'page',
         'element',
         'assert',
+        'snapshot',
       ])
     })
 
@@ -202,6 +220,14 @@ describe('Tool Registration', () => {
       expect(category.tools).toHaveLength(9)
       expect(Object.keys(category.handlers)).toHaveLength(9)
     })
+
+    it('should have correct snapshot category', () => {
+      const category = TOOL_CATEGORIES.snapshot
+      expect(category.name).toBe('Snapshot')
+      expect(category.description).toContain('3 tools')
+      expect(category.tools).toHaveLength(3)
+      expect(Object.keys(category.handlers)).toHaveLength(3)
+    })
   })
 
   describe('validateToolRegistration', () => {
@@ -232,15 +258,16 @@ describe('Tool Registration', () => {
   describe('getToolStats', () => {
     it('should return correct statistics', () => {
       const stats = getToolStats()
-      expect(stats.total).toBe(50)
+      expect(stats.total).toBe(53)
       expect(stats.categories).toEqual({
         automator: 4,
         miniprogram: 6,
         page: 8,
         element: 23,
         assert: 9,
+        snapshot: 3,
       })
-      expect(stats.handlers).toBe(50)
+      expect(stats.handlers).toBe(53)
     })
   })
 
@@ -263,6 +290,7 @@ describe('Tool Registration', () => {
       expect(getToolByName('page_query')).toBeDefined() // page
       expect(getToolByName('element_tap')).toBeDefined() // element
       expect(getToolByName('assert_exists')).toBeDefined() // assert
+      expect(getToolByName('snapshot_page')).toBeDefined() // snapshot
     })
   })
 
@@ -295,6 +323,12 @@ describe('Tool Registration', () => {
       const tools = getToolsByCategory('assert')
       expect(tools).toHaveLength(9)
       expect(tools[0].name).toBe('assert_exists')
+    })
+
+    it('should get snapshot tools', () => {
+      const tools = getToolsByCategory('snapshot')
+      expect(tools).toHaveLength(3)
+      expect(tools[0].name).toBe('snapshot_page')
     })
 
     it('should return empty array for invalid category', () => {

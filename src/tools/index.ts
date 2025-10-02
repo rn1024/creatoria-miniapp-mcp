@@ -8,8 +8,9 @@
  * - Page (8 tools): Page-level operations and data access
  * - Element (23 tools): Element-level interactions, properties, and subclass operations
  * - Assert (9 tools): Testing and verification utilities
+ * - Snapshot (3 tools): State capture and diagnostic utilities
  *
- * Total: 50 tools
+ * Total: 53 tools
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
@@ -20,6 +21,7 @@ import * as miniprogramTools from './miniprogram.js'
 import * as pageTools from './page.js'
 import * as elementTools from './element.js'
 import * as assertTools from './assert.js'
+import * as snapshotTools from './snapshot.js'
 
 // Tool handler type
 export type ToolHandler = (session: SessionState, args: any) => Promise<any>
@@ -1013,6 +1015,87 @@ export const ASSERT_TOOL_HANDLERS: Record<string, ToolHandler> = {
 }
 
 // ============================================================================
+// SNAPSHOT TOOLS (State Capture & Diagnostics)
+// ============================================================================
+
+export const SNAPSHOT_TOOLS: Tool[] = [
+  {
+    name: 'snapshot_page',
+    description: 'Capture complete page snapshot (data + screenshot)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        pagePath: {
+          type: 'string',
+          description: 'Page path (optional, defaults to current page)',
+        },
+        filename: {
+          type: 'string',
+          description: 'Output filename (optional, auto-generated if not provided)',
+        },
+        includeScreenshot: {
+          type: 'boolean',
+          description: 'Whether to include screenshot (default: true)',
+        },
+        fullPage: {
+          type: 'boolean',
+          description: 'Whether to capture full page or viewport only (default: false)',
+        },
+      },
+    },
+  },
+  {
+    name: 'snapshot_full',
+    description: 'Capture complete application snapshot (system info + page stack + current page)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        filename: {
+          type: 'string',
+          description: 'Output filename (optional, auto-generated if not provided)',
+        },
+        includeScreenshot: {
+          type: 'boolean',
+          description: 'Whether to include screenshot (default: true)',
+        },
+        fullPage: {
+          type: 'boolean',
+          description: 'Whether to capture full page or viewport only (default: false)',
+        },
+      },
+    },
+  },
+  {
+    name: 'snapshot_element',
+    description: 'Capture element snapshot (properties + optional screenshot)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        filename: {
+          type: 'string',
+          description: 'Output filename (optional, auto-generated if not provided)',
+        },
+        includeScreenshot: {
+          type: 'boolean',
+          description: 'Whether to include screenshot (default: false)',
+        },
+      },
+      required: ['refId'],
+    },
+  },
+]
+
+export const SNAPSHOT_TOOL_HANDLERS: Record<string, ToolHandler> = {
+  snapshot_page: snapshotTools.snapshotPage,
+  snapshot_full: snapshotTools.snapshotFull,
+  snapshot_element: snapshotTools.snapshotElement,
+}
+
+// ============================================================================
 // TOOL CATEGORIES
 // ============================================================================
 
@@ -1047,6 +1130,12 @@ export const TOOL_CATEGORIES: Record<string, ToolCategory> = {
     tools: ASSERT_TOOLS,
     handlers: ASSERT_TOOL_HANDLERS,
   },
+  snapshot: {
+    name: 'Snapshot',
+    description: 'State capture and diagnostic utilities (3 tools)',
+    tools: SNAPSHOT_TOOLS,
+    handlers: SNAPSHOT_TOOL_HANDLERS,
+  },
 }
 
 // ============================================================================
@@ -1059,6 +1148,7 @@ export const CORE_TOOLS: Tool[] = [
   ...PAGE_TOOLS,
   ...ELEMENT_TOOLS,
   ...ASSERT_TOOLS,
+  ...SNAPSHOT_TOOLS,
 ]
 
 export const CORE_TOOL_HANDLERS: Record<string, ToolHandler> = {
@@ -1067,6 +1157,7 @@ export const CORE_TOOL_HANDLERS: Record<string, ToolHandler> = {
   ...PAGE_TOOL_HANDLERS,
   ...ELEMENT_TOOL_HANDLERS,
   ...ASSERT_TOOL_HANDLERS,
+  ...SNAPSHOT_TOOL_HANDLERS,
 }
 
 // ============================================================================
@@ -1110,6 +1201,7 @@ export function getToolStats() {
       page: PAGE_TOOLS.length,
       element: ELEMENT_TOOLS.length,
       assert: ASSERT_TOOLS.length,
+      snapshot: SNAPSHOT_TOOLS.length,
     },
     handlers: Object.keys(CORE_TOOL_HANDLERS).length,
   }

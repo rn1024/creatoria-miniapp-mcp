@@ -3,7 +3,7 @@
   "repo": "git@github.com:rn1024/creatoria-miniapp-mcp.git",
   "branch": "main",
   "stage": "Automate",
-  "task_id": "TASK-2025-001-D1",
+  "task_id": "TASK-2025-001-D2",
   "agent": {
     "name": "ClaudeCode",
     "mode": "generalist",
@@ -11,12 +11,12 @@
     "session_ttl_minutes": 270,
     "handoff_planned_at": "2025-10-02T07:45:00Z"
   },
-  "context_digest": "✅ 已完成 Stage A-B-C-D1 (完整): A2 DevTools 启动脚本，B1 工具注册器重构，B2 SessionStore 配置，C1 Automator 工具，C2 MiniProgram 工具，C3 Page 工具，C4 Element 工具完整实现（23 个工具，包含 touch 事件和所有子类操作），C5 工具注册器优化（分类、元数据、验证），D1 断言工具集（9 个断言工具），276 个测试全部通过",
+  "context_digest": "✅ 已完成 Stage A-B-C-D1-D2 (完整): A2 DevTools 启动脚本，B1 工具注册器重构，B2 SessionStore 配置，C1 Automator 工具，C2 MiniProgram 工具，C3 Page 工具，C4 Element 工具完整实现（23 个工具，包含 touch 事件和所有子类操作），C5 工具注册器优化（分类、元数据、验证），D1 断言工具集（9 个断言工具），D2 快照能力（3 个快照工具），290 个测试全部通过",
   "open_questions": [
-    "D2 是否需要集成测试框架或 E2E 测试？"
+    "D3/D4/D5 是否需要实现（录制回放、网络 Mock、Capabilities 机制）？"
   ],
   "artifacts": [
-    {"path": ".llm/state.json", "type": "config", "change": "updated", "note": "更新为 Stage D1 完成状态"},
+    {"path": ".llm/state.json", "type": "config", "change": "updated", "note": "更新为 Stage D2 完成状态"},
     {"path": "scripts/setup-devtools-port.sh", "type": "script", "change": "created", "note": "A2: 微信开发者工具端口配置脚本"},
     {"path": "docs/setup-guide.md", "type": "docs", "change": "created", "note": "A2: 环境配置和快速开始指南"},
     {"path": "src/core/session.ts", "type": "code", "change": "updated", "note": "B2 修复: outputDir 配置穿透"},
@@ -35,6 +35,10 @@
     {"path": "tests/unit/tool-registration.test.ts", "type": "test", "change": "updated", "note": "C5+D1: 工具注册系统验证测试（31→46 个测试）"},
     {"path": "src/tools/assert.ts", "type": "code", "change": "created", "note": "D1: 实现 9 个断言工具（assertExists/notExists/text/textContains/value/attribute/property/data/visible，465 行）"},
     {"path": "tests/unit/assert.test.ts", "type": "test", "change": "created", "note": "D1: 断言工具单元测试（27 个测试）"},
+    {"path": "src/tools/snapshot.ts", "type": "code", "change": "created", "note": "D2: 实现 3 个快照工具（snapshotPage/snapshotFull/snapshotElement，337 行）"},
+    {"path": "tests/unit/snapshot.test.ts", "type": "test", "change": "created", "note": "D2: 快照工具单元测试（10 个测试）"},
+    {"path": "src/tools/index.ts", "type": "code", "change": "updated", "note": "D2: 工具注册器更新（50→53 个工具，添加 snapshot 分类）"},
+    {"path": "tests/unit/tool-registration.test.ts", "type": "test", "change": "updated", "note": "D2: 工具注册测试更新（46→55 个测试）"},
     {"path": "dist/", "type": "dir", "change": "updated", "note": "TypeScript 编译输出"}
   ],
   "risks": [
@@ -49,8 +53,13 @@
   "next_actions": [
     {
       "owner": "ClaudeCode",
-      "action": "[D2] 集成测试框架或 E2E 测试",
-      "depends_on": ["D1"]
+      "action": "[D3] 录制/回放与动作序列管理（可选）",
+      "depends_on": ["D2"]
+    },
+    {
+      "owner": "ClaudeCode",
+      "action": "[D4] 网络 Mock / wx.request 注入工具（可选）",
+      "depends_on": ["D2"]
     },
     {
       "owner": "ClaudeCode",
@@ -59,8 +68,8 @@
     },
     {
       "owner": "ClaudeCode",
-      "action": "[E2] 发布和部署准备",
-      "depends_on": ["E1"]
+      "action": "[G2] 集成测试框架或 E2E 测试",
+      "depends_on": ["D2"]
     }
   ],
   "handoff": {
