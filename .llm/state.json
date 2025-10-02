@@ -3,80 +3,162 @@
   "repo": "git@github.com:rn1024/creatoria-miniapp-mcp.git",
   "branch": "main",
   "stage": "Automate",
-  "task_id": "TASK-2025-001-D2",
+  "task_id": "TASK-2025-003-E1-AUTOMATE-PHASE1-COMPLETE",
   "agent": {
     "name": "ClaudeCode",
     "mode": "generalist",
-    "session_started_at": "2025-10-02T03:15:00Z",
-    "session_ttl_minutes": 270,
-    "handoff_planned_at": "2025-10-02T07:45:00Z"
+    "session_started_at": "2025-10-02T14:00:00Z",
+    "session_ttl_minutes": 480,
+    "handoff_planned_at": "2025-10-02T22:00:00Z"
   },
-  "context_digest": "✅ 已完成 Stage A-B-C-D1-D2 (完整): A2 DevTools 启动脚本，B1 工具注册器重构，B2 SessionStore 配置，C1 Automator 工具，C2 MiniProgram 工具，C3 Page 工具，C4 Element 工具完整实现（23 个工具，包含 touch 事件和所有子类操作），C5 工具注册器优化（分类、元数据、验证），D1 断言工具集（9 个断言工具），D2 快照能力（3 个快照工具），290 个测试全部通过",
+  "context_digest": "✅ Stage A-D 完成 + 35 个规划文档。✅ E1 Phase 1 完成（2h）：README 增强（59 工具目录+快速示例），Setup Guide（6 步配置+8 个问题），Architecture（系统设计+5 个 ADR）。Git commit 5df2a93。⏳ Next: E1 Phase 2（API 文档 7 类 59 工具，预计 3h）。",
   "open_questions": [
-    "D3/D4/D5 是否需要实现（录制回放、网络 Mock、Capabilities 机制）？"
+    "E1 Approve: 用户是否批准 E1 计划（charter + architecture + tasks）？",
+    "E1 实施优先级：是否按 Phase 1-2-3-4 顺序执行，还是允许并行？",
+    "文档自动生成：E2 是否需要从 Zod schema 自动生成 API 文档？"
   ],
   "artifacts": [
-    {"path": ".llm/state.json", "type": "config", "change": "updated", "note": "更新为 Stage D2 完成状态"},
+    {"path": ".llm/state.json", "type": "config", "change": "updated", "note": "更新为 E1 Automate Phase 1 完成"},
+    {"path": "README.md", "type": "docs", "change": "updated", "note": "E1.1: 59 工具目录，quickstart <5 min，3 个 inline examples"},
+    {"path": "docs/setup-guide.md", "type": "docs", "change": "updated", "note": "E1.2: 6 步完整配置（15 min），8 个常见问题，MCP 客户端配置"},
+    {"path": "docs/architecture.md", "type": "docs", "change": "created", "note": "E1.3: 系统架构，核心组件，5 个 ADR，数据流图"},
+    {"path": "docs/charter.E1.align.yaml", "type": "docs", "change": "created", "note": "E1 文档完善对齐文档（13KB，18 个交付物）"},
+    {"path": "docs/architecture.E1.md", "type": "docs", "change": "created", "note": "E1 文档架构设计（41KB，模板和格式规范）"},
+    {"path": "docs/tasks.E1.atomize.md", "type": "docs", "change": "created", "note": "E1 任务卡（1205 行，19 个任务，7-9 小时估算）"},
+    {"path": "docs/charter.D1.align.yaml", "type": "docs", "change": "created", "note": "D1 断言工具集对齐文档（9 个工具）"},
+    {"path": "docs/tasks.D1.atomize.md", "type": "docs", "change": "created", "note": "D1 任务卡（14 KB，完整实现步骤）"},
+    {"path": "docs/charter.D2.align.yaml", "type": "docs", "change": "created", "note": "D2 快照工具集对齐文档（3 个工具）"},
+    {"path": "docs/tasks.D2.atomize.md", "type": "docs", "change": "created", "note": "D2 任务卡（15 KB，数据结构定义）"},
+    {"path": "docs/charter.D3.align.yaml", "type": "docs", "change": "created", "note": "D3 录制回放对齐文档（6 个工具）"},
+    {"path": "docs/tasks.D3.atomize.md", "type": "docs", "change": "created", "note": "D3 任务卡（18 KB，录制回放机制）"},
+    {"path": ".llm/qa/code-review-report.md", "type": "docs", "change": "created", "note": "Stage D 完整代码 review 报告（9.1/10 评分）"},
+    {"path": "docs/charter.B1.align.yaml", "type": "docs", "change": "created", "note": "B1 MCP Server 骨架文档"},
+    {"path": "docs/tasks.B1.atomize.md", "type": "docs", "change": "created", "note": "B1 任务卡"},
+    {"path": "docs/charter.B2.align.yaml", "type": "docs", "change": "created", "note": "B2 SessionStore 文档"},
+    {"path": "docs/tasks.B2.atomize.md", "type": "docs", "change": "created", "note": "B2 任务卡"},
+    {"path": "docs/charter.B3.align.yaml", "type": "docs", "change": "created", "note": "B3 ElementRef 解析器文档"},
+    {"path": "docs/tasks.B3.atomize.md", "type": "docs", "change": "created", "note": "B3 任务卡"},
+    {"path": "docs/charter.B4.align.yaml", "type": "docs", "change": "created", "note": "B4 Logger/OutputManager 文档"},
+    {"path": "docs/tasks.B4.atomize.md", "type": "docs", "change": "created", "note": "B4 任务卡"},
+    {"path": "docs/charter.C1.align.yaml", "type": "docs", "change": "created", "note": "C1 Automator 工具文档"},
+    {"path": "docs/tasks.C1.atomize.md", "type": "docs", "change": "created", "note": "C1 任务卡"},
+    {"path": "docs/charter.C2.align.yaml", "type": "docs", "change": "created", "note": "C2 MiniProgram 工具文档"},
+    {"path": "docs/tasks.C2.atomize.md", "type": "docs", "change": "created", "note": "C2 任务卡"},
+    {"path": "docs/charter.C3.align.yaml", "type": "docs", "change": "created", "note": "C3 Page 工具文档"},
+    {"path": "docs/tasks.C3.atomize.md", "type": "docs", "change": "created", "note": "C3 任务卡"},
+    {"path": "docs/charter.C4.align.yaml", "type": "docs", "change": "created", "note": "C4 Element 工具文档（23 个工具）"},
+    {"path": "docs/tasks.C4.atomize.md", "type": "docs", "change": "created", "note": "C4 任务卡"},
+    {"path": "docs/charter.C5.align.yaml", "type": "docs", "change": "created", "note": "C5 工具注册器文档"},
+    {"path": "docs/tasks.C5.atomize.md", "type": "docs", "change": "created", "note": "C5 任务卡"},
     {"path": "scripts/setup-devtools-port.sh", "type": "script", "change": "created", "note": "A2: 微信开发者工具端口配置脚本"},
     {"path": "docs/setup-guide.md", "type": "docs", "change": "created", "note": "A2: 环境配置和快速开始指南"},
-    {"path": "src/core/session.ts", "type": "code", "change": "updated", "note": "B2 修复: outputDir 配置穿透"},
-    {"path": "tests/unit/session.test.ts", "type": "test", "change": "updated", "note": "B2: 新增 outputDir 配置测试（93 个测试）"},
-    {"path": "src/tools/automator.ts", "type": "code", "change": "created", "note": "C1: 实现 launch/connect/disconnect/close 工具（253 行）"},
-    {"path": "tests/unit/automator.test.ts", "type": "test", "change": "created", "note": "C1: Automator 工具单元测试（20 个测试）"},
-    {"path": "src/tools/miniprogram.ts", "type": "code", "change": "created", "note": "C2: 实现 navigate/callWx/evaluate/screenshot/getPageStack/getSystemInfo 工具（342 行）"},
-    {"path": "tests/unit/miniprogram.test.ts", "type": "test", "change": "created", "note": "C2: MiniProgram 工具单元测试（25 个测试）"},
-    {"path": "scripts/launch-wx-devtools.sh", "type": "script", "change": "created", "note": "A2+B1+B2 修复: DevTools 启动脚本（156 行）"},
-    {"path": "src/server.ts", "type": "code", "change": "updated", "note": "B1+B2 修复: 简化为 64 行，SessionStore 配置化"},
-    {"path": "src/tools/page.ts", "type": "code", "change": "created", "note": "C3: 实现 8 个 Page 工具（query/queryAll/waitFor/getData/setData/callMethod/getSize/getScrollTop，468 行）"},
-    {"path": "tests/unit/page.test.ts", "type": "test", "change": "created", "note": "C3: Page 工具单元测试（27 个测试）"},
-    {"path": "src/tools/element.ts", "type": "code", "change": "updated", "note": "C4: 完整实现 23 个 Element 工具（包含 touch 事件和所有子类操作，467→957 行）"},
-    {"path": "tests/unit/element.test.ts", "type": "test", "change": "updated", "note": "C4: Element 工具完整测试（36→72 个测试，总计 249 个）"},
-    {"path": "src/tools/index.ts", "type": "code", "change": "updated", "note": "C5: 工具注册器完整重构（分类、元数据、验证）+ 41→50 个工具注册"},
-    {"path": "tests/unit/tool-registration.test.ts", "type": "test", "change": "updated", "note": "C5+D1: 工具注册系统验证测试（31→46 个测试）"},
-    {"path": "src/tools/assert.ts", "type": "code", "change": "created", "note": "D1: 实现 9 个断言工具（assertExists/notExists/text/textContains/value/attribute/property/data/visible，465 行）"},
-    {"path": "tests/unit/assert.test.ts", "type": "test", "change": "created", "note": "D1: 断言工具单元测试（27 个测试）"},
-    {"path": "src/tools/snapshot.ts", "type": "code", "change": "created", "note": "D2: 实现 3 个快照工具（snapshotPage/snapshotFull/snapshotElement，337 行）"},
-    {"path": "tests/unit/snapshot.test.ts", "type": "test", "change": "created", "note": "D2: 快照工具单元测试（10 个测试）"},
-    {"path": "src/tools/index.ts", "type": "code", "change": "updated", "note": "D2: 工具注册器更新（50→53 个工具，添加 snapshot 分类）"},
-    {"path": "tests/unit/tool-registration.test.ts", "type": "test", "change": "updated", "note": "D2: 工具注册测试更新（46→55 个测试）"},
+    {"path": "src/core/session.ts", "type": "code", "change": "updated", "note": "B2: outputDir 配置穿透"},
+    {"path": "tests/unit/session.test.ts", "type": "test", "change": "updated", "note": "B2: outputDir 配置测试（93 个测试）"},
+    {"path": "src/tools/automator.ts", "type": "code", "change": "created", "note": "C1: 4 个 Automator 工具（252 行）"},
+    {"path": "tests/unit/automator.test.ts", "type": "test", "change": "created", "note": "C1: 20 个测试"},
+    {"path": "src/tools/miniprogram.ts", "type": "code", "change": "created", "note": "C2: 6 个 MiniProgram 工具（330 行）"},
+    {"path": "tests/unit/miniprogram.test.ts", "type": "test", "change": "created", "note": "C2: 25 个测试"},
+    {"path": "scripts/launch-wx-devtools.sh", "type": "script", "change": "created", "note": "A2+B1+B2: DevTools 启动脚本"},
+    {"path": "src/server.ts", "type": "code", "change": "updated", "note": "B1+B2: MCP Server 入口（64 行）"},
+    {"path": "src/tools/page.ts", "type": "code", "change": "created", "note": "C3: 8 个 Page 工具（458 行）"},
+    {"path": "tests/unit/page.test.ts", "type": "test", "change": "created", "note": "C3: 27 个测试"},
+    {"path": "src/tools/element.ts", "type": "code", "change": "updated", "note": "C4: 23 个 Element 工具（957 行）"},
+    {"path": "tests/unit/element.test.ts", "type": "test", "change": "updated", "note": "C4: 72 个测试"},
+    {"path": "src/tools/index.ts", "type": "code", "change": "updated", "note": "C5+D1+D2+D3: 59 个工具完整注册"},
+    {"path": "tests/unit/tool-registration.test.ts", "type": "test", "change": "updated", "note": "C5: 工具注册系统验证（55 个测试）"},
+    {"path": "src/tools/assert.ts", "type": "code", "change": "created", "note": "D1: 9 个断言工具（465 行）"},
+    {"path": "tests/unit/assert.test.ts", "type": "test", "change": "created", "note": "D1: 27 个测试"},
+    {"path": "src/tools/snapshot.ts", "type": "code", "change": "created", "note": "D2: 3 个快照工具（352 行）"},
+    {"path": "tests/unit/snapshot.test.ts", "type": "test", "change": "created", "note": "D2: 10 个测试"},
+    {"path": "src/tools/record.ts", "type": "code", "change": "created", "note": "D3: 6 个录制回放工具（428 行）"},
+    {"path": "tests/unit/record.test.ts", "type": "test", "change": "created", "note": "D3: 18 个测试"},
+    {"path": "docs/charter.align.yaml", "type": "docs", "change": "created", "note": "D1+D2 合并对齐文档（保留作为参考）"},
+    {"path": "docs/tasks.atomize.md", "type": "docs", "change": "created", "note": "D1+D2 合并任务卡（保留作为参考）"},
+    {"path": ".llm/session_log/2025-10-02-ClaudeCode-D1-D2-REMEDIATE.md", "type": "docs", "change": "created", "note": "D1+D2 会话日志"},
+    {"path": ".llm/qa/acceptance.md", "type": "docs", "change": "created", "note": "D1+D2 验收文档"},
     {"path": "dist/", "type": "dir", "change": "updated", "note": "TypeScript 编译输出"}
   ],
   "risks": [
-    "微信开发者工具 CLI 路径可能因系统差异需要手动配置（macOS 默认路径）",
+    "⚠️ 【已缓解】D1+D2 流程违规已通过 Memory 记录并补齐独立文档",
+    "⚠️ 【决策】跳过 Stage B-D 的 session_log 追溯补齐（代码+测试已为最佳证据，追溯意义有限）",
+    "⚠️ D3 录制序列依赖特定状态，回放时需确保环境一致",
+    "⚠️ 工具 API 变更可能导致旧录制序列失效",
+    "微信开发者工具 CLI 路径可能因系统差异需要手动配置",
     ".mcp.json 和 .claude/ 包含敏感信息，已从 git 排除",
-    "miniprogram-automator 版本为 0.12.1（最新），connect() API 使用 wsEndpoint 而非 port",
-    "Logger 使用 console.error 输出，在 MCP 环境中会通过 stderr 传输",
-    "OutputManager 会创建 .mcp-artifacts 目录，已添加到 .gitignore",
-    "Automator 工具需要微信开发者工具已安装并配置自动化端口"
+    "miniprogram-automator 版本 0.12.1，connect() 使用 wsEndpoint 而非 port",
+    "Logger 使用 console.error 输出到 stderr",
+    "OutputManager 创建 .mcp-artifacts 目录，已添加到 .gitignore",
+    "JSON 对象比较可能受键顺序影响",
+    "xpath 选择器暂不支持（需 SDK 0.11.0+）"
   ],
   "blocks": [],
   "next_actions": [
     {
       "owner": "ClaudeCode",
-      "action": "[D3] 录制/回放与动作序列管理（可选）",
-      "depends_on": ["D2"]
+      "action": "E1 Automate Phase 1: 核心文档（README + Setup Guide + Architecture）",
+      "priority": "HIGH",
+      "status": "COMPLETED",
+      "completed_at": "2025-10-02T15:30:00Z",
+      "tasks": ["E1.1", "E1.2", "E1.3"],
+      "commit": "5df2a93"
     },
     {
       "owner": "ClaudeCode",
-      "action": "[D4] 网络 Mock / wx.request 注入工具（可选）",
-      "depends_on": ["D2"]
+      "action": "E1 Automate Phase 2: API 文档（7 个类别，59 个工具）",
+      "priority": "HIGH",
+      "depends_on": ["E1 Automate Phase 1"],
+      "estimated_hours": 3,
+      "tasks": ["E1.4", "E1.5", "E1.6", "E1.7", "E1.8", "E1.9", "E1.10", "E1.11"]
     },
     {
       "owner": "ClaudeCode",
-      "action": "[E1] 文档完善和使用示例",
-      "depends_on": ["D2"]
+      "action": "E1 Automate Phase 3: 使用示例（5 个场景）",
+      "priority": "HIGH",
+      "depends_on": ["E1 Automate Phase 2"],
+      "estimated_hours": 2,
+      "tasks": ["E1.12", "E1.13", "E1.14", "E1.15", "E1.16"]
     },
     {
       "owner": "ClaudeCode",
-      "action": "[G2] 集成测试框架或 E2E 测试",
-      "depends_on": ["D2"]
+      "action": "E1 Automate Phase 4: 最终文档（Troubleshooting + CONTRIBUTING + Review）",
+      "priority": "HIGH",
+      "depends_on": ["E1 Automate Phase 3"],
+      "estimated_hours": 1.5,
+      "tasks": ["E1.17", "E1.18", "E1.19"]
+    },
+    {
+      "owner": "ClaudeCode",
+      "action": "E1 Assess: 文档验收和质量检查",
+      "priority": "HIGH",
+      "depends_on": ["E1 Automate Phase 4"],
+      "deliverables": ["E1-acceptance.md", "E1-documentation-checklist.md"]
     }
   ],
   "handoff": {
-    "required": false,
-    "reason": "",
-    "to": "",
-    "package": []
+    "required": true,
+    "reason": "E1 Align+Architect+Atomize 阶段完成，需用户批准后方可进入实施阶段",
+    "to": "User (samuelcn)",
+    "package": [
+      "✅ E1 Align: charter.E1.align.yaml（13KB，目标/范围/成功标准）",
+      "✅ E1 Architect: architecture.E1.md（41KB，文档结构和模板）",
+      "✅ E1 Atomize: tasks.E1.atomize.md（1205 行，19 个任务，7-9 小时）",
+      "📋 规划范围: 18 个文档交付物（README, 7 个 API 文档，5 个示例，架构，故障排查，CONTRIBUTING）",
+      "⏰ 预计工作量: 7-9 小时，分 4 个阶段（Phase 1-4）",
+      "❓ 等待批准: 用户需审批 E1 计划（3 个文档）后方可开始实施"
+    ],
+    "approval_required": {
+      "stage": "Approve",
+      "documents": [
+        "docs/charter.E1.align.yaml",
+        "docs/architecture.E1.md",
+        "docs/tasks.E1.atomize.md"
+      ],
+      "questions": [
+        "是否批准 E1 文档完善计划？",
+        "是否同意 7-9 小时的工作量估算？",
+        "是否按 Phase 1-2-3-4 顺序执行，还是允许部分并行？"
+      ]
+    }
   },
-  "timestamp": "2025-10-02T17:30:00Z"
+  "timestamp": "2025-10-02T14:30:00Z"
 }
