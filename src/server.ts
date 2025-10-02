@@ -11,6 +11,7 @@ import {
 import type { ServerConfig } from './types.js'
 import { sessionStore } from './core/session.js'
 import { registerTools } from './tools/index.js'
+import * as automatorTools from './tools/automator.js'
 
 export async function startServer(config: ServerConfig = {}) {
   const { capabilities = ['core'] } = config
@@ -47,36 +48,54 @@ export async function startServer(config: ServerConfig = {}) {
     try {
       // Route to appropriate tool handler
       switch (name) {
-        case 'miniprogram_launch':
+        case 'miniprogram_launch': {
+          const result = await automatorTools.launch(session, args as any)
           return {
             content: [
               {
                 type: 'text',
-                text: `Launch tool called with args: ${JSON.stringify(args)}\nSession: ${sessionId}\nTODO: Implement automator.launch()`,
+                text: JSON.stringify(result, null, 2),
               },
             ],
           }
+        }
 
-        case 'miniprogram_connect':
+        case 'miniprogram_connect': {
+          const result = await automatorTools.connect(session, args as any)
           return {
             content: [
               {
                 type: 'text',
-                text: `Connect tool called with args: ${JSON.stringify(args)}\nSession: ${sessionId}\nTODO: Implement automator.connect()`,
+                text: JSON.stringify(result, null, 2),
               },
             ],
           }
+        }
 
-        case 'miniprogram_close':
+        case 'miniprogram_disconnect': {
+          const result = await automatorTools.disconnect(session)
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          }
+        }
+
+        case 'miniprogram_close': {
+          const result = await automatorTools.close(session)
           sessionStore.delete(sessionId)
           return {
             content: [
               {
                 type: 'text',
-                text: `Session ${sessionId} closed and resources cleaned up`,
+                text: JSON.stringify(result, null, 2),
               },
             ],
           }
+        }
 
         default:
           throw new Error(`Unknown tool: ${name}`)

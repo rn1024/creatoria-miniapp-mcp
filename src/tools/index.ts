@@ -44,8 +44,16 @@ export const CORE_TOOLS: Tool[] = [
     },
   },
   {
+    name: 'miniprogram_disconnect',
+    description: 'Disconnect from miniprogram but keep IDE running',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+    },
+  },
+  {
     name: 'miniprogram_close',
-    description: 'Close current mini program session and cleanup resources',
+    description: 'Close current mini program session and cleanup all resources',
     inputSchema: {
       type: 'object',
       properties: {},
