@@ -3,7 +3,7 @@
   "repo": "git@github.com:rn1024/creatoria-miniapp-mcp.git",
   "branch": "main",
   "stage": "Automate",
-  "task_id": "TASK-2025-001-C1",
+  "task_id": "TASK-2025-001-C2",
   "agent": {
     "name": "ClaudeCode",
     "mode": "generalist",
@@ -11,15 +11,13 @@
     "session_ttl_minutes": 270,
     "handoff_planned_at": "2025-10-02T07:45:00Z"
   },
-  "context_digest": "✅ 已完成 Stage A-B-C1: A2 端口配置脚本，B2 outputDir 配置修复，C1 Automator 工具（launch/connect/disconnect/close），93 个测试全部通过",
+  "context_digest": "✅ 已完成 Stage A-B-C1-C2: A2 端口配置脚本，B2 outputDir 配置修复，C1 Automator 工具（launch/connect/disconnect/close），C2 MiniProgram 工具（navigate/callWx/evaluate/screenshot/getPageStack/getSystemInfo），118 个测试全部通过",
   "open_questions": [
-    "A1 环境已安装完成（Node 18+、pnpm 9.0、微信开发者工具）？",
-    "C2 工具需要实现哪些导航方法（navigateTo/redirectTo/reLaunch/switchTab）？",
-    "screenshot 工具是否需要支持全屏/元素截图两种模式？",
-    "callWx 工具如何处理异步 API 的返回值？"
+    "C3 Page 工具需要支持哪些数据操作方法？",
+    "C4 Element 工具的元素定位策略是否需要扩展（支持 XPath、CSS Selector）？"
   ],
   "artifacts": [
-    {"path": ".llm/state.json", "type": "config", "change": "updated", "note": "更新为 A2+B2+C1 修复完成状态"},
+    {"path": ".llm/state.json", "type": "config", "change": "updated", "note": "更新为 A2+B2+C1+C2 完成状态"},
     {"path": "scripts/setup-devtools-port.sh", "type": "script", "change": "created", "note": "A2: 微信开发者工具端口配置脚本"},
     {"path": "docs/setup-guide.md", "type": "docs", "change": "created", "note": "A2: 环境配置和快速开始指南"},
     {"path": "src/core/session.ts", "type": "code", "change": "updated", "note": "B2 修复: outputDir 配置穿透"},
@@ -28,6 +26,10 @@
     {"path": "src/tools/index.ts", "type": "code", "change": "updated", "note": "C1: 添加 miniprogram_disconnect 工具注册"},
     {"path": "src/server.ts", "type": "code", "change": "updated", "note": "C1: 替换占位符实现为真实工具处理器"},
     {"path": "tests/unit/automator.test.ts", "type": "test", "change": "created", "note": "C1: Automator 工具单元测试（20 个测试）"},
+    {"path": "src/tools/miniprogram.ts", "type": "code", "change": "created", "note": "C2: 实现 navigate/callWx/evaluate/screenshot/getPageStack/getSystemInfo 工具（342 行）"},
+    {"path": "tests/unit/miniprogram.test.ts", "type": "test", "change": "created", "note": "C2: MiniProgram 工具单元测试（25 个测试，总计 118 个）"},
+    {"path": "src/tools/index.ts", "type": "code", "change": "updated", "note": "C2: 添加 6 个 MiniProgram 工具注册"},
+    {"path": "src/server.ts", "type": "code", "change": "updated", "note": "C2: 添加 6 个 MiniProgram 工具处理器"},
     {"path": "dist/", "type": "dir", "change": "updated", "note": "TypeScript 编译输出"}
   ],
   "risks": [
@@ -42,16 +44,6 @@
   "next_actions": [
     {
       "owner": "ClaudeCode",
-      "action": "提交代码到 Git（feat: [C1] Automator 工具实现）",
-      "depends_on": []
-    },
-    {
-      "owner": "ClaudeCode",
-      "action": "[C2] MiniProgram 工具实现（导航、callWx、evaluate、screenshot）",
-      "depends_on": ["C1"]
-    },
-    {
-      "owner": "ClaudeCode",
       "action": "[C3] Page 工具实现（query、data、callMethod）",
       "depends_on": ["C2"]
     },
@@ -59,6 +51,11 @@
       "owner": "ClaudeCode",
       "action": "[C4] Element 工具实现（tap、longpress、input）",
       "depends_on": ["C3"]
+    },
+    {
+      "owner": "ClaudeCode",
+      "action": "[C5] 工具注册器优化（capability-based 动态注册）",
+      "depends_on": ["C4"]
     }
   ],
   "handoff": {
@@ -67,5 +64,5 @@
     "to": "",
     "package": []
   },
-  "timestamp": "2025-10-02T12:00:00Z"
+  "timestamp": "2025-10-02T14:30:00Z"
 }

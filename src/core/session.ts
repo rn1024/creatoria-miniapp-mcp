@@ -237,5 +237,5 @@ export class SessionStore {
   }
 }
 
-// Global session store
-export const sessionStore = new SessionStore()
+// Note: sessionStore should be created in server.ts with proper configuration
+// This allows outputDir and other options to be configured via ServerConfig
