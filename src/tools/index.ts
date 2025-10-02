@@ -9,6 +9,7 @@ import type { SessionState } from '../types.js'
 import * as automatorTools from './automator.js'
 import * as miniprogramTools from './miniprogram.js'
 import * as pageTools from './page.js'
+import * as elementTools from './element.js'
 
 // Tool handler type
 export type ToolHandler = (session: SessionState, args: any) => Promise<any>
@@ -309,6 +310,184 @@ export const CORE_TOOLS: Tool[] = [
       },
     },
   },
+  {
+    name: 'element_tap',
+    description: 'Tap (click) an element',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+      },
+      required: ['refId'],
+    },
+  },
+  {
+    name: 'element_longpress',
+    description: 'Long press an element',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+      },
+      required: ['refId'],
+    },
+  },
+  {
+    name: 'element_input',
+    description: 'Input text into an element (input/textarea only)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        value: {
+          type: 'string',
+          description: 'Text value to input',
+        },
+      },
+      required: ['refId', 'value'],
+    },
+  },
+  {
+    name: 'element_get_text',
+    description: 'Get element text content',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+      },
+      required: ['refId'],
+    },
+  },
+  {
+    name: 'element_get_attribute',
+    description: 'Get element attribute (特性)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        name: {
+          type: 'string',
+          description: 'Attribute name to retrieve',
+        },
+      },
+      required: ['refId', 'name'],
+    },
+  },
+  {
+    name: 'element_get_property',
+    description: 'Get element property (属性)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        name: {
+          type: 'string',
+          description: 'Property name to retrieve',
+        },
+      },
+      required: ['refId', 'name'],
+    },
+  },
+  {
+    name: 'element_get_value',
+    description: 'Get element value',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+      },
+      required: ['refId'],
+    },
+  },
+  {
+    name: 'element_get_size',
+    description: 'Get element size (width, height)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+      },
+      required: ['refId'],
+    },
+  },
+  {
+    name: 'element_get_offset',
+    description: 'Get element offset (position)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+      },
+      required: ['refId'],
+    },
+  },
+  {
+    name: 'element_trigger',
+    description: 'Trigger an event on the element',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        type: {
+          type: 'string',
+          description: 'Event type to trigger',
+        },
+        detail: {
+          type: 'object',
+          description: 'Event detail data (optional)',
+        },
+      },
+      required: ['refId', 'type'],
+    },
+  },
+  {
+    name: 'element_get_style',
+    description: 'Get element style value',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        refId: {
+          type: 'string',
+          description: 'Element reference ID from page_query',
+        },
+        name: {
+          type: 'string',
+          description: 'Style property name to retrieve',
+        },
+      },
+      required: ['refId', 'name'],
+    },
+  },
 ]
 
 // Tool handlers mapping
@@ -331,6 +510,17 @@ export const CORE_TOOL_HANDLERS: Record<string, ToolHandler> = {
   page_call_method: pageTools.callMethod,
   page_get_size: pageTools.getSize,
   page_get_scroll_top: pageTools.getScrollTop,
+  element_tap: elementTools.tap,
+  element_longpress: elementTools.longpress,
+  element_input: elementTools.input,
+  element_get_text: elementTools.getText,
+  element_get_attribute: elementTools.getAttribute,
+  element_get_property: elementTools.getProperty,
+  element_get_value: elementTools.getValue,
+  element_get_size: elementTools.getSize,
+  element_get_offset: elementTools.getOffset,
+  element_trigger: elementTools.trigger,
+  element_get_style: elementTools.getStyle,
 }
 
 export interface ToolRegistrationOptions {
