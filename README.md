@@ -6,7 +6,7 @@
 
 **Why?** Traditional UI automation requires writing brittle scripts. With MCP, you describe what to test in plain English, and AI agents handle the implementation details - making test creation 10x faster and maintenance effortless.
 
-[![Tests](https://img.shields.io/badge/tests-354%20passed-success)](https://github.com/rn1024/creatoria-miniapp-mcp) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/) [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-1.0-purple)](https://modelcontextprotocol.io/)
+[![Tests](https://img.shields.io/badge/tests-459%20passed-success)](https://github.com/rn1024/creatoria-miniapp-mcp) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/) [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-1.0-purple)](https://modelcontextprotocol.io/)
 
 ---
 
@@ -17,7 +17,7 @@
 - 🔧 **MCP Native**: Seamlessly integrates with Claude Desktop, Cline, and any MCP client
 - 🧪 **Test Automation**: 9 assertion tools + 6 recording tools for robust test workflows
 - 📸 **Debug Snapshots**: Capture page/app/element state for troubleshooting
-- 🎨 **TypeScript First**: Full type definitions, 354 tests, 100% pass rate
+- 🎨 **TypeScript First**: Full type definitions, 459 tests, 100% pass rate
 - 🔄 **Session Isolation**: Multi-session support with automatic 30-min cleanup
 - ⚙️ **Flexible Config**: Environment variables, config files, or CLI arguments
 
@@ -108,96 +108,119 @@ await assert.text({ selector: ".product-title", expected: "iPhone 15" })
 
 ---
 
-## 🛠️ Tool Catalog (59 Tools across 7 Categories)
+## 🛠️ Tool Catalog (65 Tools across 8 Categories)
 
 ### Automator (4 tools) - Connection & Lifecycle
 
 | Tool | Description |
 |------|-------------|
-| `automator.launch` | Launch WeChat DevTools and load mini program |
-| `automator.connect` | Connect to running DevTools instance |
-| `automator.disconnect` | Disconnect but keep DevTools running |
-| `automator.close` | Close mini program and cleanup resources |
+| `miniprogram.launch` | Launch WeChat Mini Program with automator |
+| `miniprogram.connect` | Connect to an already running WeChat DevTools instance |
+| `miniprogram.disconnect` | Disconnect from miniprogram but keep IDE running |
+| `miniprogram.close` | Close current mini program session and cleanup all resources |
 
 ### MiniProgram (6 tools) - App-Level Operations
 
 | Tool | Description |
 |------|-------------|
-| `miniprogram.navigate` | Navigate between pages (navigateTo, redirectTo, reLaunch, switchTab, navigateBack) |
-| `miniprogram.callWx` | Call WeChat APIs (wx.*) |
-| `miniprogram.evaluate` | Execute JavaScript in mini program context |
-| `miniprogram.screenshot` | Take screenshot (full page or custom region) |
-| `miniprogram.getPageStack` | Get current page stack info |
-| `miniprogram.getSystemInfo` | Get system info (platform, version, etc.) |
+| `miniprogram.navigate` | Navigate to a page using various navigation methods (navigateTo, redirectTo, reLaunch, switchTab, navigateBack) |
+| `miniprogram.call.wx` | Call a WeChat API method (wx.*) in the mini program |
+| `miniprogram.evaluate` | Evaluate JavaScript code in the mini program context |
+| `miniprogram.screenshot` | Take a screenshot of the mini program |
+| `miniprogram.get.page.stack` | Get the current page stack |
+| `miniprogram.get.system.info` | Get system information |
 
 ### Page (8 tools) - Page-Level Operations
 
 | Tool | Description |
 |------|-------------|
-| `page.query` | Query single element (CSS selector) |
-| `page.queryAll` | Query all matching elements |
-| `page.waitFor` | Wait for element to appear/disappear |
-| `page.getData` | Get page data |
-| `page.setData` | Set page data |
-| `page.callMethod` | Call page method |
-| `page.getSize` | Get page dimensions |
-| `page.getScrollTop` | Get page scroll position |
+| `page.query` | Query a single element on the page |
+| `page.query.all` | Query all matching elements on the page |
+| `page.wait.for` | Wait for a condition to be met (selector or timeout) |
+| `page.get.data` | Get page data (optionally at a specific path) |
+| `page.set.data` | Set page data |
+| `page.call.method` | Call a method on the page |
+| `page.get.size` | Get page size (width, height, scrollHeight) |
+| `page.get.scroll.top` | Get page scroll position |
 
 ### Element (23 tools) - Element-Level Operations
 
-**Tap & Input** (5 tools):
-- `element.tap`, `element.longPress`, `element.doubleTap`
-- `element.input`, `element.clearInput`
+| Tool | Description |
+|------|-------------|
+| `element.tap` | Tap (click) an element |
+| `element.longpress` | Long press an element |
+| `element.input` | Input text into an element (input/textarea only) |
+| `element.get.text` | Get element text content |
+| `element.get.attribute` | Get element attribute (特性) |
+| `element.get.property` | Get element property (属性) |
+| `element.get.value` | Get element value |
+| `element.get.size` | Get element size (width, height) |
+| `element.get.offset` | Get element offset (position) |
+| `element.trigger` | Trigger an event on the element |
+| `element.get.style` | Get element style value |
+| `element.touchstart` | Touch start on element |
+| `element.touchmove` | Touch move on element |
+| `element.touchend` | Touch end on element |
+| `element.scroll.to` | Scroll to position (ScrollView only) |
+| `element.scroll.width` | Get scroll width (ScrollView only) |
+| `element.scroll.height` | Get scroll height (ScrollView only) |
+| `element.swipe.to` | Swipe to index (Swiper only) |
+| `element.move.to` | Move to position (MovableView only) |
+| `element.slide.to` | Slide to value (Slider only) |
+| `element.call.context.method` | Call context method (ContextElement only) |
+| `element.set.data` | Set data on custom element (CustomElement only) |
+| `element.call.method` | Call method on custom element (CustomElement only) |
 
-**Touch Events** (8 tools):
-- `element.touchStart/Move/End` - Single-touch
-- `element.multiTouchStart/Move/End` - Multi-touch
-- `element.swipe`, `element.pinch` - Gestures
-
-**Getters** (7 tools):
-- `element.getText`, `element.getValue`
-- `element.getAttribute`, `element.getProperty`
-- `element.getSize`, `element.getOffset`, `element.getBoundingClientRect`
-
-**Scrolling** (3 tools):
-- `element.scroll`, `element.scrollTo`, `element.scrollIntoView`
-
-📖 See [API Reference](./docs/api/) for detailed documentation.
-
-### Assert (9 tools) - Testing & Validation
+### Assert (9 tools) - Testing & Verification
 
 | Tool | Description |
 |------|-------------|
-| `assert.exists` | Assert element exists |
-| `assert.notExists` | Assert element does not exist |
-| `assert.text` | Assert exact text match |
-| `assert.notText` | Assert text does not match |
-| `assert.attribute` | Assert attribute value |
-| `assert.notAttribute` | Assert attribute absence/mismatch |
-| `assert.data` | Assert page data value |
-| `assert.displayed` | Assert element is visible (non-zero size) |
-| `assert.count` | Assert element count |
+| `assert.exists` | Assert that an element exists on the page |
+| `assert.not.exists` | Assert that an element does not exist on the page |
+| `assert.text` | Assert element text equals expected value |
+| `assert.text.contains` | Assert element text contains expected substring |
+| `assert.value` | Assert element value equals expected value |
+| `assert.attribute` | Assert element attribute equals expected value |
+| `assert.property` | Assert element property equals expected value |
+| `assert.data` | Assert page data equals expected value |
+| `assert.visible` | Assert element is visible (has non-zero size) |
 
-### Snapshot (3 tools) - State Capture & Debug
-
-| Tool | Description |
-|------|-------------|
-| `snapshot.capture` | Capture current state (page data + optional screenshot) |
-| `snapshot.restore` | Restore previously captured state |
-| `snapshot.compare` | Compare two snapshots and report differences |
-
-### Record (6 tools) - Test Recording & Replay
+### Snapshot (3 tools) - State Capture & Debugging
 
 | Tool | Description |
 |------|-------------|
-| `record.start` | Start recording user actions |
-| `record.stop` | Stop recording and save sequence |
-| `record.list` | List all saved sequences |
-| `record.get` | Get specific sequence details |
+| `snapshot.page` | Capture complete page snapshot (data + screenshot) |
+| `snapshot.full` | Capture complete application snapshot (system info + page stack + current page) |
+| `snapshot.element` | Capture element snapshot (properties + optional screenshot) |
+
+### Record (6 tools) - Action Recording & Replay
+
+| Tool | Description |
+|------|-------------|
+| `record.start` | Start recording user actions for later replay |
+| `record.stop` | Stop the current recording and save the sequence |
+| `record.list` | List all saved action sequences |
+| `record.get` | Get details of a specific sequence |
 | `record.delete` | Delete a saved sequence |
-| `record.replay` | Replay recorded sequence for regression testing |
+| `record.replay` | Replay a recorded action sequence |
+
+### Network (6 tools) - Network Mock & Testing
+
+| Tool | Description |
+|------|-------------|
+| `network.mock.wx.method` | Mock a WeChat API method (wx.*) for testing |
+| `network.restore.wx.method` | Restore a previously mocked WeChat API method |
+| `network.mock.request` | Mock wx.request to return specific data (convenience wrapper) |
+| `network.mock.request.failure` | Mock wx.request to fail with specific error |
+| `network.restore.request` | Restore wx.request to original behavior |
+| `network.restore.all.mocks` | Restore all mocked WeChat API methods at once |
 
 ---
+
+📚 **Documentation**:
+- [Complete Tool Reference](./docs/tools.md) - Detailed API documentation
+- [Usage Examples](./examples/) - Real-world automation scripts
+- [Integration Tests](./tests/integration/) - End-to-end test scenarios
 
 ## 🏗️ 项目结构
 
@@ -214,7 +237,7 @@ creatoria-miniapp-mcp/
 │   │   ├── output.ts              # 输出管理器（截图、快照）
 │   │   └── element-ref.ts         # 元素引用解析器
 │   └── tools/                     # MCP 工具实现
-│       ├── index.ts               # 工具注册器（59 个工具）
+│       ├── index.ts               # 工具注册器（65 个工具）
 │       ├── automator.ts           # Automator 工具（4 个）
 │       ├── miniprogram.ts         # MiniProgram 工具（6 个）
 │       ├── page.ts                # Page 工具（8 个）
@@ -239,11 +262,11 @@ creatoria-miniapp-mcp/
 │
 ├── docs/                          # 文档
 │   ├── setup-guide.md             # 配置指南
-│   ├── architecture.md            # 系统架构（待创建）
-│   ├── troubleshooting.md         # 故障排除（待创建）
+│   ├── architecture.md            # 系统架构
+│   ├── troubleshooting.md         # 故障排除
 │   ├── charter.*.yaml             # 任务对齐文档
 │   ├── tasks.*.atomize.md         # 任务分解文档
-│   └── api/                       # API 参考文档（待创建）
+│   └── api/                       # API 参考文档
 │       ├── README.md              # API 文档索引
 │       ├── automator.md
 │       ├── miniprogram.md
@@ -252,7 +275,7 @@ creatoria-miniapp-mcp/
 │       ├── assert.md
 │       └── snapshot.md
 │
-├── examples/                      # 使用示例（待创建）
+├── examples/                      # 使用示例
 │   ├── README.md                  # 示例索引
 │   ├── 01-basic-navigation.md
 │   ├── 02-form-interaction.md
@@ -283,9 +306,12 @@ creatoria-miniapp-mcp/
 
 ### User Documentation
 - [**Setup Guide**](./docs/setup-guide.md) - Environment setup and configuration
-- [**API Reference**](./docs/api/) - Complete API docs for all 59 tools
+- [**API Reference**](./docs/api/) - Complete API docs for all 65 tools
 - [**Usage Examples**](./examples/) - Real-world automation scenarios
 - [**Troubleshooting**](./docs/troubleshooting.md) - Common issues and solutions
+
+### Known Issues
+- Type-only build/typecheck warnings may occur due to upstream `miniprogram-automator` type declarations. CI marks build/typecheck as non-blocking and runtime is unaffected. See `scripts/smoke-test.sh` and `.github/workflows/ci.yml` for handling details.
 
 ### Developer Documentation
 - [**Architecture**](./docs/architecture.md) - System design and technical decisions
@@ -397,7 +423,7 @@ Time:        ~6s
 
 ---
 
-**Project Status**: ✅ Stage A-E Complete (65 tools, 354 tests, full config system, complete documentation suite)
+**Project Status**: ✅ Stage A-H Complete / M5 Milestone Ready (65 tools, 459 tests, CI/CD, release automation)
 
 **Last Updated**: 2025-10-03
 

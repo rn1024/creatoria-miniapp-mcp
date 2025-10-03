@@ -36,6 +36,7 @@ describe('Snapshot Tools', () => {
         warn: jest.fn(),
         error: jest.fn(),
         debug: jest.fn(),
+        child: jest.fn().mockReturnThis(),
       },
     }
 

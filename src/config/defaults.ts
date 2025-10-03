@@ -2,7 +2,7 @@
  * Default configuration values for the MCP server
  */
 
-import { join } from 'path'
+import { join as _join } from 'path'
 import type { ServerConfig, SessionConfig } from '../types.js'
 
 /**
@@ -72,6 +72,7 @@ export const DEFAULT_SERVER_CONFIG: Required<ServerConfig> = {
   projectPath: '', // Must be provided by user
   cliPath: process.platform === 'darwin' ? DEFAULT_CLI_PATH_MACOS : '',
   port: DEFAULT_AUTOMATION_PORT,
+  autoPort: DEFAULT_AUTOMATION_PORT, // Alias for port
   capabilities: DEFAULT_CAPABILITIES,
   outputDir: DEFAULT_OUTPUT_DIR,
   timeout: DEFAULT_TIMEOUT,
@@ -80,6 +81,8 @@ export const DEFAULT_SERVER_CONFIG: Required<ServerConfig> = {
   enableFileLog: false,
   logBufferSize: DEFAULT_LOG_BUFFER_SIZE,
   logFlushInterval: DEFAULT_LOG_FLUSH_INTERVAL,
+  enableSessionReport: false, // F3: Session report generation (default: disabled)
+  enableFailureSnapshot: false, // F2: Automatic failure snapshot capture (default: disabled)
 }
 
 /**

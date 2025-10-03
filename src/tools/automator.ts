@@ -55,8 +55,8 @@ export async function launch(
       port,
     })
 
-    // Store in session
-    session.miniProgram = miniProgram
+    // Store in session (use 'as any' to bypass type incompatibility between official types and our interface)
+    session.miniProgram = miniProgram as any
     session.config = {
       ...session.config,
       projectPath,
@@ -114,8 +114,8 @@ export async function connect(
       wsEndpoint: port ? `ws://localhost:${port}` : undefined,
     } as any)
 
-    // Store in session
-    session.miniProgram = miniProgram
+    // Store in session (use 'as any' to bypass type incompatibility between official types and our interface)
+    session.miniProgram = miniProgram as any
     if (port) {
       session.config = {
         ...session.config,

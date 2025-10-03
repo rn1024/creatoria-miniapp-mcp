@@ -48,7 +48,7 @@ describe('Logger', () => {
     })
 
     it('should log debug messages', () => {
-      const logger = new ConsoleLogger('test-session')
+      const logger = new ConsoleLogger('test-session', undefined, { level: 'debug' })
       logger.debug('Debug message')
 
       expect(consoleErrorSpy).toHaveBeenCalled()

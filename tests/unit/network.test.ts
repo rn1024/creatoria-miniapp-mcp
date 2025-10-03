@@ -21,6 +21,7 @@ describe('Network Mock Tools', () => {
         warn: jest.fn(),
         error: jest.fn(),
         debug: jest.fn(),
+        child: jest.fn().mockReturnThis(),
       },
     }
 
@@ -230,11 +231,9 @@ describe('Network Mock Tools', () => {
       })
 
       expect(result.success).toBe(true)
-      expect(mockMiniProgram.mockWxMethod).toHaveBeenCalledWith(
-        'request',
-        expect.any(Object),
-        { type: 'fail' }
-      )
+      expect(mockMiniProgram.mockWxMethod).toHaveBeenCalledWith('request', expect.any(Object), {
+        type: 'fail',
+      })
     })
 
     it('should throw if miniprogram not connected', async () => {

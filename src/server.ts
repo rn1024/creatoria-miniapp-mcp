@@ -10,7 +10,7 @@ import { SessionStore } from './core/session.js'
 import { registerTools } from './tools/index.js'
 import { mergeServerConfig } from './config/defaults.js'
 
-export async function startServer(config: Partial<ServerConfig> = {}) {
+export async function startServer(config: Partial<ServerConfig> = {}): Promise<Server> {
   // Merge config with defaults to ensure all fields are present
   const fullConfig = mergeServerConfig(config)
   const {
@@ -21,6 +21,7 @@ export async function startServer(config: Partial<ServerConfig> = {}) {
     enableFileLog,
     logBufferSize,
     logFlushInterval,
+    enableSessionReport,
   } = fullConfig
 
   // Generate unique session ID for this server instance
@@ -31,6 +32,7 @@ export async function startServer(config: Partial<ServerConfig> = {}) {
   const sessionStore = new SessionStore({
     outputDir,
     sessionTimeout,
+    enableSessionReport,
     loggerConfig: {
       level: logLevel,
       enableFileLog,
@@ -100,4 +102,6 @@ export async function startServer(config: Partial<ServerConfig> = {}) {
   console.error('WeChat Mini Program MCP Server running on stdio')
   console.error(`Capabilities: ${capabilities.join(', ')}`)
   console.error(`Tools registered: ${tools.length}`)
+
+  return server
 }

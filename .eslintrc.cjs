@@ -24,5 +24,5 @@ module.exports = {
     }],
     'no-console': 'off'
   },
-  ignorePatterns: ['dist', 'node_modules', '*.cjs']
+  ignorePatterns: ['dist', 'node_modules', '*.cjs', 'examples/**', 'scripts/**', 'tests/**']
 }

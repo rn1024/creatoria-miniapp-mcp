@@ -7,6 +7,7 @@ import { join } from 'path'
 import type { SessionState, SessionConfig, SessionMetrics, LoggerConfig } from '../types.js'
 import { createLogger } from './logger.js'
 import { createOutputManager } from './output.js'
+import { generateAndSaveReports } from './report-generator.js'
 
 const DEFAULT_SESSION_TIMEOUT = 30 * 60 * 1000 // 30 minutes
 const DEFAULT_OUTPUT_DIR = '.mcp-artifacts'
@@ -16,14 +17,21 @@ export class SessionStore {
   private sessionTimeout: number
   private outputDir: string
   private loggerConfig?: LoggerConfig
+  private enableSessionReport: boolean
   private cleanupInterval?: NodeJS.Timeout
 
   constructor(
-    config: { sessionTimeout?: number; outputDir?: string; loggerConfig?: LoggerConfig } = {}
+    config: {
+      sessionTimeout?: number
+      outputDir?: string
+      loggerConfig?: LoggerConfig
+      enableSessionReport?: boolean
+    } = {}
   ) {
     this.sessionTimeout = config.sessionTimeout || DEFAULT_SESSION_TIMEOUT
     this.outputDir = config.outputDir || DEFAULT_OUTPUT_DIR
     this.loggerConfig = config.loggerConfig
+    this.enableSessionReport = config.enableSessionReport || false
 
     // Start periodic cleanup of timed-out sessions
     this.startCleanupTimer()
@@ -62,7 +70,18 @@ export class SessionStore {
   private async cleanupSessionResources(session: SessionState, sessionId: string): Promise<void> {
     const errors: Error[] = []
 
-    // Issue #5: Dispose logger first to flush buffer and close file handles
+    // F3: Generate session reports before cleanup (fire-and-forget)
+    if (session.reportData) {
+      try {
+        await generateAndSaveReports(session)
+        console.error(`Session reports generated for ${sessionId}`)
+      } catch (error) {
+        // Don't add to errors - report generation failure shouldn't block cleanup
+        console.error(`Failed to generate session reports for ${sessionId}:`, error)
+      }
+    }
+
+    // Issue #5: Dispose logger after report generation (to capture report logs)
     if (session.logger?.dispose) {
       try {
         await session.logger.dispose()
@@ -198,17 +217,26 @@ export class SessionStore {
     if (!session) {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
       const outputDir = join(this.outputDir, `${sessionId}-${timestamp}`)
+      const now = new Date()
 
       session = {
         sessionId,
         pages: [],
         elements: new Map(),
         outputDir,
-        createdAt: new Date(),
-        lastActivity: new Date(),
+        createdAt: now,
+        lastActivity: now,
         config,
         logger: createLogger(sessionId, this.loggerConfig),
+        loggerConfig: this.loggerConfig,
         outputManager: createOutputManager(outputDir),
+        // F3: Initialize report data if enabled
+        reportData: this.enableSessionReport
+          ? {
+              toolCalls: [],
+              startTime: now,
+            }
+          : undefined,
       }
       this.set(sessionId, session)
       console.error(`Created new session: ${sessionId}`)
@@ -242,7 +270,6 @@ export class SessionStore {
     // Check every 5 minutes
     this.cleanupInterval = setInterval(
       async () => {
-        const now = Date.now()
         const expiredSessions: string[] = []
 
         for (const [sessionId, session] of this.sessions.entries()) {

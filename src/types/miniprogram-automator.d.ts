@@ -303,32 +303,32 @@ export interface MiniProgram {
   /**
    * Navigate to a page using navigateTo
    */
-  navigateTo(url: string): Promise<void>
+  navigateTo(url: string): Promise<Page | undefined>
 
   /**
    * Navigate to a page using redirectTo
    */
-  redirectTo(url: string): Promise<void>
+  redirectTo(url: string): Promise<Page | undefined>
 
   /**
    * Navigate to a page using reLaunch
    */
-  reLaunch(url: string): Promise<void>
+  reLaunch(url: string): Promise<Page | undefined>
 
   /**
    * Switch to a tab page
    */
-  switchTab(url: string): Promise<void>
+  switchTab(url: string): Promise<Page | undefined>
 
   /**
    * Navigate back
    */
-  navigateBack(delta?: number): Promise<void>
+  navigateBack(delta?: number): Promise<Page | undefined>
 
   /**
    * Get current page
    */
-  currentPage(): Promise<Page>
+  currentPage(): Promise<Page | undefined>
 
   /**
    * Get page stack

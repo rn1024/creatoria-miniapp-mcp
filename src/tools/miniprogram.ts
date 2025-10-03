@@ -167,10 +167,7 @@ export async function evaluate(
     const { withTimeout, getTimeout, DEFAULT_TIMEOUTS } = await import('../core/timeout.js')
 
     // Get timeout from config or use default (5 seconds for evaluate)
-    const timeoutMs = getTimeout(
-      session.config?.evaluateTimeout,
-      DEFAULT_TIMEOUTS.evaluate
-    )
+    const timeoutMs = getTimeout(session.config?.evaluateTimeout, DEFAULT_TIMEOUTS.evaluate)
 
     // Evaluate expression with timeout protection
     const result = await withTimeout(

@@ -102,6 +102,17 @@ await assert_exists({ selector: ".success-toast" })
 
 ---
 
+## XPath 支持说明
+
+当前 MCP API 以 CSS/WXML 选择器为主（`page_query` / `page_query_all`）。底层已具备 XPath 能力，但尚未对外提供独立的 `page_xpath` 系列工具，以避免变更既有工具数量（65 个）影响文档与校验脚本。
+
+注意事项：
+- 推荐优先使用 CSS/WXML 选择器，兼顾可读性与兼容性。
+- 如确需 XPath 精准定位，可在 Issue 中反馈需求；后续将评估以不破坏现有计数与 CI 校验的方式补充对应工具。
+- 参考：`miniprogram-automator` 0.11.0+ 提供 `page.xpath/getElementByXpath/getElementsByXpath` 能力。
+
+---
+
 ## page_query_all
 
 查询所有符合条件的元素，返回元素数组。

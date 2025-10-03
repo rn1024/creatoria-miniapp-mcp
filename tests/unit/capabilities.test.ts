@@ -185,7 +185,12 @@ describe('Capabilities System', () => {
 
       // Check that we have tools from each capability
       const automatorTools = tools.filter((t) =>
-        ['miniprogram_launch', 'miniprogram_connect', 'miniprogram_disconnect', 'miniprogram_close'].includes(t.name)
+        [
+          'miniprogram_launch',
+          'miniprogram_connect',
+          'miniprogram_disconnect',
+          'miniprogram_close',
+        ].includes(t.name)
       )
       const pageTools = tools.filter((t) => t.name.startsWith('page_'))
       const networkTools = tools.filter((t) => t.name.startsWith('network_'))

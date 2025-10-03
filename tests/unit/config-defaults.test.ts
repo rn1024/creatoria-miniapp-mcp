@@ -22,9 +22,7 @@ import {
 describe('Config Defaults', () => {
   describe('Constants', () => {
     it('should have sensible default values', () => {
-      expect(DEFAULT_CLI_PATH_MACOS).toBe(
-        '/Applications/wechatwebdevtools.app/Contents/MacOS/cli'
-      )
+      expect(DEFAULT_CLI_PATH_MACOS).toBe('/Applications/wechatwebdevtools.app/Contents/MacOS/cli')
       expect(DEFAULT_AUTOMATION_PORT).toBe(9420)
       expect(DEFAULT_OUTPUT_DIR).toBe('.mcp-artifacts')
       expect(DEFAULT_SESSION_TIMEOUT).toBe(30 * 60 * 1000) // 30 minutes

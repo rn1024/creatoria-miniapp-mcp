@@ -16,6 +16,7 @@ const DEFAULT_LOGGER_CONFIG: Required<LoggerConfig> = {
   outputDir: '.mcp-artifacts',
   bufferSize: 100,
   flushInterval: 5000,
+  enableFailureSnapshot: false,
 }
 
 /**

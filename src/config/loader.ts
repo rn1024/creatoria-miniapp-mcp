@@ -15,8 +15,9 @@ const CONFIG_FILE_NAMES = ['.mcp.json', 'mcp.config.json', '.mcp.config.json']
 
 /**
  * Environment variable prefix
+ * @unused Reserved for future environment variable support
  */
-const ENV_PREFIX = 'MCP_'
+const _ENV_PREFIX = 'MCP_'
 
 /**
  * Find config file in current directory or parent directories

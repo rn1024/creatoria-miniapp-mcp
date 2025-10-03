@@ -18,6 +18,7 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import { Tool, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 import type { SessionState } from '../types.js'
+import { ToolLogger } from '../core/tool-logger.js'
 import * as automatorTools from './automator.js'
 import * as miniprogramTools from './miniprogram.js'
 import * as pageTools from './page.js'
@@ -1547,18 +1548,32 @@ export function registerTools(server: Server, options: ToolRegistrationOptions):
 
   // Count tools by category in registered set
   const registeredCounts = {
-    automator: tools.filter(t => t.name.startsWith('miniprogram_launch') || t.name.startsWith('miniprogram_connect') || t.name.startsWith('miniprogram_disconnect') || t.name.startsWith('miniprogram_close')).length,
-    miniprogram: tools.filter(t => t.name.startsWith('miniprogram_') && !t.name.includes('launch') && !t.name.includes('connect') && !t.name.includes('disconnect') && !t.name.includes('close')).length,
-    page: tools.filter(t => t.name.startsWith('page_')).length,
-    element: tools.filter(t => t.name.startsWith('element_')).length,
-    assert: tools.filter(t => t.name.startsWith('assert_')).length,
-    snapshot: tools.filter(t => t.name.startsWith('snapshot_')).length,
-    record: tools.filter(t => t.name.startsWith('record_')).length,
-    network: tools.filter(t => t.name.startsWith('network_')).length,
+    automator: tools.filter(
+      (t) =>
+        t.name.startsWith('miniprogram_launch') ||
+        t.name.startsWith('miniprogram_connect') ||
+        t.name.startsWith('miniprogram_disconnect') ||
+        t.name.startsWith('miniprogram_close')
+    ).length,
+    miniprogram: tools.filter(
+      (t) =>
+        t.name.startsWith('miniprogram_') &&
+        !t.name.includes('launch') &&
+        !t.name.includes('connect') &&
+        !t.name.includes('disconnect') &&
+        !t.name.includes('close')
+    ).length,
+    page: tools.filter((t) => t.name.startsWith('page_')).length,
+    element: tools.filter((t) => t.name.startsWith('element_')).length,
+    assert: tools.filter((t) => t.name.startsWith('assert_')).length,
+    snapshot: tools.filter((t) => t.name.startsWith('snapshot_')).length,
+    record: tools.filter((t) => t.name.startsWith('record_')).length,
+    network: tools.filter((t) => t.name.startsWith('network_')).length,
   }
 
   if (registeredCounts.automator > 0) console.error(`  - Automator: ${registeredCounts.automator}`)
-  if (registeredCounts.miniprogram > 0) console.error(`  - MiniProgram: ${registeredCounts.miniprogram}`)
+  if (registeredCounts.miniprogram > 0)
+    console.error(`  - MiniProgram: ${registeredCounts.miniprogram}`)
   if (registeredCounts.page > 0) console.error(`  - Page: ${registeredCounts.page}`)
   if (registeredCounts.element > 0) console.error(`  - Element: ${registeredCounts.element}`)
   if (registeredCounts.assert > 0) console.error(`  - Assert: ${registeredCounts.assert}`)
@@ -1581,8 +1596,15 @@ export function registerTools(server: Server, options: ToolRegistrationOptions):
         throw new Error(`Unknown tool: ${name}`)
       }
 
-      // Execute handler
-      const result = await handler(session, args as any)
+      // Wrap handler with automatic logging if logger is available
+      let wrappedHandler = handler
+      if (session.logger) {
+        const toolLogger = new ToolLogger(session.logger, session.loggerConfig)
+        wrappedHandler = toolLogger.wrap(name, handler)
+      }
+
+      // Execute handler (with logging if available)
+      const result = await wrappedHandler(session, args as any)
 
       // Handle session deletion for close tool
       if (name === 'miniprogram_close' && deleteSession) {

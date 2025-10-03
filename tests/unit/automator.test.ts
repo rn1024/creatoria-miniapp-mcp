@@ -29,6 +29,7 @@ describe('Automator Tools', () => {
         warn: jest.fn(),
         error: jest.fn(),
         debug: jest.fn(),
+        child: jest.fn().mockReturnThis(),
       },
     }
 
@@ -213,7 +214,11 @@ describe('Automator Tools', () => {
       }
 
       mockSession.miniProgram = mockMiniProgram
-      mockSession.elements.set('elem-1', { element: {}, pagePath: 'pages/test', cachedAt: new Date() })
+      mockSession.elements.set('elem-1', {
+        element: {},
+        pagePath: 'pages/test',
+        cachedAt: new Date(),
+      })
       mockSession.pages = [{ path: '/pages/index' }]
 
       const result = await automatorTools.disconnect(mockSession)
@@ -244,7 +249,11 @@ describe('Automator Tools', () => {
       }
 
       mockSession.miniProgram = mockMiniProgram
-      mockSession.elements.set('elem-1', { element: {}, pagePath: 'pages/test', cachedAt: new Date() })
+      mockSession.elements.set('elem-1', {
+        element: {},
+        pagePath: 'pages/test',
+        cachedAt: new Date(),
+      })
       mockSession.pages = [{ path: '/pages/index' }]
 
       await expect(automatorTools.disconnect(mockSession)).rejects.toThrow(
@@ -284,7 +293,11 @@ describe('Automator Tools', () => {
 
       mockSession.miniProgram = mockMiniProgram
       mockSession.ideProcess = mockIdeProcess as any
-      mockSession.elements.set('elem-1', { element: {}, pagePath: 'pages/test', cachedAt: new Date() })
+      mockSession.elements.set('elem-1', {
+        element: {},
+        pagePath: 'pages/test',
+        cachedAt: new Date(),
+      })
       mockSession.pages = [{ path: '/pages/index' }]
 
       const result = await automatorTools.close(mockSession)

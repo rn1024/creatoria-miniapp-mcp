@@ -69,9 +69,6 @@ export const DEFAULT_TIMEOUTS = {
  * 3. Operation-specific default
  * 4. Global default (30s)
  */
-export function getTimeout(
-  configTimeout: number | undefined,
-  operationDefault: number
-): number {
+export function getTimeout(configTimeout: number | undefined, operationDefault: number): number {
   return configTimeout ?? operationDefault ?? DEFAULT_TIMEOUTS.default
 }

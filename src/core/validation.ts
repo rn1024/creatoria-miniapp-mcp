@@ -60,9 +60,7 @@ export function validateFilename(
 
   const extension = parts[parts.length - 1].toLowerCase()
   if (!allowedExtensions.includes(extension)) {
-    throw new Error(
-      `Invalid file extension. Allowed extensions: ${allowedExtensions.join(', ')}`
-    )
+    throw new Error(`Invalid file extension. Allowed extensions: ${allowedExtensions.join(', ')}`)
   }
 
   // Check length (防止过长文件名)

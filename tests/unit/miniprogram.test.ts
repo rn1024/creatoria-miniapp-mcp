@@ -21,6 +21,7 @@ describe('MiniProgram Tools', () => {
         warn: jest.fn(),
         error: jest.fn(),
         debug: jest.fn(),
+        child: jest.fn().mockReturnThis(),
       },
       outputManager: {
         getOutputDir: jest.fn().mockReturnValue('/tmp/test-output'),

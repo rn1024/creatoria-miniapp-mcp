@@ -14,10 +14,18 @@
     "start": "node dist/server.js",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:unit": "jest tests/unit",
+    "test:integration": "jest tests/integration --runInBand",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
     "typecheck": "tsc --noEmit",
+    "update-readme": "tsx scripts/update-readme.ts",
+    "smoke-test": "bash scripts/smoke-test.sh",
+    "release:patch": "bash scripts/release.sh patch",
+    "release:minor": "bash scripts/release.sh minor",
+    "release:major": "bash scripts/release.sh major",
+    "release:prerelease": "bash scripts/release.sh prerelease",
     "prepare": "husky install"
   },
   "keywords": [
@@ -49,6 +57,7 @@
     "prettier": "^3.3.2",
     "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
     "typescript": "^5.5.2"
   },
   "engines": {

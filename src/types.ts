@@ -2,16 +2,16 @@
  * Core type definitions for creatoria-miniapp-mcp
  */
 
-import type { MiniProgram, Page } from './miniprogram-automator.js'
 import type { ChildProcess } from 'child_process'
 
 // Re-export miniprogram-automator types for easier imports
-export type { MiniProgram, Page, Element, SystemInfo } from './miniprogram-automator.js'
+export type { MiniProgram, Page, Element, SystemInfo } from './types/miniprogram-automator.js'
 
 export interface ServerConfig {
   projectPath?: string
   cliPath?: string
   port?: number
+  autoPort?: number // Automation port for WeChat DevTools (alias for port)
   capabilities?: string[]
   outputDir?: string
   timeout?: number
@@ -20,22 +20,24 @@ export interface ServerConfig {
   enableFileLog?: boolean // Enable file logging (default: false)
   logBufferSize?: number // Log buffer size (default: 100)
   logFlushInterval?: number // Log flush interval in ms (default: 5000)
+  enableSessionReport?: boolean // Enable session report generation (default: false)
+  enableFailureSnapshot?: boolean // Enable automatic failure snapshot capture (F2 feature, default: false)
 }
 
 /**
  * Cached element with page metadata for invalidation
  */
 export interface CachedElement {
-  element: import('./miniprogram-automator.js').Element // The actual element object
+  element: any // The actual element object (using any to allow mocking and avoid type conflicts)
   pagePath: string // Page path where element was cached
   cachedAt: Date // When the element was cached
 }
 
 export interface SessionState {
   sessionId: string
-  miniProgram?: MiniProgram // miniprogram-automator MiniProgram instance
+  miniProgram?: any // miniprogram-automator MiniProgram instance (using any to allow mocking)
   ideProcess?: ChildProcess // IDE process handle
-  pages: Page[] // Page stack
+  pages: any[] // Page stack (using any to avoid type conflicts)
   elements: Map<string, CachedElement> // Element cache (refId -> CachedElement)
   currentPagePath?: string // Current page path for cache invalidation
   outputDir: string // Session-specific output directory
@@ -43,8 +45,10 @@ export interface SessionState {
   lastActivity: Date
   config?: SessionConfig
   logger?: Logger // Session-specific logger
+  loggerConfig?: LoggerConfig // Logger configuration (for ToolLogger)
   outputManager?: OutputManager // Session-specific output manager
   recording?: RecordingState // Recording state
+  reportData?: ReportData // Session report collection (F3)
 }
 
 export interface SessionConfig {
@@ -87,8 +91,8 @@ export interface ElementRefInput {
  * Resolved element result
  */
 export interface ResolvedElement {
-  page: Page // Page object from miniprogram-automator
-  element: import('./miniprogram-automator.js').Element // Element object from miniprogram-automator
+  page: any // Page object from miniprogram-automator
+  element: any // Element object from miniprogram-automator (using any to avoid type conflicts)
   refId?: string // Generated refId if save=true
 }
 
@@ -118,6 +122,7 @@ export interface LoggerConfig {
   outputDir?: string // Output directory for logs
   bufferSize?: number // Buffer size for file writes (default: 100)
   flushInterval?: number // Flush interval in ms (default: 5000)
+  enableFailureSnapshot?: boolean // Enable automatic failure snapshot capture (default: false)
 }
 
 /**
@@ -207,4 +212,54 @@ export interface RecordingState {
   isRecording: boolean
   currentSequence?: ActionSequence
   startedAt?: Date
+}
+
+/**
+ * Tool call record for session report (F3)
+ */
+export interface ToolCallRecord {
+  timestamp: Date
+  toolName: string
+  duration: number // milliseconds
+  success: boolean
+  result?: any // Sanitized result (success case)
+  error?: {
+    message: string
+    snapshotPath?: string // Link to F2 failure snapshot
+  }
+}
+
+/**
+ * Report data collected during session (F3)
+ */
+export interface ReportData {
+  toolCalls: ToolCallRecord[]
+  startTime: Date
+  endTime?: Date
+}
+
+/**
+ * Session report (JSON format) (F3)
+ */
+export interface SessionReport {
+  sessionId: string
+  startTime: string // ISO 8601
+  endTime: string // ISO 8601
+  duration: number // milliseconds
+  summary: {
+    totalCalls: number
+    successCount: number
+    failureCount: number
+    successRate: number // 0-1
+    avgDuration: number // milliseconds
+    maxDuration: number
+    minDuration: number
+  }
+  toolCalls: ToolCallRecord[]
+  failures: Array<{
+    toolName: string
+    timestamp: string
+    error: string
+    snapshotPath?: string
+  }>
 }

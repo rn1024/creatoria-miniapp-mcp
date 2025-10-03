@@ -2,7 +2,7 @@
  * Tool call logger wrapper for automatic logging
  */
 
-import type { Logger } from '../types.js'
+import type { Logger, ToolCallRecord } from '../types.js'
 import type { SessionState } from '../types.js'
 
 /**
@@ -14,6 +14,11 @@ const MAX_LOG_SIZE = 1024
  * Maximum recursion depth for sanitization
  */
 const MAX_SANITIZE_DEPTH = 5
+
+/**
+ * Maximum number of tool call records to keep in memory (F3)
+ */
+const MAX_TOOL_CALL_RECORDS = 1000
 
 /**
  * Sensitive key patterns to redact from logs (Issue #3: Enhanced sanitization)
@@ -46,7 +51,12 @@ const SENSITIVE_PATTERNS = [
  * Tool logger wrapper for automatic START/END/ERROR logging
  */
 export class ToolLogger {
-  constructor(private logger: Logger) {}
+  private capturing = false // Issue #P2: Prevent recursive snapshot triggers
+
+  constructor(
+    private logger: Logger,
+    private config?: import('../types.js').LoggerConfig
+  ) {}
 
   /**
    * Wrap a tool handler with automatic logging
@@ -81,6 +91,15 @@ export class ToolLogger {
           result: this.sanitizeResult(result),
         })
 
+        // F3: Record successful tool call
+        this.recordToolCall(session, {
+          timestamp: new Date(startTime),
+          toolName,
+          duration,
+          success: true,
+          result: this.sanitizeResult(result),
+        })
+
         return result
       } catch (error) {
         const duration = Date.now() - startTime
@@ -91,6 +110,37 @@ export class ToolLogger {
           duration,
           error: error instanceof Error ? error.message : String(error),
           stackTrace: error instanceof Error ? error.stack : undefined,
+        })
+
+        // F2: Capture failure snapshot (fire-and-forget, non-blocking)
+        let snapshotPath: string | undefined
+        if (this.config?.enableFailureSnapshot) {
+          snapshotPath = await this.captureFailureSnapshot({
+            session,
+            toolName,
+            args,
+            error: error instanceof Error ? error : new Error(String(error)),
+            duration,
+          }).catch((e) => {
+            childLogger.warn('Snapshot capture failed', {
+              error: e instanceof Error ? e.message : String(e),
+            })
+            return undefined
+          })
+        }
+
+        // F3: Record failed tool call
+        this.recordToolCall(session, {
+          timestamp: new Date(startTime),
+          toolName,
+          duration,
+          success: false,
+          error: {
+            message: this.sanitizeErrorMessage(
+              error instanceof Error ? error.message : String(error)
+            ),
+            snapshotPath,
+          },
         })
 
         throw error // Re-throw to preserve error handling
@@ -252,6 +302,226 @@ export class ToolLogger {
     } catch (error) {
       // If sanitization fails, return placeholder
       return '<Failed to sanitize result>'
+    }
+  }
+
+  /**
+   * Capture failure snapshot when tool call fails (F2 feature)
+   *
+   * Creates a failure directory with:
+   * - snapshot.json: Page data
+   * - snapshot.png: Screenshot
+   * - error-context.json: Error details + tool context
+   *
+   * @param context Failure context
+   * @returns Relative path to the failure directory (for F3 reporting)
+   */
+  private async captureFailureSnapshot(context: {
+    session: import('../types.js').SessionState
+    toolName: string
+    args: any
+    error: Error
+    duration: number
+  }): Promise<string | undefined> {
+    const { session, toolName, args, error, duration } = context
+    const logger = this.logger
+
+    // Issue #P2: Prevent recursive snapshot triggers
+    if (this.capturing) {
+      logger?.debug('Skipping failure snapshot: already capturing')
+      return undefined
+    }
+
+    this.capturing = true
+    try {
+      // 1. Check prerequisites
+      if (!this.config?.enableFailureSnapshot) {
+        return undefined // Feature disabled
+      }
+
+      if (!session.miniProgram) {
+        logger?.debug('Skipping failure snapshot: miniProgram not connected')
+        return undefined
+      }
+
+      if (!session.outputManager) {
+        logger?.debug('Skipping failure snapshot: outputManager not available')
+        return undefined
+      }
+
+      // 2. Create failure directory
+      // Issue #P1: Sanitize toolName to prevent path traversal
+      const sanitizedToolName = toolName.replace(/[^a-zA-Z0-9_-]/g, '_')
+
+      // Issue #P1: Preserve millisecond precision to avoid collisions
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').replace('T', '_')
+      const failureDirName = `${sanitizedToolName}-${timestamp}`
+      const failureDir = `failures/${failureDirName}`
+
+      const outputManager = session.outputManager
+      await outputManager.ensureOutputDir()
+
+      // Create failures subdirectory
+      const { mkdir } = await import('fs/promises')
+      const { join } = await import('path')
+      const failurePath = join(outputManager.getOutputDir(), failureDir)
+      await mkdir(failurePath, { recursive: true })
+
+      logger?.info('Capturing failure snapshot', { path: failurePath })
+
+      // 3. Capture page snapshot
+      const snapshotFilename = join(failureDir, 'snapshot.json')
+
+      const snapshotTools = await import('../tools/snapshot.js')
+      await snapshotTools.snapshotPage(session, {
+        filename: snapshotFilename,
+        includeScreenshot: true,
+        fullPage: false,
+      })
+
+      // 4. Save error context
+      const errorContext = {
+        toolName,
+        timestamp: new Date().toISOString(),
+        error: {
+          message: error.message,
+          // Issue #P2: Sanitize stack trace to remove sensitive paths
+          stack: this.sanitizeStackTrace(error.stack),
+          code: (error as any).code,
+        },
+        args: this.sanitizeArgs(args), // Reuse existing sanitization
+        duration,
+      }
+
+      const contextFilename = join(failureDir, 'error-context.json')
+      await outputManager.writeFile(
+        contextFilename,
+        Buffer.from(JSON.stringify(errorContext, null, 2))
+      )
+
+      logger?.info('Failure snapshot captured successfully', {
+        path: failurePath,
+        files: ['snapshot.json', 'snapshot.png', 'error-context.json'],
+      })
+
+      // F3: Return relative path for report linking
+      return failureDir
+    } catch (snapshotError) {
+      // Snapshot capture failed - log but don't throw
+      logger?.warn('Failed to capture failure snapshot', {
+        error: snapshotError instanceof Error ? snapshotError.message : String(snapshotError),
+      })
+      return undefined
+    } finally {
+      this.capturing = false
+    }
+  }
+
+  /**
+   * Record a tool call to session report data (F3 feature)
+   *
+   * Adds a tool call record to the session's reportData. Implements
+   * memory protection by limiting to MAX_TOOL_CALL_RECORDS with FIFO eviction.
+   *
+   * @param session Session state
+   * @param record Tool call record to add
+   */
+  private recordToolCall(session: SessionState, record: ToolCallRecord): void {
+    // Skip if session reporting is not enabled
+    if (!session.reportData) {
+      return
+    }
+
+    // Add record to the array
+    session.reportData.toolCalls.push(record)
+
+    // F3-P2: Memory protection with batch eviction for better performance
+    // Instead of shift() every time (O(n)), we batch-remove when hitting 1.5x limit
+    // This reduces eviction frequency from every call to every 500 calls
+    const currentLength = session.reportData.toolCalls.length
+    if (currentLength >= MAX_TOOL_CALL_RECORDS * 1.5) {
+      // Remove oldest 50% to get back to limit
+      const removeCount = Math.floor(MAX_TOOL_CALL_RECORDS * 0.5)
+      const removed = session.reportData.toolCalls.splice(0, removeCount)
+
+      this.logger?.debug('Tool call records evicted (memory limit)', {
+        removedCount: removed.length,
+        oldestTool: removed[0]?.toolName,
+        oldestTimestamp: removed[0]?.timestamp,
+        newestRemovedTool: removed[removed.length - 1]?.toolName,
+        currentCount: session.reportData.toolCalls.length,
+        maxCount: MAX_TOOL_CALL_RECORDS,
+      })
+    }
+  }
+
+  /**
+   * Sanitize error message to remove sensitive information (F3-S1)
+   *
+   * Removes:
+   * - File paths (Unix, Linux, Windows)
+   * - API keys and tokens (32+ character alphanumeric strings)
+   * - Stack trace locations
+   *
+   * @param message Raw error message
+   * @returns Sanitized error message with placeholders
+   */
+  private sanitizeErrorMessage(message: string): string {
+    if (!message) return message
+
+    try {
+      return (
+        message
+          // Replace Unix user paths: /Users/username/ -> /Users/<user>/
+          .replace(/\/Users\/[^/]+\//g, '/Users/<user>/')
+          // Replace Linux home paths: /home/username/ -> /home/<user>/
+          .replace(/\/home\/[^/]+\//g, '/home/<user>/')
+          // Replace Windows user paths: C:\Users\username\ -> C:\Users\<user>\
+          .replace(/C:\\Users\\[^\\]+\\/gi, 'C:\\Users\\<user>\\')
+          // Replace common environment paths
+          .replace(/\/opt\/[^/\s]+\//g, '/opt/<app>/')
+          .replace(/\/var\/[^/\s]+\//g, '/var/<app>/')
+          // Replace long alphanumeric strings with underscores/hyphens (likely API keys/tokens)
+          .replace(/\b[a-zA-Z0-9_-]{32,}\b/g, '<REDACTED>')
+          // Replace stack trace locations: "at path:line:col" or " at path:line:col" -> "at <path>:<line>:<col>"
+          .replace(/\bat\s+[^:\s]+:\d+:\d+/g, 'at <path>:<line>:<col>')
+      )
+    } catch (error) {
+      // If sanitization fails, return placeholder to avoid leaking raw message
+      return '<Failed to sanitize error message>'
+    }
+  }
+
+  /**
+   * Sanitize stack trace to remove sensitive file paths (Issue #P2)
+   *
+   * Removes:
+   * - Absolute user paths (/Users/<username>/, /home/<username>/)
+   * - Windows paths (C:\Users\<username>\)
+   * - Environment-specific paths
+   *
+   * @param stack Raw stack trace
+   * @returns Sanitized stack trace with placeholders
+   */
+  private sanitizeStackTrace(stack: string | undefined): string | undefined {
+    if (!stack) return stack
+
+    try {
+      return (
+        stack
+          // Replace Unix user paths: /Users/username/ -> /Users/<user>/
+          .replace(/\/Users\/[^/]+\//g, '/Users/<user>/')
+          // Replace Linux home paths: /home/username/ -> /home/<user>/
+          .replace(/\/home\/[^/]+\//g, '/home/<user>/')
+          // Replace Windows user paths: C:\Users\username\ -> C:\Users\<user>\
+          .replace(/C:\\Users\\[^\\]+\\/gi, 'C:\\Users\\<user>\\')
+          // Replace common environment variables that may leak info
+          .replace(/\/opt\/[^/]+\//g, '/opt/<app>/')
+          .replace(/\/var\/[^/]+\//g, '/var/<app>/')
+      )
+    } catch (error) {
+      // If sanitization fails, return placeholder to avoid leaking raw stack
+      return '<Stack trace sanitization failed>'
     }
   }
 }
