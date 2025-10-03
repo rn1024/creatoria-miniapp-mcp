@@ -149,12 +149,14 @@ export function mergeConfigs(
  * @param options.skipEnv - Skip loading from environment variables
  * @param options.skipFile - Skip loading from config file
  */
-export function loadConfig(options: {
-  configPath?: string
-  cliConfig?: Partial<ServerConfig>
-  skipEnv?: boolean
-  skipFile?: boolean
-} = {}): Required<ServerConfig> {
+export function loadConfig(
+  options: {
+    configPath?: string
+    cliConfig?: Partial<ServerConfig>
+    skipEnv?: boolean
+    skipFile?: boolean
+  } = {}
+): Required<ServerConfig> {
   const { configPath, cliConfig = {}, skipEnv = false, skipFile = false } = options
 
   // Load from file

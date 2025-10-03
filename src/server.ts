@@ -13,7 +13,15 @@ import { mergeServerConfig } from './config/defaults.js'
 export async function startServer(config: Partial<ServerConfig> = {}) {
   // Merge config with defaults to ensure all fields are present
   const fullConfig = mergeServerConfig(config)
-  const { capabilities, outputDir, sessionTimeout } = fullConfig
+  const {
+    capabilities,
+    outputDir,
+    sessionTimeout,
+    logLevel,
+    enableFileLog,
+    logBufferSize,
+    logFlushInterval,
+  } = fullConfig
 
   // Generate unique session ID for this server instance
   // Each stdio transport connection gets a unique session
@@ -23,6 +31,13 @@ export async function startServer(config: Partial<ServerConfig> = {}) {
   const sessionStore = new SessionStore({
     outputDir,
     sessionTimeout,
+    loggerConfig: {
+      level: logLevel,
+      enableFileLog,
+      outputDir,
+      bufferSize: logBufferSize,
+      flushInterval: logFlushInterval,
+    },
   })
 
   const server = new Server(

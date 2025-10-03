@@ -4,7 +4,7 @@
  */
 
 import { join } from 'path'
-import type { SessionState, SessionConfig, SessionMetrics } from '../types.js'
+import type { SessionState, SessionConfig, SessionMetrics, LoggerConfig } from '../types.js'
 import { createLogger } from './logger.js'
 import { createOutputManager } from './output.js'
 
@@ -15,11 +15,15 @@ export class SessionStore {
   private sessions = new Map<string, SessionState>()
   private sessionTimeout: number
   private outputDir: string
+  private loggerConfig?: LoggerConfig
   private cleanupInterval?: NodeJS.Timeout
 
-  constructor(config: { sessionTimeout?: number; outputDir?: string } = {}) {
+  constructor(
+    config: { sessionTimeout?: number; outputDir?: string; loggerConfig?: LoggerConfig } = {}
+  ) {
     this.sessionTimeout = config.sessionTimeout || DEFAULT_SESSION_TIMEOUT
     this.outputDir = config.outputDir || DEFAULT_OUTPUT_DIR
+    this.loggerConfig = config.loggerConfig
 
     // Start periodic cleanup of timed-out sessions
     this.startCleanupTimer()
@@ -32,7 +36,12 @@ export class SessionStore {
     const session = this.sessions.get(sessionId)
     if (session && this.isSessionExpired(session)) {
       console.error(`Session ${sessionId} has expired, cleaning up...`)
-      this.delete(sessionId)
+      // Remove from map immediately (synchronous)
+      this.sessions.delete(sessionId)
+      // Fire-and-forget cleanup of resources (async operation)
+      void this.cleanupSessionResources(session, sessionId).catch((error) => {
+        console.error(`Failed to cleanup expired session ${sessionId}:`, error)
+      })
       return undefined
     }
     return session
@@ -46,29 +55,30 @@ export class SessionStore {
   }
 
   /**
-   * Delete session and cleanup resources
-   *
-   * Properly cleans up all async resources:
-   * - Disconnects from miniProgram
-   * - Kills IDE process and waits for exit
-   * - Clears element cache
+   * Cleanup session resources (internal helper)
    *
    * @throws AggregateError if cleanup operations fail
    */
-  async delete(sessionId: string): Promise<void> {
-    const session = this.sessions.get(sessionId)
-    if (!session) {
-      this.sessions.delete(sessionId)
-      return
-    }
-
+  private async cleanupSessionResources(session: SessionState, sessionId: string): Promise<void> {
     const errors: Error[] = []
+
+    // Issue #5: Dispose logger first to flush buffer and close file handles
+    if (session.logger?.dispose) {
+      try {
+        await session.logger.dispose()
+        console.error(`Logger disposed for session ${sessionId}`)
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error(String(error))
+        errors.push(new Error(`Failed to dispose logger: ${err.message}`))
+        console.error(`Failed to dispose logger for session ${sessionId}:`, error)
+      }
+    }
 
     // Clean up miniProgram instance (async operation)
     if (session.miniProgram) {
       try {
         if (typeof session.miniProgram.disconnect === 'function') {
-          await session.miniProgram.disconnect() // ✅ Await async operation
+          await session.miniProgram.disconnect()
         }
         console.error(`Disconnected miniProgram for session ${sessionId}`)
       } catch (error) {
@@ -118,9 +128,6 @@ export class SessionStore {
       errors.push(new Error(`Failed to clear element cache: ${err.message}`))
     }
 
-    // Remove from session map
-    this.sessions.delete(sessionId)
-
     // If there were any errors, throw AggregateError
     if (errors.length > 0) {
       console.error(`Session ${sessionId} cleanup completed with ${errors.length} error(s)`)
@@ -128,6 +135,30 @@ export class SessionStore {
     }
 
     console.error(`Session ${sessionId} cleaned up successfully`)
+  }
+
+  /**
+   * Delete session and cleanup resources
+   *
+   * Properly cleans up all async resources:
+   * - Disconnects from miniProgram
+   * - Kills IDE process and waits for exit
+   * - Clears element cache
+   *
+   * @throws AggregateError if cleanup operations fail
+   */
+  async delete(sessionId: string): Promise<void> {
+    const session = this.sessions.get(sessionId)
+    if (!session) {
+      this.sessions.delete(sessionId)
+      return
+    }
+
+    // Remove from session map first
+    this.sessions.delete(sessionId)
+
+    // Cleanup resources
+    await this.cleanupSessionResources(session, sessionId)
   }
 
   /**
@@ -176,7 +207,7 @@ export class SessionStore {
         createdAt: new Date(),
         lastActivity: new Date(),
         config,
-        logger: createLogger(sessionId),
+        logger: createLogger(sessionId, this.loggerConfig),
         outputManager: createOutputManager(outputDir),
       }
       this.set(sessionId, session)
@@ -278,7 +309,7 @@ export class SessionStore {
   /**
    * Clear expired sessions manually
    */
-  cleanupExpired(): number {
+  async cleanupExpired(): Promise<number> {
     const expiredSessions: string[] = []
 
     for (const [sessionId, session] of this.sessions.entries()) {
@@ -287,9 +318,14 @@ export class SessionStore {
       }
     }
 
-    for (const sessionId of expiredSessions) {
-      this.delete(sessionId)
-    }
+    // Delete all expired sessions in parallel
+    await Promise.all(
+      expiredSessions.map((sessionId) =>
+        this.delete(sessionId).catch((error) => {
+          console.error(`Failed to delete expired session ${sessionId}:`, error)
+        })
+      )
+    )
 
     return expiredSessions.length
   }

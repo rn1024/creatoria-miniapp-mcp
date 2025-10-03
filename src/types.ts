@@ -16,6 +16,10 @@ export interface ServerConfig {
   outputDir?: string
   timeout?: number
   sessionTimeout?: number // Session timeout in milliseconds (default: 30 minutes)
+  logLevel?: LogLevel // Log level (default: 'info')
+  enableFileLog?: boolean // Enable file logging (default: false)
+  logBufferSize?: number // Log buffer size (default: 100)
+  logFlushInterval?: number // Log flush interval in ms (default: 5000)
 }
 
 /**
@@ -106,6 +110,17 @@ export interface LogEntry {
 }
 
 /**
+ * Logger configuration
+ */
+export interface LoggerConfig {
+  level?: LogLevel // Minimum log level (default: 'info')
+  enableFileLog?: boolean // Enable file logging (default: false)
+  outputDir?: string // Output directory for logs
+  bufferSize?: number // Buffer size for file writes (default: 100)
+  flushInterval?: number // Flush interval in ms (default: 5000)
+}
+
+/**
  * Logger interface for structured logging
  */
 export interface Logger {
@@ -113,6 +128,22 @@ export interface Logger {
   warn(message: string, context?: Record<string, any>): void
   error(message: string, context?: Record<string, any>): void
   debug(message: string, context?: Record<string, any>): void
+  child(toolName: string): Logger
+  dispose?(): Promise<void> // Flush buffer and close file handles
+  flush?(): Promise<void> // Force flush buffer to disk
+}
+
+/**
+ * Tool execution log entry with timing
+ */
+export interface ToolLogEntry extends LogEntry {
+  toolName: string // Tool name (e.g., "page_query")
+  phase: 'START' | 'END' | 'ERROR'
+  args?: any // Tool input arguments (START phase)
+  result?: any // Tool output result (END phase)
+  error?: string // Error message (ERROR phase)
+  duration?: number // Execution time in ms (END/ERROR phase)
+  stackTrace?: string // Error stack trace (ERROR phase)
 }
 
 /**

@@ -1,0 +1,193 @@
+task: F1
+name: "结构化日志增强 (Structured Logging Enhancement)"
+parent_stage: "F - Observability & Artifacts"
+version: "1.0"
+date: "2025-10-03"
+status: "Align"
+
+# ==============================================================================
+# 1. MISSION & SCOPE
+# ==============================================================================
+
+mission: |
+  增强现有日志系统，为每个 MCP 工具调用自动记录结构化信息（工具名、参数、
+  开始/结束时间、耗时、状态、错误），支持控制台输出格式化和可选的文件持久化，
+  提供完整的操作审计和调试能力。
+
+goals:
+  - id: G1
+    description: "自动记录工具调用生命周期"
+    rationale: "每个工具调用应自动记录 START/END 事件，无需手动编写日志代码"
+    acceptance_criteria:
+      - "工具调用前自动记录 START 日志（工具名、参数）"
+      - "工具调用后自动记录 END 日志（工具名、结果、耗时）"
+      - "工具调用失败时记录 ERROR 日志（错误信息、堆栈）"
+      - "日志中包含 sessionId 和 timestamp"
+
+  - id: G2
+    description: "结构化日志格式"
+    rationale: "日志应易于机器解析（JSON）和人类阅读（格式化文本）"
+    acceptance_criteria:
+      - "每条日志为 JSON 对象（timestamp, level, sessionId, toolName, message, context, duration）"
+      - "控制台输出格式化为易读文本"
+      - "支持日志级别过滤（DEBUG, INFO, WARN, ERROR）"
+
+  - id: G3
+    description: "可选的文件持久化"
+    rationale: "长时间测试或 CI 环境需要保存日志到文件"
+    acceptance_criteria:
+      - "通过配置启用文件日志（默认禁用）"
+      - "日志文件按会话分离（outputDir/logs/session-{sessionId}.log）"
+      - "文件日志为 JSON Lines 格式（每行一个 JSON 对象）"
+
+non_goals:
+  - "日志轮转（依赖外部工具如 logrotate）"
+  - "日志查询 API（用户使用 jq/grep 等工具）"
+  - "实时日志流传输"
+  - "日志加密"
+
+# ==============================================================================
+# 2. CONTEXT & CONSTRAINTS
+# ==============================================================================
+
+context:
+  current_state: |
+    - ConsoleLogger 已实现基础功能（info/warn/error/debug）
+    - 当前日志输出到 stderr，格式为：timestamp LEVEL [sessionId] [toolName]: message {context}
+    - 工具调用需要手动添加日志语句
+    - 无耗时统计
+    - 无文件持久化
+
+  dependencies:
+    - "B4: Logger 接口定义（src/types.ts:Logger）"
+    - "E1-E4: 配置系统（可配置 logLevel, enableFileLog, outputDir）"
+    - "C5: 工具注册器（src/tools/index.ts - 需集成自动日志）"
+
+constraints:
+  technical:
+    - "日志不能阻塞工具执行（异步写入）"
+    - "保持 Logger 接口向后兼容"
+    - "文件写入错误不应中断工具执行"
+
+  business:
+    - "文件日志默认禁用（避免未预期的磁盘写入）"
+    - "不破坏现有 395 个单元测试"
+
+  timeline:
+    - "预计完成时间：1-1.5 小时"
+
+# ==============================================================================
+# 3. SUCCESS CRITERIA
+# ==============================================================================
+
+success_criteria:
+  functional:
+    - id: SC1
+      description: "自动日志注入"
+      verification: "调用任意工具，验证 START/END 日志自动出现"
+
+    - id: SC2
+      description: "结构化信息完整"
+      verification: "检查日志包含所有必需字段（timestamp, level, sessionId, toolName, duration）"
+
+    - id: SC3
+      description: "文件持久化可选"
+      verification: "启用 enableFileLog，验证日志写入文件；禁用时不写入"
+
+  non_functional:
+    - id: NFR1
+      description: "性能开销 <5%"
+      verification: "对比启用/禁用增强日志的工具执行时间"
+
+    - id: NFR2
+      description: "向后兼容"
+      verification: "所有现有测试通过"
+
+# ==============================================================================
+# 4. RISKS & MITIGATION
+# ==============================================================================
+
+risks:
+  - id: R1
+    description: "文件写入失败（磁盘满、权限问题）"
+    probability: "Low"
+    impact: "Low"
+    mitigation: "捕获文件写入异常，仅记录 stderr 警告，不中断工具执行"
+
+  - id: R2
+    description: "日志输出影响性能"
+    probability: "Medium"
+    impact: "Medium"
+    mitigation: "异步文件写入，批量缓冲（每 100 条或 5 秒刷新）"
+
+# ==============================================================================
+# 5. DELIVERABLES
+# ==============================================================================
+
+deliverables:
+  code:
+    - path: "src/core/logger.ts"
+      description: "增强 ConsoleLogger：添加文件写入、批量缓冲"
+      type: "enhancement"
+
+    - path: "src/core/tool-logger.ts"
+      description: "工具调用日志包装器（auto-log wrapper）"
+      type: "new"
+
+    - path: "src/tools/index.ts"
+      description: "集成 tool-logger 到工具调用流程"
+      type: "integration"
+
+    - path: "src/types.ts"
+      description: "新增 ToolLogEntry, LoggerConfig 类型"
+      type: "enhancement"
+
+  tests:
+    - path: "tests/unit/logger-enhanced.test.ts"
+      description: "增强日志功能测试（文件写入、缓冲、耗时）"
+      estimated_tests: 15
+
+    - path: "tests/unit/tool-logger.test.ts"
+      description: "工具调用日志包装器测试"
+      estimated_tests: 10
+
+  docs:
+    - path: "docs/observability.md"
+      description: "F1 部分：结构化日志配置和使用"
+
+# ==============================================================================
+# 6. OPEN QUESTIONS
+# ==============================================================================
+
+open_questions:
+  - question: "日志缓冲策略？"
+    proposed_answer: "100 条或 5 秒，先达到为准"
+    status: "proposed"
+
+  - question: "日志文件最大大小？"
+    proposed_answer: "单文件 10MB，超过则警告（不自动轮转）"
+    status: "proposed"
+
+# ==============================================================================
+# 7. APPROVAL CHECKLIST
+# ==============================================================================
+
+approval_checklist:
+  - [ ] Goals 清晰且可衡量
+  - [ ] Success criteria 可验证
+  - [ ] Risks 已识别
+  - [ ] Deliverables 完整
+  - [ ] Open questions 已解决
+
+# ==============================================================================
+# METADATA
+# ==============================================================================
+
+metadata:
+  created_by: "ClaudeCode"
+  created_at: "2025-10-03T02:30:00Z"
+  task: "F1 - Structured Logging"
+  parent_stage: "F - Observability & Artifacts"
+  estimated_effort: "1-1.5 hours"
+  priority: "HIGH"
+  status: "Ready for Architect"

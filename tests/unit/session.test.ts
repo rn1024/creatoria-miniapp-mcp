@@ -11,8 +11,8 @@ describe('SessionStore', () => {
     store = new SessionStore({ sessionTimeout: 1000 }) // 1 second timeout for testing
   })
 
-  afterEach(() => {
-    store.dispose()
+  afterEach(async () => {
+    await store.dispose()
   })
 
   describe('Session Creation', () => {
@@ -24,7 +24,7 @@ describe('SessionStore', () => {
       expect(session.elements.size).toBe(0)
     })
 
-    it('should respect custom outputDir configuration', () => {
+    it('should respect custom outputDir configuration', async () => {
       const customStore = new SessionStore({
         sessionTimeout: 1000,
         outputDir: '/custom/output/path',
@@ -34,7 +34,7 @@ describe('SessionStore', () => {
       expect(session.outputDir).toContain('/custom/output/path')
       expect(session.outputDir).toContain('test-session')
 
-      customStore.dispose()
+      await customStore.dispose()
     })
 
     it('should return existing session on getOrCreate', () => {
@@ -84,10 +84,10 @@ describe('SessionStore', () => {
       expect(session?.sessionId).toBe('test-session')
     })
 
-    it('should delete session', () => {
+    it('should delete session', async () => {
       store.getOrCreate('test-session')
       expect(store.has('test-session')).toBe(true)
-      store.delete('test-session')
+      await store.delete('test-session')
       expect(store.has('test-session')).toBe(false)
     })
 
@@ -139,7 +139,7 @@ describe('SessionStore', () => {
       // Wait for expiration
       await new Promise((resolve) => setTimeout(resolve, 1100))
 
-      const cleaned = store.cleanupExpired()
+      const cleaned = await store.cleanupExpired()
       expect(cleaned).toBe(2)
       expect(store.has('session-1')).toBe(false)
       expect(store.has('session-2')).toBe(false)
@@ -177,41 +177,41 @@ describe('SessionStore', () => {
   })
 
   describe('Resource Cleanup', () => {
-    it('should cleanup miniProgram on session delete', () => {
+    it('should cleanup miniProgram on session delete', async () => {
       const session = store.getOrCreate('test-session')
       const mockDisconnect = jest.fn()
       session.miniProgram = { disconnect: mockDisconnect }
 
-      store.delete('test-session')
+      await store.delete('test-session')
       expect(mockDisconnect).toHaveBeenCalled()
     })
 
-    it('should cleanup IDE process on session delete', () => {
+    it('should cleanup IDE process on session delete', async () => {
       const session = store.getOrCreate('test-session')
       const mockKill = jest.fn()
       session.ideProcess = { kill: mockKill } as any
 
-      store.delete('test-session')
+      await store.delete('test-session')
       expect(mockKill).toHaveBeenCalled()
     })
 
-    it('should clear element cache on session delete', () => {
+    it('should clear element cache on session delete', async () => {
       const session = store.getOrCreate('test-session')
       session.elements.set('elem-1', { element: {}, pagePath: 'pages/test', cachedAt: new Date() })
       expect(session.elements.size).toBe(1)
 
-      store.delete('test-session')
+      await store.delete('test-session')
       // Session no longer exists
       expect(store.has('test-session')).toBe(false)
     })
 
-    it('should dispose all sessions', () => {
+    it('should dispose all sessions', async () => {
       store.getOrCreate('session-1')
       store.getOrCreate('session-2')
       store.getOrCreate('session-3')
 
       expect(store.getMetrics().totalSessions).toBe(3)
-      store.dispose()
+      await store.dispose()
       expect(store.getMetrics().totalSessions).toBe(0)
     })
   })

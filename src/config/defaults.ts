@@ -51,6 +51,21 @@ export const DEFAULT_SCREENSHOT_TIMEOUT = 10 * 1000
 export const DEFAULT_CAPABILITIES = ['core']
 
 /**
+ * Default log level
+ */
+export const DEFAULT_LOG_LEVEL = 'info' as const
+
+/**
+ * Default log buffer size (number of log entries)
+ */
+export const DEFAULT_LOG_BUFFER_SIZE = 100
+
+/**
+ * Default log flush interval (5 seconds in milliseconds)
+ */
+export const DEFAULT_LOG_FLUSH_INTERVAL = 5000
+
+/**
  * Default server configuration
  */
 export const DEFAULT_SERVER_CONFIG: Required<ServerConfig> = {
@@ -61,6 +76,10 @@ export const DEFAULT_SERVER_CONFIG: Required<ServerConfig> = {
   outputDir: DEFAULT_OUTPUT_DIR,
   timeout: DEFAULT_TIMEOUT,
   sessionTimeout: DEFAULT_SESSION_TIMEOUT,
+  logLevel: DEFAULT_LOG_LEVEL,
+  enableFileLog: false,
+  logBufferSize: DEFAULT_LOG_BUFFER_SIZE,
+  logFlushInterval: DEFAULT_LOG_FLUSH_INTERVAL,
 }
 
 /**
