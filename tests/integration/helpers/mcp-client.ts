@@ -3,6 +3,7 @@
  */
 
 import type { Server } from '@modelcontextprotocol/sdk/server/index.js'
+import { CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 
 export interface ToolCallResult {
   content: Array<{
@@ -40,7 +41,7 @@ export class McpClient {
   /**
    * 调用 MCP 工具
    *
-   * @param toolName - 工具名称（如 'automator_launch'）
+   * @param toolName - 工具名称（如 'miniprogram_launch'）
    * @param args - 工具参数
    * @returns 工具调用结果
    */
@@ -49,18 +50,19 @@ export class McpClient {
       throw new Error('Client not connected. Call connect() first.')
     }
 
-    // 模拟 MCP protocol 调用
-    // 在真实实现中，这会通过 transport 发送 tools/call 请求
+    // 使用 MCP SDK 的请求处理机制
+    // 通过 request() 方法发送 tools/call 请求
     try {
-      const result = await this.server.callTool({
-        params: {
-          name: toolName,
-          arguments: args,
+      const result = await this.server.request(
+        {
+          method: 'tools/call',
+          params: {
+            name: toolName,
+            arguments: args,
+          },
         },
-        meta: {
-          progressToken: undefined,
-        },
-      })
+        CallToolRequestSchema
+      )
 
       return result as ToolCallResult
     } catch (error) {
