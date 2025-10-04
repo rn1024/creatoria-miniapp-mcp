@@ -74,7 +74,6 @@ async function runScenario(scenario: Scenario, client: StdioMCPClient): Promise<
 
       results.push({ step: stepNumber, tool: step.tool, success: true })
       stepNumber++
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
       console.log(`   ❌ Failed: ${errorMessage}`)
@@ -94,10 +93,10 @@ async function runScenario(scenario: Scenario, client: StdioMCPClient): Promise<
   console.log(`\n✅ Scenario completed successfully!`)
   console.log(`\n📊 Summary:`)
   console.log(`   - Total steps: ${results.length}`)
-  console.log(`   - Successful: ${results.filter(r => r.success).length}`)
-  console.log(`   - Failed: ${results.filter(r => !r.success).length}`)
+  console.log(`   - Successful: ${results.filter((r) => r.success).length}`)
+  console.log(`   - Failed: ${results.filter((r) => !r.success).length}`)
 
-  return results.every(r => r.success)
+  return results.every((r) => r.success)
 }
 
 /**
@@ -113,15 +112,12 @@ async function main() {
   console.log(`📚 Loaded ${scenarios.length} scenarios\n`)
 
   // Filter scenarios
-  const toRun =
-    scenarioId === 'all'
-      ? scenarios
-      : scenarios.filter(s => s.id === scenarioId)
+  const toRun = scenarioId === 'all' ? scenarios : scenarios.filter((s) => s.id === scenarioId)
 
   if (toRun.length === 0) {
     console.error(`❌ Scenario "${scenarioId}" not found`)
     console.log('\n📋 Available scenarios:')
-    scenarios.forEach(s => {
+    scenarios.forEach((s) => {
       console.log(`   - ${s.id}: ${s.name}`)
     })
     process.exit(1)
@@ -149,12 +145,12 @@ async function main() {
   console.log('📈 Final Results')
   console.log(`${'='.repeat(80)}\n`)
 
-  results.forEach(r => {
+  results.forEach((r) => {
     const icon = r.success ? '✅' : '❌'
     console.log(`${icon} ${r.scenario}`)
   })
 
-  const successCount = results.filter(r => r.success).length
+  const successCount = results.filter((r) => r.success).length
   const totalCount = results.length
 
   console.log(`\n📊 Overall: ${successCount}/${totalCount} scenarios passed`)
@@ -168,7 +164,7 @@ async function main() {
   }
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error('\n❌ Error:', error)
   process.exit(1)
 })

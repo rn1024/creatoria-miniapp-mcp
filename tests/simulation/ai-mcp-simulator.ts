@@ -416,9 +416,12 @@ async function main() {
     console.log('\n✅ Simulation completed successfully!\n')
     console.log('📊 Summary:')
     console.log(`   - Total scenarios: ${scenarios.length}`)
-    console.log(`   - Total tool calls: ${simulator.getLog().filter(log => log.startsWith('🔧')).length}`)
-    console.log(`   - Total results: ${simulator.getLog().filter(log => log.startsWith('✅')).length}`)
-
+    console.log(
+      `   - Total tool calls: ${simulator.getLog().filter((log) => log.startsWith('🔧')).length}`
+    )
+    console.log(
+      `   - Total results: ${simulator.getLog().filter((log) => log.startsWith('✅')).length}`
+    )
   } catch (error) {
     console.error('\n❌ Simulation failed:', error)
     process.exit(1)

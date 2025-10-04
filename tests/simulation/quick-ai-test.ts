@@ -30,7 +30,9 @@ async function simulateAIWorkflow() {
     console.log('🤖 AI: "已连接到小程序\n')
 
     // 3. AI navigates to index page (already there, but let's test navigation)
-    console.log('🔧 AI calls: miniprogram_navigate({ method: "reLaunch", url: "/pages/index/index" })')
+    console.log(
+      '🔧 AI calls: miniprogram_navigate({ method: "reLaunch", url: "/pages/index/index" })'
+    )
     const navResult = await client.callTool('miniprogram_navigate', {
       method: 'reLaunch',
       url: '/pages/index/index',
@@ -119,15 +121,16 @@ async function simulateAIWorkflow() {
     await client.disconnect()
     console.log('✅ Disconnected from MCP server\n')
 
-    console.log('=' .repeat(60))
+    console.log('='.repeat(60))
     console.log('✅ AI Simulation Completed Successfully!')
-    console.log('=' .repeat(60))
+    console.log('='.repeat(60))
     console.log('\n📋 Summary:')
     console.log('   - Tool calls: 10')
     console.log('   - Categories used: Automator, MiniProgram, Page, Element, Assert')
-    console.log('   - Workflow: Launch → Navigate → Fill Form → Submit → Verify → Screenshot → Close')
+    console.log(
+      '   - Workflow: Launch → Navigate → Fill Form → Submit → Verify → Screenshot → Close'
+    )
     console.log('\n💡 This simulates exactly how an AI agent would interact with your MCP server!')
-
   } catch (error) {
     console.error('\n❌ Simulation failed:', error)
     process.exit(1)

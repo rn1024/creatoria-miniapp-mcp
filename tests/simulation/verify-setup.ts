@@ -61,44 +61,47 @@ console.log(`   ✅ 项目路径: ${DEMO_PROJECT_PATH}\n`)
 console.log('3. 尝试启动自动化 (launch 方式)...')
 console.log('   如果失败，请确认开发者工具的 "CLI/HTTP 调用" 已开启\n')
 
-automator.launch({
-  cliPath: DEFAULT_CLI_PATH,
-  projectPath: DEMO_PROJECT_PATH,
-  projectConfig: {
-    appid: '',  // 空 appid 可能绕过验证
-  },
-}).then(async (miniProgram: any) => {
-  console.log('   ✅ 自动化启动成功！\n')
+automator
+  .launch({
+    cliPath: DEFAULT_CLI_PATH,
+    projectPath: DEMO_PROJECT_PATH,
+    projectConfig: {
+      appid: '', // 空 appid 可能绕过验证
+    },
+  })
+  .then(async (miniProgram: any) => {
+    console.log('   ✅ 自动化启动成功！\n')
 
-  console.log('4. 获取系统信息...')
-  try {
-    const systemInfo = await miniProgram.systemInfo()
-    console.log('   ✅ 系统信息:', JSON.stringify(systemInfo, null, 2))
-  } catch (err: any) {
-    console.log('   ⚠️  无法获取系统信息:', err.message)
-  }
+    console.log('4. 获取系统信息...')
+    try {
+      const systemInfo = await miniProgram.systemInfo()
+      console.log('   ✅ 系统信息:', JSON.stringify(systemInfo, null, 2))
+    } catch (err: any) {
+      console.log('   ⚠️  无法获取系统信息:', err.message)
+    }
 
-  console.log('\n5. 关闭小程序...')
-  await miniProgram.close()
-  console.log('   ✅ 已关闭\n')
+    console.log('\n5. 关闭小程序...')
+    await miniProgram.close()
+    console.log('   ✅ 已关闭\n')
 
-  console.log('✅ 所有检查通过！环境配置正确。')
-  console.log('\n下一步：运行完整测试')
-  console.log('  TEST_PROJECT_PATH=' + DEMO_PROJECT_PATH + ' pnpm simulate:quick\n')
+    console.log('✅ 所有检查通过！环境配置正确。')
+    console.log('\n下一步：运行完整测试')
+    console.log('  TEST_PROJECT_PATH=' + DEMO_PROJECT_PATH + ' pnpm simulate:quick\n')
 
-  process.exit(0)
-}).catch((err: any) => {
-  console.log('   ❌ 启动失败:', err.message, '\n')
+    process.exit(0)
+  })
+  .catch((err: any) => {
+    console.log('   ❌ 启动失败:', err.message, '\n')
 
-  console.log('🔧 故障排除：')
-  console.log('   1. 打开微信开发者工具')
-  console.log('   2. 设置 → 安全设置 → 开启以下选项：')
-  console.log('      ☑ 服务端口')
-  console.log('      ☑ CLI/HTTP 调用')
-  console.log('   3. 重启开发者工具')
-  console.log('   4. 重新运行此脚本\n')
+    console.log('🔧 故障排除：')
+    console.log('   1. 打开微信开发者工具')
+    console.log('   2. 设置 → 安全设置 → 开启以下选项：')
+    console.log('      ☑ 服务端口')
+    console.log('      ☑ CLI/HTTP 调用')
+    console.log('   3. 重启开发者工具')
+    console.log('   4. 重新运行此脚本\n')
 
-  console.log('错误详情:', err)
+    console.log('错误详情:', err)
 
-  process.exit(1)
-})
+    process.exit(1)
+  })
