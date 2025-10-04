@@ -6,7 +6,7 @@
 
 **Why?** Traditional UI automation requires writing brittle scripts. With MCP, you describe what to test in plain English, and AI agents handle the implementation details - making test creation 10x faster and maintenance effortless.
 
-[![Tests](https://img.shields.io/badge/tests-459%20passed-success)](https://github.com/rn1024/creatoria-miniapp-mcp) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/) [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-1.0-purple)](https://modelcontextprotocol.io/)
+[![Tests](https://img.shields.io/badge/tests-545%20passed-success)](https://github.com/rn1024/creatoria-miniapp-mcp) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/) [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-1.0-purple)](https://modelcontextprotocol.io/)
 
 ---
 
@@ -17,7 +17,7 @@
 - 🔧 **MCP Native**: Seamlessly integrates with Claude Desktop, Cline, and any MCP client
 - 🧪 **Test Automation**: 9 assertion tools + 6 recording tools for robust test workflows
 - 📸 **Debug Snapshots**: Capture page/app/element state for troubleshooting
-- 🎨 **TypeScript First**: Full type definitions, 459 tests, 100% pass rate
+- 🎨 **TypeScript First**: Full type definitions, 545 tests, 100% pass rate
 - 🔄 **Session Isolation**: Multi-session support with automatic 30-min cleanup
 - ⚙️ **Flexible Config**: Environment variables, config files, or CLI arguments
 
@@ -218,7 +218,7 @@ await assert.text({ selector: ".product-title", expected: "iPhone 15" })
 ---
 
 📚 **Documentation**:
-- [Complete Tool Reference](./docs/tools.md) - Detailed API documentation
+- [Complete API Reference](./docs/api/) - Detailed API documentation for all 65 tools
 - [Usage Examples](./examples/) - Real-world automation scripts
 - [Integration Tests](./tests/integration/) - End-to-end test scenarios
 
@@ -247,18 +247,19 @@ creatoria-miniapp-mcp/
 │       └── record.ts              # Record 工具（6 个）
 │
 ├── tests/                         # 测试文件
-│   └── unit/                      # 单元测试（290+ 个测试）
-│       ├── session.test.ts
-│       ├── output.test.ts
-│       ├── element-ref.test.ts
-│       ├── automator.test.ts
-│       ├── miniprogram.test.ts
-│       ├── page.test.ts
-│       ├── element.test.ts
-│       ├── assert.test.ts
-│       ├── snapshot.test.ts
-│       ├── record.test.ts
-│       └── tool-registration.test.ts
+│   ├── unit/                      # 单元测试（545 个测试）
+│   │   ├── session.test.ts
+│   │   ├── output.test.ts
+│   │   ├── element-ref.test.ts
+│   │   ├── automator.test.ts
+│   │   ├── miniprogram.test.ts
+│   │   ├── page.test.ts
+│   │   ├── element.test.ts
+│   │   ├── assert.test.ts
+│   │   ├── snapshot.test.ts
+│   │   ├── record.test.ts
+│   │   └── tool-registration.test.ts
+│   └── integration/               # 集成测试（需要测试小程序项目）
 │
 ├── docs/                          # 文档
 │   ├── setup-guide.md             # 配置指南
@@ -361,24 +362,20 @@ pnpm format:check
 ```bash
 $ pnpm test
 
-Test Suites: 9 passed, 9 total
-Tests:       290 passed, 290 total
+Test Suites: 21 passed, 21 total
+Tests:       545 passed, 545 total
 Snapshots:   0 total
 Time:        ~6s
 
 ✅ 100% 测试通过率
 ```
 
-**Test Coverage**:
-- Core modules: 93 tests (session, output, element-ref)
-- Automator tools: 20 tests
-- MiniProgram tools: 25 tests
-- Page tools: 27 tests
-- Element tools: 72 tests
-- Assert tools: 27 tests
-- Snapshot tools: 10 tests
-- Record tools: 18 tests
-- Tool registration: 55 tests
+**Test Coverage** (545 tests total):
+- Core modules: Session, Logger, Output, ElementRef
+- Tool implementations: Automator, MiniProgram, Page, Element
+- Capabilities: Assert, Snapshot, Record, Network
+- Infrastructure: Config, Tool registration, Helpers
+- Quality: Smoke tests, Release scripts
 
 ### 添加新工具
 
@@ -423,7 +420,7 @@ Time:        ~6s
 
 ---
 
-**Project Status**: ✅ Stage A-H Complete / M5 Milestone Ready (65 tools, 459 tests, CI/CD, release automation)
+**Project Status**: ✅ Stage A-H Complete / M5 Milestone Ready (65 tools, 545 tests, CI/CD, release automation)
 
 **Last Updated**: 2025-10-03
 

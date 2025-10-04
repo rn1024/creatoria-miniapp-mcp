@@ -439,8 +439,8 @@ PROJECT_PATH=/path/to/miniprogram node dist/cli.js
 **Expected Output:**
 ```
 WeChat Mini Program MCP Server running on stdio
-Capabilities: core,assert,snapshot,record
-Tools registered: 59
+Capabilities: core,assert,snapshot,record,network
+Tools registered: 65
 ```
 
 Press `Ctrl+C` to stop.

@@ -30,7 +30,7 @@ pnpm smoke-test
 ```
 
 **Expected Output**:
-- ✅ Unit Tests: 354 passing
+- ✅ Unit Tests: 545 passing
 - ✅ Tool Count: 65 tools
 - ✅ Lint: No errors
 - ✅ Format: All files formatted

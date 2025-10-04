@@ -105,21 +105,21 @@ Reports are saved to session-specific directories:
     },
     {
       "timestamp": "2025-10-03T06:05:10.000Z",
-      "toolName": "element_click",
+      "toolName": "element_tap",
       "duration": 500,
       "success": false,
       "error": {
         "message": "Element not found",
-        "snapshotPath": "failures/element_click-2025-10-03_06-05-10-123Z"
+        "snapshotPath": "failures/element_tap-2025-10-03_06-05-10-123Z"
       }
     }
   ],
   "failures": [
     {
-      "toolName": "element_click",
+      "toolName": "element_tap",
       "timestamp": "2025-10-03T06:05:10.000Z",
       "error": "Element not found",
-      "snapshotPath": "failures/element_click-2025-10-03_06-05-10-123Z"
+      "snapshotPath": "failures/element_tap-2025-10-03_06-05-10-123Z"
     }
   ]
 }
@@ -162,38 +162,36 @@ Reports are saved to session-specific directories:
 | Tool Name | Calls | Success | Failure | Avg Duration |
 |-----------|-------|---------|---------|--------------|
 | miniprogram_launch | 1 | 1 | 0 | 3.0s |
-| page_navigate | 5 | 5 | 0 | 0.8s |
-| element_click | 10 | 8 | 2 | 0.5s |
+| miniprogram_navigate | 5 | 5 | 0 | 0.8s |
+| element_tap | 10 | 8 | 2 | 0.5s |
 | element_input | 8 | 8 | 0 | 0.3s |
-| page_screenshot | 3 | 3 | 0 | 2.1s |
+| miniprogram_screenshot | 3 | 3 | 0 | 2.1s |
 
 ## Failures
-### 1. element_click
+### 1. element_tap
 - **Time**: 2025-10-03 06:05:10
 - **Error**: Element not found
-- **Snapshot**: [failures/element_click-2025-10-03_06-05-10-123Z](failures/element_click-2025-10-03_06-05-10-123Z)
+- **Snapshot**: [failures/element_tap-2025-10-03_06-05-10-123Z](failures/element_tap-2025-10-03_06-05-10-123Z)
 
-### 2. element_click
+### 2. element_tap
 - **Time**: 2025-10-03 06:10:45
 - **Error**: Element is not interactable
-- **Snapshot**: [failures/element_click-2025-10-03_06-10-45-789Z](failures/element_click-2025-10-03_06-10-45-789Z)
+- **Snapshot**: [failures/element_tap-2025-10-03_06-10-45-789Z](failures/element_tap-2025-10-03_06-10-45-789Z)
 
 ## Timeline
 | Time | Tool | Status | Duration |
 |------|------|--------|----------|
 | 06:00:05 | miniprogram_launch | ✅ | 3.0s |
-| 06:00:08 | page_navigate | ✅ | 0.8s |
-| 06:00:12 | element_click | ✅ | 0.5s |
-| 06:05:10 | element_click | ❌ | 0.5s |
-| 06:10:45 | element_click | ❌ | 0.6s |
-| 06:15:30 | page_screenshot | ✅ | 2.1s |
+| 06:00:08 | miniprogram_navigate | ✅ | 0.8s |
+| 06:00:12 | element_tap | ✅ | 0.5s |
+| 06:05:10 | element_tap | ❌ | 0.5s |
+| 06:10:45 | element_tap | ❌ | 0.6s |
+| 06:15:30 | miniprogram_screenshot | ✅ | 2.1s |
 ```
 
 ### Rendered Preview
 
-The Markdown report renders beautifully in GitHub, GitLab, and other Markdown viewers:
-
-![Session Report Preview](../images/session-report-preview.png)
+The Markdown report renders beautifully in GitHub, GitLab, and other Markdown viewers.
 
 ---
 

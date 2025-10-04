@@ -45,11 +45,11 @@ Global mini program operations including navigation, screenshots, and script exe
 | Tool | Description |
 |------|-------------|
 | `miniprogram_navigate` | Navigate between pages (5 methods: navigateTo, redirectTo, etc.) |
-| `miniprogram_callWx` | Call WeChat APIs (wx.*) |
+| `miniprogram_call_wx` | Call WeChat APIs (wx.*) |
 | `miniprogram_evaluate` | Execute JavaScript in mini program context |
 | `miniprogram_screenshot` | Take screenshot (full page or custom region) |
-| `miniprogram_getPageStack` | Get current page stack information |
-| `miniprogram_getSystemInfo` | Get system info (platform, version, etc.) |
+| `miniprogram_current_page` | Get current page information |
+| `miniprogram_get_system_info` | Get system info (platform, version, etc.) |
 
 ---
 
@@ -60,13 +60,13 @@ Query elements, manipulate page data, and call page methods.
 | Tool | Description |
 |------|-------------|
 | `page_query` | Query single element (returns ElementRef) |
-| `page_queryAll` | Query all matching elements |
-| `page_waitFor` | Wait for element to appear/disappear |
-| `page_getData` | Get page data by path |
-| `page_setData` | Set page data by path |
-| `page_callMethod` | Call page method |
-| `page_getSize` | Get page dimensions |
-| `page_getScrollTop` | Get page scroll position |
+| `page_query_all` | Query all matching elements |
+| `page_wait_for` | Wait for element to appear/disappear |
+| `page_get_data` | Get page data by path |
+| `page_set_data` | Set page data by path |
+| `page_call_method` | Call page method |
+| `page_get_size` | Get page dimensions |
+| `page_get_scroll_top` | Get page scroll position |
 
 ---
 
@@ -75,21 +75,21 @@ Query elements, manipulate page data, and call page methods.
 Interact with elements, get attributes, and control scrolling.
 
 **Tap & Input** (5 tools):
-- `element_tap`, `element_longPress`, `element_doubleTap`
-- `element_input`, `element_clearInput`
+- `element_tap`, `element_long_press`, `element_input`
+- `element_clear_input`, `element_trigger`
 
-**Touch Events** (8 tools):
-- `element_touchStart/Move/End` - Single-touch gestures
-- `element_multiTouchStart/Move/End` - Multi-touch gestures
-- `element_swipe`, `element_pinch` - Common gestures
+**Touch Events** (6 tools):
+- `element_touch_start`, `element_touch_move`, `element_touch_end`
+- `element_swipe`, `element_moveTo`, `element_slide`
 
 **Getters** (7 tools):
-- `element_getText`, `element_getValue`
-- `element_getAttribute`, `element_getProperty`
-- `element_getSize`, `element_getOffset`, `element_getBoundingClientRect`
+- `element_get_text`, `element_get_value`
+- `element_get_attribute`, `element_get_property`
+- `element_get_size`, `element_get_offset`, `element_get_rect`
 
-**Scrolling** (3 tools):
-- `element_scroll`, `element_scrollTo`, `element_scrollIntoView`
+**Scrolling** (5 tools):
+- `element_scroll`, `element_scroll_to`, `element_scroll_into_view`
+- `element_scroll_x`, `element_scroll_y`
 
 📖 **[Full Element API Documentation](./element.md)**
 
@@ -102,13 +102,13 @@ Automated testing assertions for element validation.
 | Tool | Description |
 |------|-------------|
 | `assert_exists` | Assert element exists |
-| `assert_notExists` | Assert element does not exist |
+| `assert_not_exists` | Assert element does not exist |
 | `assert_text` | Assert exact text match |
-| `assert_notText` | Assert text does not match |
+| `assert_text_contains` | Assert text contains substring |
 | `assert_attribute` | Assert attribute value |
-| `assert_notAttribute` | Assert attribute absence/mismatch |
+| `assert_property` | Assert property value |
 | `assert_data` | Assert page data value |
-| `assert_displayed` | Assert element is visible (non-zero size) |
+| `assert_visible` | Assert element is visible (non-zero size) |
 | `assert_count` | Assert element count |
 
 ---
@@ -224,4 +224,21 @@ element_tap({ selector: ".btn" })  // 重复查询
 
 ---
 
-**最后更新**: 2025-10-02
+---
+
+## 🔑 工具命名说明
+
+**MCP 工具名称格式**: 实际工具名称使用 `snake_case` 格式（如 `miniprogram_navigate`、`page_query`）。
+
+**文档展示格式**: 为了提高可读性，文档中某些地方使用点号分隔（如 `miniprogram.navigate`、`page.query`），这仅是**展示格式**，调用时请使用下划线格式。
+
+**示例对照**:
+- 文档展示: `miniprogram.navigate` → 实际调用: `miniprogram_navigate`
+- 文档展示: `page.getData` → 实际调用: `page_get_data`
+- 文档展示: `element.tap` → 实际调用: `element_tap`
+
+所有工具的**完整准确名称**请参考各分类页面的工具列表。
+
+---
+
+**最后更新**: 2025-10-03

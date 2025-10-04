@@ -250,7 +250,7 @@ function generateToolCatalog(categories: ToolCategory[]): string {
   lines.push('---')
   lines.push('')
   lines.push('📚 **Documentation**:')
-  lines.push('- [Complete Tool Reference](./docs/tools.md) - Detailed API documentation')
+  lines.push('- [Complete API Reference](./docs/api/) - Detailed API documentation for all 65 tools')
   lines.push('- [Usage Examples](./examples/) - Real-world automation scripts')
   lines.push('- [Integration Tests](./tests/integration/) - End-to-end test scenarios')
 
