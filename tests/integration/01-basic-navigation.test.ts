@@ -13,7 +13,7 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals'
-import { McpClient } from './helpers/mcp-client.js'
+import { MCPClient } from './helpers/mcp-client.js'
 import { startServer } from '../../src/server.js'
 import type { Server } from '@modelcontextprotocol/sdk/server/index.js'
 
@@ -25,7 +25,7 @@ const describeIntegration = SKIP_INTEGRATION || !TEST_PROJECT_PATH ? describe.sk
 
 describeIntegration('Integration: Basic Navigation', () => {
   let server: Server
-  let client: McpClient
+  let client: MCPClient
 
   beforeAll(async () => {
     // 启动 MCP Server
@@ -38,7 +38,7 @@ describeIntegration('Integration: Basic Navigation', () => {
     })
 
     // 创建测试客户端
-    client = new McpClient(server)
+    client = new MCPClient(server)
     await client.connect()
   }, 60000) // 60s timeout for setup
 

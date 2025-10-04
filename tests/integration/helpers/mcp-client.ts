@@ -17,7 +17,7 @@ export interface ToolCallResult {
 /**
  * 简化的 MCP 客户端，用于集成测试
  */
-export class McpClient {
+export class MCPClient {
   private sessionId: string | null = null
 
   constructor(private server: Server) {}

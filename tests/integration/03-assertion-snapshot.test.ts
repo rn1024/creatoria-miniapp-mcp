@@ -14,7 +14,7 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals'
-import { McpClient } from './helpers/mcp-client.js'
+import { MCPClient } from './helpers/mcp-client.js'
 import { startServer } from '../../src/server.js'
 import type { Server } from '@modelcontextprotocol/sdk/server/index.js'
 
@@ -25,7 +25,7 @@ const describeIntegration = SKIP_INTEGRATION || !TEST_PROJECT_PATH ? describe.sk
 
 describeIntegration('Integration: Assertion & Snapshot', () => {
   let server: Server
-  let client: McpClient
+  let client: MCPClient
 
   beforeAll(async () => {
     server = await startServer({
@@ -36,7 +36,7 @@ describeIntegration('Integration: Assertion & Snapshot', () => {
       enableSessionReport: false,
     })
 
-    client = new McpClient(server)
+    client = new MCPClient(server)
     await client.connect()
 
     // 启动小程序并导航

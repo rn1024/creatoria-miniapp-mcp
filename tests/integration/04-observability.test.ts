@@ -13,7 +13,7 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals'
-import { McpClient } from './helpers/mcp-client.js'
+import { MCPClient } from './helpers/mcp-client.js'
 import { startServer } from '../../src/server.js'
 import type { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import { readFile, access } from 'fs/promises'
@@ -26,7 +26,7 @@ const describeIntegration = SKIP_INTEGRATION || !TEST_PROJECT_PATH ? describe.sk
 
 describeIntegration('Integration: Observability (F2 + F3)', () => {
   let server: Server
-  let client: McpClient
+  let client: MCPClient
   let sessionOutputDir: string
 
   beforeAll(async () => {
@@ -40,7 +40,7 @@ describeIntegration('Integration: Observability (F2 + F3)', () => {
       enableSessionReport: true, // F3
     })
 
-    client = new McpClient(server)
+    client = new MCPClient(server)
     await client.connect()
 
     // 启动小程序

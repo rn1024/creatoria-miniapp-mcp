@@ -1,0 +1,331 @@
+{
+  "scenarios": [
+    {
+      "id": "basic-navigation",
+      "name": "基础导航测试",
+      "description": "模拟 AI 启动小程序并导航到指定页面",
+      "userMessage": "打开小程序并进入首页",
+      "steps": [
+        {
+          "tool": "miniprogram_launch",
+          "args": {},
+          "aiReasoning": "用户要求打开小程序，我需要先启动 automator"
+        },
+        {
+          "tool": "miniprogram_navigate",
+          "args": { "path": "/pages/index/index" },
+          "aiReasoning": "导航到首页"
+        },
+        {
+          "tool": "miniprogram_get_page_stack",
+          "args": { "expected": "/pages/index/index" },
+          "aiReasoning": "验证导航是否成功"
+        }
+      ]
+    },
+    {
+      "id": "form-interaction",
+      "name": "表单交互测试",
+      "description": "模拟 AI 填写表单并提交",
+      "userMessage": "在登录页面输入用户名和密码并登录",
+      "steps": [
+        {
+          "tool": "miniprogram_navigate",
+          "args": { "path": "/pages/login/login" },
+          "aiReasoning": "首先导航到登录页面"
+        },
+        {
+          "tool": "page_query",
+          "args": { "selector": "#username", "save": true },
+          "aiReasoning": "查找用户名输入框"
+        },
+        {
+          "tool": "element_input",
+          "args": { "refId": "element_1", "value": "testuser" },
+          "aiReasoning": "输入用户名"
+        },
+        {
+          "tool": "page_query",
+          "args": { "selector": "#password", "save": true },
+          "aiReasoning": "查找密码输入框"
+        },
+        {
+          "tool": "element_input",
+          "args": { "refId": "element_2", "value": "password123" },
+          "aiReasoning": "输入密码"
+        },
+        {
+          "tool": "element_tap",
+          "args": { "selector": ".login-btn" },
+          "aiReasoning": "点击登录按钮"
+        },
+        {
+          "tool": "assert_exists",
+          "args": { "selector": ".success-toast" },
+          "aiReasoning": "验证登录成功提示"
+        }
+      ]
+    },
+    {
+      "id": "list-scrolling",
+      "name": "列表滚动测试",
+      "description": "模拟 AI 操作可滚动列表",
+      "userMessage": "滚动到商品列表底部并获取最后一个商品名称",
+      "steps": [
+        {
+          "tool": "miniprogram_navigate",
+          "args": { "path": "/pages/products/list" },
+          "aiReasoning": "导航到商品列表页"
+        },
+        {
+          "tool": "page_wait_for",
+          "args": { "selector": ".product-item", "timeout": 5000 },
+          "aiReasoning": "等待商品列表加载"
+        },
+        {
+          "tool": "page_scroll_to",
+          "args": { "scrollTop": 10000, "duration": 300 },
+          "aiReasoning": "滚动到列表底部"
+        },
+        {
+          "tool": "element_get_text",
+          "args": { "selector": ".product-item:last-child .name" },
+          "aiReasoning": "获取最后一个商品名称"
+        }
+      ]
+    },
+    {
+      "id": "network-mock",
+      "name": "网络 Mock 测试",
+      "description": "模拟 AI 使用网络 mock 测试错误处理",
+      "userMessage": "模拟登录接口失败，验证错误提示",
+      "steps": [
+        {
+          "tool": "network_mock_request_failure",
+          "args": {
+            "method": "POST",
+            "url": "/api/login",
+            "statusCode": 401,
+            "errorMessage": "Invalid credentials"
+          },
+          "aiReasoning": "Mock 登录接口返回失败"
+        },
+        {
+          "tool": "miniprogram_navigate",
+          "args": { "path": "/pages/login/login" },
+          "aiReasoning": "进入登录页"
+        },
+        {
+          "tool": "element_tap",
+          "args": { "selector": ".login-btn" },
+          "aiReasoning": "触发登录请求"
+        },
+        {
+          "tool": "assert_text",
+          "args": {
+            "selector": ".error-toast",
+            "expected": "Invalid credentials"
+          },
+          "aiReasoning": "验证错误提示是否正确显示"
+        },
+        {
+          "tool": "network_restore_all_mocks",
+          "args": {},
+          "aiReasoning": "恢复网络 mock"
+        }
+      ]
+    },
+    {
+      "id": "snapshot-debug",
+      "name": "快照调试测试",
+      "description": "模拟 AI 使用快照功能进行调试",
+      "userMessage": "拍摄当前页面快照用于问题排查",
+      "steps": [
+        {
+          "tool": "miniprogram_current_page",
+          "args": {},
+          "aiReasoning": "获取当前页面路径"
+        },
+        {
+          "tool": "snapshot_page_data",
+          "args": {},
+          "aiReasoning": "捕获页面数据状态"
+        },
+        {
+          "tool": "miniprogram_screenshot",
+          "args": { "path": "debug-snapshot.png" },
+          "aiReasoning": "保存页面截图"
+        },
+        {
+          "tool": "snapshot_page",
+          "args": { "includeData": true },
+          "aiReasoning": "获取完整页面快照"
+        }
+      ]
+    },
+    {
+      "id": "element-properties",
+      "name": "元素属性测试",
+      "description": "模拟 AI 获取和验证元素属性",
+      "userMessage": "检查提交按钮是否被禁用",
+      "steps": [
+        {
+          "tool": "page_query",
+          "args": { "selector": ".submit-btn", "save": true },
+          "aiReasoning": "查找提交按钮"
+        },
+        {
+          "tool": "element_get_attribute",
+          "args": { "refId": "element_1", "name": "disabled" },
+          "aiReasoning": "获取 disabled 属性"
+        },
+        {
+          "tool": "assert_attribute",
+          "args": {
+            "selector": ".submit-btn",
+            "name": "disabled",
+            "expected": "true"
+          },
+          "aiReasoning": "验证按钮是否被禁用"
+        }
+      ]
+    },
+    {
+      "id": "data-extraction",
+      "name": "数据提取测试",
+      "description": "模拟 AI 从页面提取多个数据点",
+      "userMessage": "获取用户个人信息页面的所有字段值",
+      "steps": [
+        {
+          "tool": "miniprogram_navigate",
+          "args": { "path": "/pages/user/profile" },
+          "aiReasoning": "进入个人信息页"
+        },
+        {
+          "tool": "element_get_text",
+          "args": { "selector": ".username" },
+          "aiReasoning": "获取用户名"
+        },
+        {
+          "tool": "element_get_text",
+          "args": { "selector": ".email" },
+          "aiReasoning": "获取邮箱"
+        },
+        {
+          "tool": "element_get_text",
+          "args": { "selector": ".phone" },
+          "aiReasoning": "获取手机号"
+        },
+        {
+          "tool": "snapshot_page_data",
+          "args": {},
+          "aiReasoning": "获取完整页面数据以便进一步分析"
+        }
+      ]
+    },
+    {
+      "id": "multi-page-flow",
+      "name": "多页面流程测试",
+      "description": "模拟 AI 执行跨多个页面的完整流程",
+      "userMessage": "完成从浏览商品到下单的完整流程",
+      "steps": [
+        {
+          "tool": "miniprogram_navigate",
+          "args": { "path": "/pages/products/list" },
+          "aiReasoning": "进入商品列表"
+        },
+        {
+          "tool": "element_tap",
+          "args": { "selector": ".product-item:first-child" },
+          "aiReasoning": "点击第一个商品"
+        },
+        {
+          "tool": "element_tap",
+          "args": { "selector": ".add-to-cart-btn" },
+          "aiReasoning": "添加到购物车"
+        },
+        {
+          "tool": "miniprogram_navigate",
+          "args": { "path": "/pages/cart/cart" },
+          "aiReasoning": "进入购物车"
+        },
+        {
+          "tool": "element_tap",
+          "args": { "selector": ".checkout-btn" },
+          "aiReasoning": "点击结算"
+        },
+        {
+          "tool": "miniprogram_get_page_stack",
+          "args": { "expected": "/pages/order/checkout" },
+          "aiReasoning": "验证是否到达结算页面"
+        }
+      ]
+    },
+    {
+      "id": "conditional-logic",
+      "name": "条件逻辑测试",
+      "description": "模拟 AI 根据页面状态做出决策",
+      "userMessage": "如果有优惠券可用则应用，否则直接提交订单",
+      "steps": [
+        {
+          "tool": "miniprogram_navigate",
+          "args": { "path": "/pages/order/checkout" },
+          "aiReasoning": "进入结算页"
+        },
+        {
+          "tool": "page_query",
+          "args": { "selector": ".coupon-section", "save": false },
+          "aiReasoning": "检查是否有优惠券区域"
+        },
+        {
+          "tool": "element_tap",
+          "args": { "selector": ".apply-coupon-btn" },
+          "aiReasoning": "如果有优惠券，点击应用（假设存在）"
+        },
+        {
+          "tool": "element_tap",
+          "args": { "selector": ".submit-order-btn" },
+          "aiReasoning": "提交订单"
+        },
+        {
+          "tool": "assert_exists",
+          "args": { "selector": ".order-success" },
+          "aiReasoning": "验证订单提交成功"
+        }
+      ]
+    },
+    {
+      "id": "performance-test",
+      "name": "性能测试",
+      "description": "模拟 AI 进行页面性能监测",
+      "userMessage": "测试商品列表页面的加载性能",
+      "steps": [
+        {
+          "tool": "record_start",
+          "args": {},
+          "aiReasoning": "开始录制用户操作"
+        },
+        {
+          "tool": "miniprogram_navigate",
+          "args": { "path": "/pages/products/list" },
+          "aiReasoning": "导航到列表页"
+        },
+        {
+          "tool": "page_wait_for",
+          "args": { "selector": ".product-item", "timeout": 5000 },
+          "aiReasoning": "等待商品加载"
+        },
+        {
+          "tool": "record_stop",
+          "args": {},
+          "aiReasoning": "停止录制"
+        },
+        {
+          "tool": "miniprogram_screenshot",
+          "args": { "path": "performance-result.png" },
+          "aiReasoning": "保存性能测试结果截图"
+        }
+      ]
+    }
+  ]
+}

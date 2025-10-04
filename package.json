@@ -26,6 +26,9 @@
     "release:minor": "bash scripts/release.sh minor",
     "release:major": "bash scripts/release.sh major",
     "release:prerelease": "bash scripts/release.sh prerelease",
+    "simulate:ai": "tsx tests/simulation/ai-mcp-simulator.ts",
+    "simulate:quick": "tsx tests/simulation/quick-ai-test.ts",
+    "simulate:scenario": "tsx tests/simulation/scenario-runner.ts",
     "prepare": "husky install"
   },
   "keywords": [
