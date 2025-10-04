@@ -1,57 +1,56 @@
-# @creatoria/miniapp-mcp
+# WeChat Mini Program MCP Server
 
-> 🤖 Enable AI assistants to orchestrate WeChat Mini Program testing through natural language
+Model Context Protocol (MCP) server for WeChat Mini Program automation using the official `miniprogram-automator` SDK.
 
-**@creatoria/miniapp-mcp** is a production-ready MCP (Model Context Protocol) server that wraps WeChat's official `miniprogram-automator` SDK into 65 AI-friendly tools. Let LLMs like Claude control your Mini Program with simple natural language commands - from navigation and interaction to assertions and debugging.
-
-**Why?** Traditional UI automation requires writing brittle scripts. With MCP, you describe what to test in plain English, and AI agents handle the implementation details - making test creation 10x faster and maintenance effortless.
-
-[![npm version](https://img.shields.io/npm/v/@creatoria/miniapp-mcp)](https://www.npmjs.com/package/@creatoria/miniapp-mcp) [![Tests](https://img.shields.io/badge/tests-545%20passed-success)](https://github.com/rn1024/creatoria-miniapp-mcp) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/) [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-1.0-purple)](https://modelcontextprotocol.io/)
+[![npm version](https://img.shields.io/npm/v/@creatoria/miniapp-mcp)](https://www.npmjs.com/package/@creatoria/miniapp-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## 📦 Installation
+## Features
 
+- 🤖 **LLM-Friendly**: 65 AI-optimized tools for natural language automation
+- 🎯 **Complete Coverage**: Automator, MiniProgram, Page, Element, Assert, Snapshot, Record, Network tools
+- 🔧 **Zero Config**: Auto-detects project path from `project.config.json` or `app.json`
+- 📦 **npx Ready**: No installation needed, just `npx -y @creatoria/miniapp-mcp`
+- 🧪 **Test Automation**: Built-in assertion and recording capabilities
+- 🎨 **TypeScript**: Full type definitions with 545 passing tests
+
+## Quick Start
+
+### Installation
+
+Use with npx (recommended):
 ```bash
-# Using npx (recommended - no installation needed)
 npx -y @creatoria/miniapp-mcp
-
-# Or install globally
-npm install -g @creatoria/miniapp-mcp
-
-# Or install locally
-npm install @creatoria/miniapp-mcp
 ```
 
----
+Or install globally:
+```bash
+npm install -g @creatoria/miniapp-mcp
+```
 
-## ✨ Core Features
-
-- 🎯 **65 AI-Friendly Tools**: Complete coverage across 8 categories (Automator, MiniProgram, Page, Element, Assert, Snapshot, Record, Network)
-- 🤖 **Natural Language Testing**: Describe tests in plain English, let AI write automation code
-- 🔧 **MCP Native**: Seamlessly integrates with Claude Desktop, Cline, and any MCP client
-- 🧪 **Test Automation**: 9 assertion tools + 6 recording tools for robust test workflows
-- 📸 **Debug Snapshots**: Capture page/app/element state for troubleshooting
-- 🎨 **TypeScript First**: Full type definitions, 545 tests, 100% pass rate
-- 🔄 **Session Isolation**: Multi-session support with automatic 30-min cleanup
-- ⚙️ **Flexible Config**: Environment variables, config files, or CLI arguments
-
----
-
-## 📋 前置要求
-
-- **Node.js**: >= 18.0.0
-- **微信开发者工具**: 已安装并启用 CLI（[下载地址](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)）
-- **小程序项目**: 用于测试的微信小程序项目目录
-- **pnpm**: 推荐使用 pnpm 作为包管理器（`npm install -g pnpm`）
-
----
-
-## 🚀 Quickstart (< 2 minutes)
-
-### 1. Configure MCP Client
+### Configuration
 
 Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "miniprogram": {
+      "command": "npx",
+      "args": ["-y", "@creatoria/miniapp-mcp"]
+    }
+  }
+}
+```
+
+**That's it!** The server will automatically detect your mini program project.
+
+<details>
+<summary>Advanced Configuration</summary>
+
+#### Custom Project Path
 
 ```json
 {
@@ -62,32 +61,27 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
         "-y",
         "@creatoria/miniapp-mcp",
         "--project-path",
-        "/path/to/your/miniprogram",
-        "--port",
-        "9420"
-      ],
-      "env": {}
+        "/path/to/your/miniprogram"
+      ]
     }
   }
 }
 ```
 
-**That's it!** Restart Claude Desktop and you're ready to go. The package will be automatically downloaded on first use.
+#### Using Config File
 
-### 2. Alternative: Using Config File
-
-Create a `.mcp.json` in your project root:
+Create `.mcp.json` in your project root:
 
 ```json
 {
-  "projectPath": "/path/to/your/miniprogram",
+  "projectPath": "/path/to/miniprogram",
   "cliPath": "/Applications/wechatwebdevtools.app/Contents/MacOS/cli",
   "port": 9420,
-  "capabilities": ["core", "assert", "snapshot"]
+  "capabilities": ["core", "assert", "snapshot", "record", "network"]
 }
 ```
 
-Then use simplified config:
+Then use:
 
 ```json
 {
@@ -100,370 +94,213 @@ Then use simplified config:
 }
 ```
 
-See [Setup Guide](./docs/setup-guide.md) for advanced configuration.
+#### Environment Variables
 
-### 3. First Automation (Optional)
+```bash
+export MCP_PROJECT_PATH=/path/to/miniprogram
+export MCP_PORT=9420
+export MCP_CAPABILITIES=core,assert,snapshot
+```
 
-Talk to Claude in natural language:
+</details>
+
+## How It Works
+
+The server wraps WeChat's official `miniprogram-automator` SDK, exposing it through the Model Context Protocol. This allows AI assistants like Claude to:
+
+1. **Connect** to WeChat DevTools automation interface
+2. **Control** mini program UI through natural language
+3. **Verify** behavior with built-in assertions
+4. **Debug** with snapshots and recordings
+
+### Auto-Detection
+
+The server automatically searches for mini program projects:
+
+- Current directory (checks for `project.config.json` or `app.json`)
+- Common subdirectories: `dist/`, `build/`, `miniprogram/`, `src/`
+
+## Available Tools
+
+### Core Tools (65 total)
+
+<details>
+<summary><strong>Automator (4 tools)</strong> - Connection & Lifecycle</summary>
+
+- `miniprogram_launch` - Launch WeChat Mini Program
+- `miniprogram_connect` - Connect to running DevTools instance
+- `miniprogram_disconnect` - Disconnect but keep IDE running
+- `miniprogram_close` - Close session and cleanup resources
+
+</details>
+
+<details>
+<summary><strong>MiniProgram (6 tools)</strong> - App-Level Operations</summary>
+
+- `miniprogram_navigate` - Navigate using navigateTo/redirectTo/reLaunch/switchTab/navigateBack
+- `miniprogram_call_wx` - Call WeChat API methods (wx.*)
+- `miniprogram_evaluate` - Execute JavaScript in mini program context
+- `miniprogram_screenshot` - Take screenshots
+- `miniprogram_get_page_stack` - Get current page stack
+- `miniprogram_get_system_info` - Get system information
+
+</details>
+
+<details>
+<summary><strong>Page (8 tools)</strong> - Page-Level Operations</summary>
+
+- `page_query` - Query single element
+- `page_query_all` - Query all matching elements
+- `page_wait_for` - Wait for condition or selector
+- `page_get_data` - Get page data
+- `page_set_data` - Set page data
+- `page_call_method` - Call page methods
+- `page_get_size` - Get page dimensions
+- `page_get_scroll_top` - Get scroll position
+
+</details>
+
+<details>
+<summary><strong>Element (23 tools)</strong> - Element-Level Operations</summary>
+
+- `element_tap` - Tap/click element
+- `element_longpress` - Long press element
+- `element_input` - Input text (input/textarea)
+- `element_get_text` - Get text content
+- `element_get_attribute` - Get element attribute
+- `element_get_property` - Get element property
+- `element_get_value` - Get element value
+- `element_trigger` - Trigger custom events
+- Component-specific: ScrollView, Swiper, MovableView, Slider methods
+
+</details>
+
+<details>
+<summary><strong>Assert (9 tools)</strong> - Testing & Verification</summary>
+
+- `assert_exists` - Assert element exists
+- `assert_not_exists` - Assert element doesn't exist
+- `assert_text` - Assert text equals expected
+- `assert_text_contains` - Assert text contains substring
+- `assert_value` - Assert value equals expected
+- `assert_attribute` - Assert attribute equals expected
+- `assert_property` - Assert property equals expected
+- `assert_data` - Assert page data equals expected
+- `assert_visible` - Assert element is visible
+
+</details>
+
+<details>
+<summary><strong>Snapshot (3 tools)</strong> - State Capture</summary>
+
+- `snapshot_page` - Capture page snapshot (data + screenshot)
+- `snapshot_full` - Capture full app snapshot (system + page stack)
+- `snapshot_element` - Capture element snapshot
+
+</details>
+
+<details>
+<summary><strong>Record (6 tools)</strong> - Action Recording</summary>
+
+- `record_start` - Start recording actions
+- `record_stop` - Stop and save recording
+- `record_list` - List saved recordings
+- `record_get` - Get recording details
+- `record_delete` - Delete recording
+- `record_replay` - Replay recorded actions
+
+</details>
+
+<details>
+<summary><strong>Network (6 tools)</strong> - Mock & Testing</summary>
+
+- `network_mock_wx_method` - Mock WeChat API methods
+- `network_restore_wx_method` - Restore mocked methods
+- `network_mock_request` - Mock wx.request responses
+- `network_mock_request_failure` - Mock request failures
+- `network_restore_request` - Restore wx.request
+- `network_restore_all_mocks` - Restore all mocks
+
+</details>
+
+## Requirements
+
+- **Node.js**: >= 18.0.0
+- **WeChat DevTools**: [Download](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)
+  - Enable CLI/HTTP calls in Settings → Security
+  - Default automation port: 9420
+- **Mini Program Project**: Any WeChat mini program with `project.config.json` or `app.json`
+
+## Examples
+
+### Natural Language Testing
 
 ```
-You: Launch my mini program and navigate to the product list page
+You: "Launch the mini program and navigate to the product list page"
 
-Claude: [Calls automator.launch + miniprogram.navigate]
-✅ Mini program launched
+Claude: [Calls miniprogram_connect + miniprogram_navigate]
+✅ Connected to DevTools
 ✅ Navigated to pages/product/list
 
-You: Find the first product title and verify it contains "iPhone"
+You: "Find the first product title and verify it contains 'iPhone'"
 
-Claude: [Calls page.query + element.getText + assert.text]
+Claude: [Calls page_query + element_get_text + assert_text_contains]
 ✅ Found element with text: "iPhone 15 Pro"
 ✅ Assertion passed: text contains "iPhone"
 ```
 
-### Quick Examples
+### Programmatic Usage
 
-**Example 1: Navigation**
-```javascript
-// Launch and navigate to a page
-await automator.launch({ projectPath: "/path/to/project" })
-await miniprogram.navigate({ url: "/pages/home/home" })
-```
+See [examples/](./examples/) directory for complete workflows:
 
-**Example 2: Element Interaction**
-```javascript
-// Find element, tap it, and input text
-const btn = await page.query({ selector: ".search-btn" })
-await element.tap({ refId: btn.refId })
-await element.input({ selector: ".search-input", value: "iPhone" })
-```
+- [Basic Navigation](./examples/01-basic-navigation.md)
+- [Element Interaction](./examples/02-element-interaction.md)
+- [Assertion Testing](./examples/03-assertion-testing.md)
+- [Snapshot Debugging](./examples/04-snapshot-debugging.md)
+- [Action Recording](./examples/05-record-replay.md)
 
-**Example 3: Assertions**
-```javascript
-// Verify element exists and has correct text
-await assert.exists({ selector: ".product-title" })
-await assert.text({ selector: ".product-title", expected: "iPhone 15" })
-```
+## Documentation
 
-📚 **Next Steps**: Check out [Usage Examples](./examples/) for complete workflows including form submission, snapshot debugging, and test recording.
+- [API Reference](./docs/api/) - Complete API docs for all 65 tools
+- [Setup Guide](./docs/setup-guide.md) - Detailed setup instructions
+- [Troubleshooting](./docs/troubleshooting.md) - Common issues and solutions
+- [Architecture](./docs/architecture.md) - System design and technical decisions
 
----
-
-## 🛠️ Tool Catalog (65 Tools across 8 Categories)
-
-### Automator (4 tools) - Connection & Lifecycle
-
-| Tool | Description |
-|------|-------------|
-| `miniprogram.launch` | Launch WeChat Mini Program with automator |
-| `miniprogram.connect` | Connect to an already running WeChat DevTools instance |
-| `miniprogram.disconnect` | Disconnect from miniprogram but keep IDE running |
-| `miniprogram.close` | Close current mini program session and cleanup all resources |
-
-### MiniProgram (6 tools) - App-Level Operations
-
-| Tool | Description |
-|------|-------------|
-| `miniprogram.navigate` | Navigate to a page using various navigation methods (navigateTo, redirectTo, reLaunch, switchTab, navigateBack) |
-| `miniprogram.call.wx` | Call a WeChat API method (wx.*) in the mini program |
-| `miniprogram.evaluate` | Evaluate JavaScript code in the mini program context |
-| `miniprogram.screenshot` | Take a screenshot of the mini program |
-| `miniprogram.get.page.stack` | Get the current page stack |
-| `miniprogram.get.system.info` | Get system information |
-
-### Page (8 tools) - Page-Level Operations
-
-| Tool | Description |
-|------|-------------|
-| `page.query` | Query a single element on the page |
-| `page.query.all` | Query all matching elements on the page |
-| `page.wait.for` | Wait for a condition to be met (selector or timeout) |
-| `page.get.data` | Get page data (optionally at a specific path) |
-| `page.set.data` | Set page data |
-| `page.call.method` | Call a method on the page |
-| `page.get.size` | Get page size (width, height, scrollHeight) |
-| `page.get.scroll.top` | Get page scroll position |
-
-### Element (23 tools) - Element-Level Operations
-
-| Tool | Description |
-|------|-------------|
-| `element.tap` | Tap (click) an element |
-| `element.longpress` | Long press an element |
-| `element.input` | Input text into an element (input/textarea only) |
-| `element.get.text` | Get element text content |
-| `element.get.attribute` | Get element attribute (特性) |
-| `element.get.property` | Get element property (属性) |
-| `element.get.value` | Get element value |
-| `element.get.size` | Get element size (width, height) |
-| `element.get.offset` | Get element offset (position) |
-| `element.trigger` | Trigger an event on the element |
-| `element.get.style` | Get element style value |
-| `element.touchstart` | Touch start on element |
-| `element.touchmove` | Touch move on element |
-| `element.touchend` | Touch end on element |
-| `element.scroll.to` | Scroll to position (ScrollView only) |
-| `element.scroll.width` | Get scroll width (ScrollView only) |
-| `element.scroll.height` | Get scroll height (ScrollView only) |
-| `element.swipe.to` | Swipe to index (Swiper only) |
-| `element.move.to` | Move to position (MovableView only) |
-| `element.slide.to` | Slide to value (Slider only) |
-| `element.call.context.method` | Call context method (ContextElement only) |
-| `element.set.data` | Set data on custom element (CustomElement only) |
-| `element.call.method` | Call method on custom element (CustomElement only) |
-
-### Assert (9 tools) - Testing & Verification
-
-| Tool | Description |
-|------|-------------|
-| `assert.exists` | Assert that an element exists on the page |
-| `assert.not.exists` | Assert that an element does not exist on the page |
-| `assert.text` | Assert element text equals expected value |
-| `assert.text.contains` | Assert element text contains expected substring |
-| `assert.value` | Assert element value equals expected value |
-| `assert.attribute` | Assert element attribute equals expected value |
-| `assert.property` | Assert element property equals expected value |
-| `assert.data` | Assert page data equals expected value |
-| `assert.visible` | Assert element is visible (has non-zero size) |
-
-### Snapshot (3 tools) - State Capture & Debugging
-
-| Tool | Description |
-|------|-------------|
-| `snapshot.page` | Capture complete page snapshot (data + screenshot) |
-| `snapshot.full` | Capture complete application snapshot (system info + page stack + current page) |
-| `snapshot.element` | Capture element snapshot (properties + optional screenshot) |
-
-### Record (6 tools) - Action Recording & Replay
-
-| Tool | Description |
-|------|-------------|
-| `record.start` | Start recording user actions for later replay |
-| `record.stop` | Stop the current recording and save the sequence |
-| `record.list` | List all saved action sequences |
-| `record.get` | Get details of a specific sequence |
-| `record.delete` | Delete a saved sequence |
-| `record.replay` | Replay a recorded action sequence |
-
-### Network (6 tools) - Network Mock & Testing
-
-| Tool | Description |
-|------|-------------|
-| `network.mock.wx.method` | Mock a WeChat API method (wx.*) for testing |
-| `network.restore.wx.method` | Restore a previously mocked WeChat API method |
-| `network.mock.request` | Mock wx.request to return specific data (convenience wrapper) |
-| `network.mock.request.failure` | Mock wx.request to fail with specific error |
-| `network.restore.request` | Restore wx.request to original behavior |
-| `network.restore.all.mocks` | Restore all mocked WeChat API methods at once |
-
----
-
-📚 **Documentation**:
-- [Complete API Reference](./docs/api/) - Detailed API documentation for all 65 tools
-- [Usage Examples](./examples/) - Real-world automation scripts
-- [Integration Tests](./tests/integration/) - End-to-end test scenarios
-
-## 🏗️ 项目结构
-
-```
-creatoria-miniapp-mcp/
-├── src/                           # 源代码
-│   ├── server.ts                  # MCP 服务器入口
-│   ├── cli.ts                     # CLI 入口
-│   ├── types.ts                   # TypeScript 类型定义
-│   ├── config/                    # 配置管理
-│   │   └── index.ts               # 配置加载和验证
-│   ├── core/                      # 核心模块
-│   │   ├── session.ts             # 会话管理器
-│   │   ├── output.ts              # 输出管理器（截图、快照）
-│   │   └── element-ref.ts         # 元素引用解析器
-│   └── tools/                     # MCP 工具实现
-│       ├── index.ts               # 工具注册器（65 个工具）
-│       ├── automator.ts           # Automator 工具（4 个）
-│       ├── miniprogram.ts         # MiniProgram 工具（6 个）
-│       ├── page.ts                # Page 工具（8 个）
-│       ├── element.ts             # Element 工具（23 个）
-│       ├── assert.ts              # Assert 工具（9 个）
-│       ├── snapshot.ts            # Snapshot 工具（3 个）
-│       └── record.ts              # Record 工具（6 个）
-│
-├── tests/                         # 测试文件
-│   ├── unit/                      # 单元测试（545 个测试）
-│   │   ├── session.test.ts
-│   │   ├── output.test.ts
-│   │   ├── element-ref.test.ts
-│   │   ├── automator.test.ts
-│   │   ├── miniprogram.test.ts
-│   │   ├── page.test.ts
-│   │   ├── element.test.ts
-│   │   ├── assert.test.ts
-│   │   ├── snapshot.test.ts
-│   │   ├── record.test.ts
-│   │   └── tool-registration.test.ts
-│   └── integration/               # 集成测试（需要测试小程序项目）
-│
-├── docs/                          # 文档
-│   ├── setup-guide.md             # 配置指南
-│   ├── architecture.md            # 系统架构
-│   ├── troubleshooting.md         # 故障排除
-│   ├── charter.*.yaml             # 任务对齐文档
-│   ├── tasks.*.atomize.md         # 任务分解文档
-│   └── api/                       # API 参考文档
-│       ├── README.md              # API 文档索引
-│       ├── automator.md
-│       ├── miniprogram.md
-│       ├── page.md
-│       ├── element.md
-│       ├── assert.md
-│       └── snapshot.md
-│
-├── examples/                      # 使用示例
-│   ├── README.md                  # 示例索引
-│   ├── 01-basic-navigation.md
-│   ├── 02-form-interaction.md
-│   ├── 03-assertion-testing.md
-│   ├── 04-snapshot-debugging.md
-│   └── 05-advanced-automation.md
-│
-├── scripts/                       # 脚本
-│   ├── launch-wx-devtools.sh      # 启动微信开发者工具
-│   └── setup-devtools-port.sh     # 配置自动化端口
-│
-├── .llm/                          # LLM 工作流程文档（6A 工作法）
-│   ├── state.json                 # 项目状态（SSOT）
-│   ├── prompts/                   # 工作流程规范
-│   ├── session_log/               # 会话日志
-│   └── qa/                        # 验收文档
-│
-├── dist/                          # 构建输出
-├── package.json                   # 项目配置
-├── tsconfig.json                  # TypeScript 配置
-├── jest.config.js                 # Jest 测试配置
-└── README.md                      # 本文件
-```
-
----
-
-## 📚 Documentation
-
-### User Documentation
-- [**Setup Guide**](./docs/setup-guide.md) - Environment setup and configuration
-- [**API Reference**](./docs/api/) - Complete API docs for all 65 tools
-- [**Usage Examples**](./examples/) - Real-world automation scenarios
-- [**Troubleshooting**](./docs/troubleshooting.md) - Common issues and solutions
-
-### Known Issues
-- Type-only build/typecheck warnings may occur due to upstream `miniprogram-automator` type declarations. CI marks build/typecheck as non-blocking and runtime is unaffected. See `scripts/smoke-test.sh` and `.github/workflows/ci.yml` for handling details.
-
-### Developer Documentation
-- [**Architecture**](./docs/architecture.md) - System design and technical decisions
-- [**Contributing Guide**](./CONTRIBUTING.md) - How to contribute to the project
-- [**Task Breakdown**](./docs/) - Development tasks and progress tracking (35 charter + task docs)
-
-### 6A Workflow Documentation (Internal)
-- [`.llm/state.json`](./.llm/state.json) - Project state (Single Source of Truth)
-- [`.llm/prompts/`](./.llm/prompts/) - 6A workflow specifications
-- [`.llm/session_log/`](./.llm/session_log/) - Development session logs
-- [`.llm/qa/`](./.llm/qa/) - Acceptance documentation
-
----
-
-## 🧪 开发
-
-### 常用命令
+## Development
 
 ```bash
-# 构建
+# Install dependencies
+pnpm install
+
+# Build
 pnpm build
 
-# 开发模式（watch）
-pnpm dev
-
-# 运行测试
+# Run tests
 pnpm test
 
-# 运行测试（watch 模式）
-pnpm test:watch
-
-# 类型检查
+# Type check
 pnpm typecheck
 
-# 代码检查
+# Lint
 pnpm lint
-
-# 代码格式化
-pnpm format
-
-# 格式检查
-pnpm format:check
 ```
 
-### 测试状态
+## Contributing
 
-```bash
-$ pnpm test
+Contributions welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
-Test Suites: 21 passed, 21 total
-Tests:       545 passed, 545 total
-Snapshots:   0 total
-Time:        ~6s
+## License
 
-✅ 100% 测试通过率
-```
+MIT License - see [LICENSE](./LICENSE) file for details.
 
-**Test Coverage** (545 tests total):
-- Core modules: Session, Logger, Output, ElementRef
-- Tool implementations: Automator, MiniProgram, Page, Element
-- Capabilities: Assert, Snapshot, Record, Network
-- Infrastructure: Config, Tool registration, Helpers
-- Quality: Smoke tests, Release scripts
+## Links
 
-### 添加新工具
-
-查看 [贡献指南](./CONTRIBUTING.md) 了解如何添加新工具。
+- [npm Package](https://www.npmjs.com/package/@creatoria/miniapp-mcp)
+- [GitHub Repository](https://github.com/rn1024/creatoria-miniapp-mcp)
+- [Model Context Protocol](https://modelcontextprotocol.io/)
+- [WeChat Mini Program Automator](https://developers.weixin.qq.com/miniprogram/dev/devtools/auto/)
+- [WeChat DevTools](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)
 
 ---
 
-## 🤝 贡献
-
-欢迎贡献！请查看 [贡献指南](./CONTRIBUTING.md) 了解：
-
-- 6A 工作法开发流程
-- 代码规范和测试要求
-- Pull Request 流程
-- 常见问题
-
-### 贡献者
-
-感谢所有贡献者！
-
----
-
-## 📄 许可证
-
-本项目采用 [MIT License](./LICENSE) 开源协议。
-
----
-
-## 🔗 相关链接
-
-- [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)
-- [miniprogram-automator 官方文档](https://developers.weixin.qq.com/miniprogram/dev/devtools/auto/)
-- [微信小程序开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)
-- [Claude Desktop](https://claude.ai/download)
-
----
-
-## 📮 联系方式
-
-- **Issues**: [GitHub Issues](https://github.com/your-org/creatoria-miniapp-mcp/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-org/creatoria-miniapp-mcp/discussions)
-
----
-
-**Project Status**: ✅ Stage A-H Complete / M5 Milestone Ready (65 tools, 545 tests, CI/CD, release automation)
-
-**Last Updated**: 2025-10-03
-
----
-
-Made with ❤️ using the [6A Workflow](./docs/charter.E-Docs.align.yaml) (Align → Architect → Atomize → Approve → Automate → Assess)
+Made with ❤️ for the WeChat Mini Program developer community
