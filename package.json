@@ -1,6 +1,6 @@
 {
   "name": "@creatoria/miniapp-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP server for WeChat Mini Program automation using miniprogram-automator",
   "type": "module",
   "packageManager": "pnpm@9.0.0",
