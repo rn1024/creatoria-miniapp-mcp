@@ -175,14 +175,15 @@ export const MINIPROGRAM_TOOLS: Tool[] = [
   },
   {
     name: 'miniprogram_screenshot',
-    description: 'Take a screenshot of the mini program',
+    description:
+      'Take a screenshot of the mini program. Returns base64 string by default, or saves to file if filename is provided.',
     inputSchema: {
       type: 'object',
       properties: {
         filename: {
           type: 'string',
           description:
-            'Custom filename for the screenshot (optional, auto-generated if not provided)',
+            'Optional filename to save screenshot to file. If not provided, returns base64 string instead.',
         },
         fullPage: {
           type: 'boolean',

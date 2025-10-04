@@ -199,6 +199,7 @@ export async function evaluate(
 
 /**
  * Take a screenshot of the mini program
+ * Returns base64 string by default, or saves to file if filename is provided
  */
 export async function screenshot(
   session: SessionState,
@@ -209,7 +210,8 @@ export async function screenshot(
 ): Promise<{
   success: boolean
   message: string
-  path: string
+  base64?: string
+  path?: string
 }> {
   const { filename, fullPage = false } = args
   const logger = session.logger
@@ -222,37 +224,44 @@ export async function screenshot(
       )
     }
 
+    logger?.info('Taking screenshot', { filename, fullPage })
+
+    // If no filename provided, return base64
+    if (!filename) {
+      const base64String = await session.miniProgram.screenshot()
+      logger?.info('Screenshot captured as base64')
+
+      return {
+        success: true,
+        message: 'Screenshot captured successfully',
+        base64: base64String,
+      }
+    }
+
+    // Filename provided - save to file
     if (!outputManager) {
       throw new Error('OutputManager not available')
     }
 
-    logger?.info('Taking screenshot', { filename, fullPage })
-
-    // Validate filename if provided (security: prevent path traversal)
-    if (filename) {
-      const { validateFilename } = await import('../core/validation.js')
-      try {
-        validateFilename(filename, ['png', 'jpg', 'jpeg'])
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error)
-        throw new Error(`Invalid filename: ${errorMessage}`)
-      }
+    // Validate filename (security: prevent path traversal)
+    const { validateFilename } = await import('../core/validation.js')
+    try {
+      validateFilename(filename, ['png', 'jpg', 'jpeg'])
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      throw new Error(`Invalid filename: ${errorMessage}`)
     }
 
     // Ensure output directory exists
     await outputManager.ensureOutputDir()
 
-    // Generate filename if not provided
-    const outputFilename = filename || outputManager.generateFilename('screenshot', 'png')
-
     // Get full path
     const fullPath = await outputManager.writeFile(
-      outputFilename,
+      filename,
       Buffer.from([]) // Placeholder, will be overwritten
     )
 
-    // Take screenshot using miniprogram-automator
-    // Note: screenshot() returns Buffer directly
+    // Take screenshot using miniprogram-automator with path
     const screenshotBuffer = await session.miniProgram.screenshot({
       path: fullPath,
       fullPage,
@@ -260,14 +269,14 @@ export async function screenshot(
 
     // If screenshot() doesn't write to file directly, write the buffer
     if (screenshotBuffer) {
-      await outputManager.writeFile(outputFilename, screenshotBuffer)
+      await outputManager.writeFile(filename, screenshotBuffer)
     }
 
     logger?.info('Screenshot saved', { path: fullPath })
 
     return {
       success: true,
-      message: 'Screenshot captured successfully',
+      message: 'Screenshot saved to file',
       path: fullPath,
     }
   } catch (error) {
