@@ -1,12 +1,27 @@
-# creatoria-miniapp-mcp
+# @creatoria/miniapp-mcp
 
 > 🤖 Enable AI assistants to orchestrate WeChat Mini Program testing through natural language
 
-**creatoria-miniapp-mcp** is a production-ready MCP (Model Context Protocol) server that wraps WeChat's official `miniprogram-automator` SDK into 65 AI-friendly tools. Let LLMs like Claude control your Mini Program with simple natural language commands - from navigation and interaction to assertions and debugging.
+**@creatoria/miniapp-mcp** is a production-ready MCP (Model Context Protocol) server that wraps WeChat's official `miniprogram-automator` SDK into 65 AI-friendly tools. Let LLMs like Claude control your Mini Program with simple natural language commands - from navigation and interaction to assertions and debugging.
 
 **Why?** Traditional UI automation requires writing brittle scripts. With MCP, you describe what to test in plain English, and AI agents handle the implementation details - making test creation 10x faster and maintenance effortless.
 
-[![Tests](https://img.shields.io/badge/tests-545%20passed-success)](https://github.com/rn1024/creatoria-miniapp-mcp) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/) [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-1.0-purple)](https://modelcontextprotocol.io/)
+[![npm version](https://img.shields.io/npm/v/@creatoria/miniapp-mcp)](https://www.npmjs.com/package/@creatoria/miniapp-mcp) [![Tests](https://img.shields.io/badge/tests-545%20passed-success)](https://github.com/rn1024/creatoria-miniapp-mcp) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/) [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-1.0-purple)](https://modelcontextprotocol.io/)
+
+---
+
+## 📦 Installation
+
+```bash
+# Using npx (recommended - no installation needed)
+npx -y @creatoria/miniapp-mcp
+
+# Or install globally
+npm install -g @creatoria/miniapp-mcp
+
+# Or install locally
+npm install @creatoria/miniapp-mcp
+```
 
 ---
 
@@ -32,17 +47,9 @@
 
 ---
 
-## 🚀 Quickstart (< 5 minutes)
+## 🚀 Quickstart (< 2 minutes)
 
-### 1. Install & Build
-
-```bash
-git clone https://github.com/rn1024/creatoria-miniapp-mcp.git
-cd creatoria-miniapp-mcp
-pnpm install && pnpm build
-```
-
-### 2. Configure MCP Client
+### 1. Configure MCP Client
 
 Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
 
@@ -50,19 +57,52 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 {
   "mcpServers": {
     "miniprogram": {
-      "command": "node",
-      "args": ["/absolute/path/to/creatoria-miniapp-mcp/dist/cli.js"],
-      "env": {
-        "PROJECT_PATH": "/path/to/your/miniprogram"
-      }
+      "command": "npx",
+      "args": [
+        "-y",
+        "@creatoria/miniapp-mcp",
+        "--project-path",
+        "/path/to/your/miniprogram",
+        "--port",
+        "9420"
+      ],
+      "env": {}
     }
   }
 }
 ```
 
-**That's it!** Restart Claude Desktop and you're ready to go. See [Setup Guide](./docs/setup-guide.md) for advanced configuration.
+**That's it!** Restart Claude Desktop and you're ready to go. The package will be automatically downloaded on first use.
 
-### 3. First Automation
+### 2. Alternative: Using Config File
+
+Create a `.mcp.json` in your project root:
+
+```json
+{
+  "projectPath": "/path/to/your/miniprogram",
+  "cliPath": "/Applications/wechatwebdevtools.app/Contents/MacOS/cli",
+  "port": 9420,
+  "capabilities": ["core", "assert", "snapshot"]
+}
+```
+
+Then use simplified config:
+
+```json
+{
+  "mcpServers": {
+    "miniprogram": {
+      "command": "npx",
+      "args": ["-y", "@creatoria/miniapp-mcp", "--config", ".mcp.json"]
+    }
+  }
+}
+```
+
+See [Setup Guide](./docs/setup-guide.md) for advanced configuration.
+
+### 3. First Automation (Optional)
 
 Talk to Claude in natural language:
 

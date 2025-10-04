@@ -1,0 +1,40 @@
+# Source files
+src/
+tests/
+scripts/
+test-miniapp/
+
+# Development files
+.llm/
+.claude/
+.mcp-artifacts/
+tsconfig.json
+jest.config.js
+.eslintrc.json
+.prettierrc
+.husky/
+
+# Build and cache
+*.log
+*.tgz
+.DS_Store
+node_modules/
+
+# Test and CI
+coverage/
+.nyc_output/
+
+# Documentation (keep only README)
+CLAUDE.md
+CONTRIBUTING.md
+TEST_REPORT.md
+
+# Configuration files
+.mcp.json
+.mcp.json.example
+.editorconfig
+.npmrc
+
+# Git
+.gitignore
+.git/

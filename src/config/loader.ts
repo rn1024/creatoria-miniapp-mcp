@@ -45,6 +45,36 @@ export function findConfigFile(startDir: string = process.cwd()): string | null 
 }
 
 /**
+ * Auto-detect miniprogram project path
+ * Searches for project.config.json or app.json in current dir and subdirectories
+ */
+export function autoDetectProjectPath(startDir: string = process.cwd()): string | null {
+  const indicators = ['project.config.json', 'app.json']
+
+  // Check current directory first
+  for (const indicator of indicators) {
+    if (existsSync(join(startDir, indicator))) {
+      return startDir
+    }
+  }
+
+  // Check common subdirectories
+  const commonDirs = ['dist', 'build', 'miniprogram', 'src']
+  for (const dir of commonDirs) {
+    const subDir = join(startDir, dir)
+    if (existsSync(subDir)) {
+      for (const indicator of indicators) {
+        if (existsSync(join(subDir, indicator))) {
+          return subDir
+        }
+      }
+    }
+  }
+
+  return null
+}
+
+/**
  * Load config from file
  */
 export function loadConfigFile(filePath: string): Partial<ServerConfig> {
@@ -185,6 +215,16 @@ export function loadConfig(
     }
   }
 
+  // Auto-detect project path if not specified
+  let finalCliConfig = { ...cliConfig }
+  if (!finalCliConfig.projectPath && !fileConfig.projectPath && !envConfig.projectPath) {
+    const detected = autoDetectProjectPath()
+    if (detected) {
+      finalCliConfig.projectPath = detected
+      console.error(`Auto-detected project path: ${detected}`)
+    }
+  }
+
   // Merge all configs
-  return mergeConfigs(fileConfig, envConfig, cliConfig)
+  return mergeConfigs(fileConfig, envConfig, finalCliConfig)
 }

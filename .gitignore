@@ -44,6 +44,9 @@ tmp/
 temp/
 .cache/
 
+# Test miniprogram (local only)
+test-miniapp/
+
 # MCP
 memory.json
 .mcp.json
