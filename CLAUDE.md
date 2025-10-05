@@ -159,7 +159,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - `docs/微信小程序自动化完整操作手册.md`: Official API reference (50+ pages)
 - `docs/开发任务计划.md`: Task breakdown with milestones
 - `docs/接口方案.md`: MCP interface mapping design
-- `docs/playwright-mcp调研.md`: Inspiration from Playwright MCP
+- `docs/directory-structure-and-code-style-best-practices.md`: Directory structure and coding guidelines
 
 ## Critical Rules
 

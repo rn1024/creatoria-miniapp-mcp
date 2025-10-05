@@ -6,7 +6,7 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 import type { ServerConfig } from './types.js'
-import { SessionStore } from './core/session.js'
+import { SessionStore } from './runtime/session/index.js'
 import { registerTools } from './tools/index.js'
 import { mergeServerConfig } from './config/defaults.js'
 

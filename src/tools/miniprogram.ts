@@ -3,6 +3,7 @@
  * Handles navigation, WX API calls, evaluation, and screenshots
  */
 
+import { join } from 'path'
 import type { SessionState } from '../types.js'
 
 /**
@@ -210,7 +211,6 @@ export async function screenshot(
 ): Promise<{
   success: boolean
   message: string
-  base64?: string
   path?: string
 }> {
   const { filename, fullPage = false } = args
@@ -226,58 +226,43 @@ export async function screenshot(
 
     logger?.info('Taking screenshot', { filename, fullPage })
 
-    // If no filename provided, return base64
-    if (!filename) {
-      const base64String = await session.miniProgram.screenshot()
-      logger?.info('Screenshot captured as base64')
-
-      return {
-        success: true,
-        message: 'Screenshot captured successfully',
-        base64: base64String,
-      }
-    }
-
-    // Filename provided - save to file
     if (!outputManager) {
       throw new Error('OutputManager not available')
     }
 
-    // Validate filename (security: prevent path traversal)
-    const { validateFilename } = await import('../core/validation.js')
-    try {
-      validateFilename(filename, ['png', 'jpg', 'jpeg'])
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      throw new Error(`Invalid filename: ${errorMessage}`)
-    }
+    const { validateFilename } = await import('../runtime/validation/validation.js')
 
-    // Ensure output directory exists
+    const resolvedFilename = filename
+      ? (() => {
+          validateFilename(filename, ['png', 'jpg', 'jpeg'])
+          return filename
+        })()
+      : (() => {
+          const generated = outputManager.generateFilename('screenshot', 'png')
+          validateFilename(generated, ['png', 'jpg', 'jpeg'])
+          return generated
+        })()
+
     await outputManager.ensureOutputDir()
 
-    // Get full path
-    const fullPath = await outputManager.writeFile(
-      filename,
-      Buffer.from([]) // Placeholder, will be overwritten
-    )
+    const fullPath = join(outputManager.getOutputDir(), resolvedFilename)
 
-    // Take screenshot using miniprogram-automator with path
     const screenshotBuffer = await session.miniProgram.screenshot({
       path: fullPath,
       fullPage,
     })
 
-    // If screenshot() doesn't write to file directly, write the buffer
+    let finalPath = fullPath
     if (screenshotBuffer) {
-      await outputManager.writeFile(filename, screenshotBuffer)
+      finalPath = await outputManager.writeFile(resolvedFilename, screenshotBuffer)
     }
 
-    logger?.info('Screenshot saved', { path: fullPath })
+    logger?.info('Screenshot saved', { path: finalPath })
 
     return {
       success: true,
       message: 'Screenshot saved to file',
-      path: fullPath,
+      path: finalPath,
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)

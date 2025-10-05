@@ -18,7 +18,7 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import { Tool, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 import type { SessionState } from '../types.js'
-import { ToolLogger } from '../core/tool-logger.js'
+import { ToolLogger } from '../runtime/logging/tool-logger.js'
 import * as automatorTools from './automator.js'
 import * as miniprogramTools from './miniprogram.js'
 import * as pageTools from './page.js'
