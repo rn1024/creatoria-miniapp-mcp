@@ -1,6 +1,6 @@
 {
   "name": "@creatoria/miniapp-mcp",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "MCP server for WeChat Mini Program automation using miniprogram-automator",
   "type": "module",
   "packageManager": "pnpm@9.0.0",
@@ -47,6 +47,7 @@
     "simulate:ai": "tsx tests/simulation/ai-mcp-simulator.ts",
     "simulate:quick": "tsx tests/simulation/quick-ai-test.ts",
     "simulate:scenario": "tsx tests/simulation/scenario-runner.ts",
+    "generate:schemas": "tsx scripts/generate-tool-schemas.ts",
     "prepare": "husky install"
   },
   "keywords": [
@@ -79,7 +80,8 @@
     "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.2",
+    "zod-to-json-schema": "^3.22.4"
   },
   "engines": {
     "node": ">=18.0.0"

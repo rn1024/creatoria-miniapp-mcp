@@ -64,7 +64,23 @@ export class MCPClient {
         CallToolRequestSchema
       )
 
-      return result as ToolCallResult
+      const anyResult = result as any
+      const normalizedContent = Array.isArray(anyResult?.content)
+        ? anyResult.content
+        : [
+            {
+              type: 'text',
+              text:
+                typeof anyResult === 'string'
+                  ? anyResult
+                  : JSON.stringify(anyResult, null, 2),
+            },
+          ]
+
+      return {
+        content: normalizedContent,
+        isError: anyResult?.isError === true,
+      }
     } catch (error) {
       // Preserve stack trace for better debugging
       const errorMessage =

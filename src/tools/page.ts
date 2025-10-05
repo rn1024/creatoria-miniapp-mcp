@@ -4,8 +4,8 @@
  */
 
 import type { SessionState } from '../types.js'
-import { resolvePage } from '../core/element-ref.js'
-import { generateRefId } from '../core/element-ref.js'
+import { resolvePage } from '../runtime/element/element-ref.js'
+import { generateRefId } from '../runtime/element/element-ref.js'
 
 /**
  * Query a single element on the page

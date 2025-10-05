@@ -216,7 +216,7 @@ export function loadConfig(
   }
 
   // Auto-detect project path if not specified
-  let finalCliConfig = { ...cliConfig }
+  const finalCliConfig = { ...cliConfig }
   if (!finalCliConfig.projectPath && !fileConfig.projectPath && !envConfig.projectPath) {
     const detected = autoDetectProjectPath()
     if (detected) {

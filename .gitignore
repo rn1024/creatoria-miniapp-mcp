@@ -51,6 +51,7 @@ test-miniapp/
 memory.json
 .mcp.json
 .claude/
+.workflow/
 
 # Session logs
 .llm/session_log/

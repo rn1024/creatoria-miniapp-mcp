@@ -261,10 +261,21 @@ See [examples/](./examples/) directory for complete workflows:
 
 ## Documentation
 
-- [API Reference](./docs/api/) - Complete API docs for all 65 tools
-- [Setup Guide](./docs/setup-guide.md) - Detailed setup instructions
+- [Directory & Code Guidelines](./docs/directory-structure-and-code-style-best-practices.md)
+- [Migration Overview](./docs/migration/README.md)
+- [Runtime Skeleton Mapping](./docs/migration/runtime-skeleton.md)
+- [Tool Schema Strategy](./docs/migration/tool-schema-strategy.md)
 - [Troubleshooting](./docs/troubleshooting.md) - Common issues and solutions
-- [Architecture](./docs/architecture.md) - System design and technical decisions
+- [完整实现方案](./docs/完整实现方案.md) - Detailed implementation blueprint (ZH)
+- [微信小程序自动化完整操作手册](./docs/微信小程序自动化完整操作手册.md) - Official automation guidance (ZH)
+
+## Migration Planning
+
+- Active branch: `migration-structure-prep`
+- Current focus: stabilize 0.1.x while reshaping runtime/app/capability layers
+- Task tracking: `.llm/task_cards/`, latest status in `.llm/state.json`
+- Schema generation: `pnpm generate:schemas`（根据 Zod schema 生成工具 JSON Schema）
+- Runtime layout: 详见 `docs/migration/runtime-skeleton.md`
 
 ## Development
 
