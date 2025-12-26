@@ -56,6 +56,16 @@ export const DEFAULT_TIMEOUTS = {
   connect: 30000,
   /** Timeout for screenshot operations (10 seconds) */
   screenshot: 10000,
+  /** Timeout for fullPage screenshot operations (30 seconds) */
+  screenshotFullPage: 30000,
+  /** Timeout for navigation operations (30 seconds) */
+  navigation: 30000,
+  /** Timeout for callWx operations (10 seconds) */
+  callWx: 10000,
+  /** Timeout for pageStack operations (5 seconds) */
+  pageStack: 5000,
+  /** Timeout for systemInfo operations (5 seconds) */
+  systemInfo: 5000,
   /** Timeout for waitFor operations (30 seconds) */
   waitFor: 30000,
   /** Timeout for element queries (10 seconds) */

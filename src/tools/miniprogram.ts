@@ -1,10 +1,14 @@
 /**
  * MiniProgram tool implementations
  * Handles navigation, WX API calls, evaluation, and screenshots
+ *
+ * All async operations are protected with timeouts to prevent hanging.
  */
 
 import { join } from 'path'
 import type { SessionState } from '../types.js'
+import { withTimeout, getTimeout, DEFAULT_TIMEOUTS } from '../runtime/timeout/timeout.js'
+import { withRetry, RetryPredicates } from '../runtime/retry/retry.js'
 
 /**
  * Navigate to a page in the mini program
@@ -34,7 +38,10 @@ export async function navigate(
 
     logger?.info(`Navigating using ${method}`, { url, delta })
 
-    // Execute navigation method
+    // Get timeout for navigation operations
+    const timeoutMs = getTimeout(session.config?.timeout, DEFAULT_TIMEOUTS.navigation)
+
+    // Execute navigation method with timeout protection
     switch (method) {
       case 'navigateTo':
       case 'redirectTo':
@@ -43,19 +50,31 @@ export async function navigate(
         if (!url) {
           throw new Error(`URL is required for ${method}`)
         }
-        await session.miniProgram[method](url)
+        await withTimeout(
+          session.miniProgram[method](url),
+          timeoutMs,
+          `Navigation (${method})`
+        )
         break
 
       case 'navigateBack':
-        await session.miniProgram.navigateBack(delta)
+        await withTimeout(
+          session.miniProgram.navigateBack(delta),
+          timeoutMs,
+          'Navigation (navigateBack)'
+        )
         break
 
       default:
         throw new Error(`Unknown navigation method: ${method}`)
     }
 
-    // Get current page after navigation
-    const currentPage = await session.miniProgram.currentPage()
+    // Get current page after navigation with timeout
+    const currentPage = await withTimeout(
+      session.miniProgram.currentPage(),
+      DEFAULT_TIMEOUTS.pageStack,
+      'Get current page'
+    ) as { path?: string } | null
     const currentPath = currentPage?.path || 'unknown'
 
     logger?.info(`Navigation successful, current page: ${currentPath}`)
@@ -103,8 +122,15 @@ export async function callWx(
 
     logger?.info(`Calling wx.${method}`, { args: wxArgs })
 
-    // Call WX API method
-    const result = await session.miniProgram.callWxMethod(method, ...wxArgs)
+    // Get timeout for wx API calls
+    const timeoutMs = getTimeout(session.config?.timeout, DEFAULT_TIMEOUTS.callWx)
+
+    // Call WX API method with timeout protection
+    const result = await withTimeout(
+      session.miniProgram.callWxMethod(method, ...wxArgs),
+      timeoutMs,
+      `wx.${method} call`
+    )
 
     logger?.info(`wx.${method} call successful`, { result })
 
@@ -164,9 +190,6 @@ export async function evaluate(
       timestamp: new Date().toISOString(),
     })
 
-    // Import timeout utilities
-    const { withTimeout, getTimeout, DEFAULT_TIMEOUTS } = await import('../core/timeout.js')
-
     // Get timeout from config or use default (5 seconds for evaluate)
     const timeoutMs = getTimeout(session.config?.evaluateTimeout, DEFAULT_TIMEOUTS.evaluate)
 
@@ -200,22 +223,31 @@ export async function evaluate(
 
 /**
  * Take a screenshot of the mini program
- * Returns base64 string by default, or saves to file if filename is provided
+ * Returns base64 string if returnBase64 is true, otherwise saves to file
+ *
+ * @param session - Session state
+ * @param args - Screenshot options
+ * @param args.filename - Optional filename to save screenshot (auto-generated if not provided)
+ * @param args.fullPage - Whether to capture the full page including scroll area
+ * @param args.returnBase64 - Return screenshot as base64 string instead of saving to file
  */
 export async function screenshot(
   session: SessionState,
   args: {
     filename?: string
     fullPage?: boolean
+    returnBase64?: boolean
   } = {}
 ): Promise<{
   success: boolean
   message: string
   path?: string
+  base64?: string
 }> {
-  const { filename, fullPage = false } = args
+  const { filename, fullPage = false, returnBase64 = false } = args
   const logger = session.logger
   const outputManager = session.outputManager
+  const startTime = Date.now()
 
   try {
     if (!session.miniProgram) {
@@ -224,10 +256,56 @@ export async function screenshot(
       )
     }
 
-    logger?.info('Taking screenshot', { filename, fullPage })
+    // Calculate timeout: use longer timeout for fullPage screenshots
+    const baseTimeout = getTimeout(session.config?.screenshotTimeout, DEFAULT_TIMEOUTS.screenshot)
+    const timeoutMs = fullPage ? DEFAULT_TIMEOUTS.screenshotFullPage : baseTimeout
 
+    logger?.info('Taking screenshot', { filename, fullPage, returnBase64, timeoutMs })
+
+    // If returnBase64 is true and no filename, return base64 directly (fast path)
+    if (returnBase64 && !filename) {
+      const buffer = (await withRetry(
+        () =>
+          withTimeout(
+            session.miniProgram.screenshot({ fullPage }),
+            timeoutMs,
+            'Screenshot capture (base64)'
+          ),
+        {
+          maxRetries: 2,
+          delayMs: 1000,
+          shouldRetry: RetryPredicates.onTransientError,
+          onRetry: (attempt, error, delay) => {
+            logger?.warn(`Screenshot retry attempt ${attempt}`, {
+              error: error.message,
+              nextDelayMs: delay,
+            })
+          },
+        }
+      )) as Buffer | string
+
+      const duration = Date.now() - startTime
+      const bufferLength = buffer instanceof Buffer ? buffer.length : buffer?.length
+      logger?.info('Screenshot captured (base64)', {
+        duration,
+        fullPage,
+        size: bufferLength,
+      })
+
+      // Handle both Buffer and string return types from SDK
+      const base64String =
+        buffer instanceof Buffer ? buffer.toString('base64') : typeof buffer === 'string' ? buffer : String(buffer)
+
+      return {
+        success: true,
+        message: 'Screenshot captured successfully',
+        base64: base64String,
+      }
+    }
+
+    // File saving path
     if (!outputManager) {
-      throw new Error('OutputManager not available')
+      throw new Error('OutputManager not available. Set outputDir in config or use returnBase64=true.')
     }
 
     const { validateFilename } = await import('../runtime/validation/validation.js')
@@ -247,28 +325,77 @@ export async function screenshot(
 
     const fullPath = join(outputManager.getOutputDir(), resolvedFilename)
 
-    const screenshotBuffer = await session.miniProgram.screenshot({
-      path: fullPath,
-      fullPage,
-    })
+    // Screenshot with timeout and retry protection
+    const screenshotBuffer = (await withRetry(
+      () =>
+        withTimeout(
+          session.miniProgram.screenshot({
+            path: fullPath,
+            fullPage,
+          }),
+          timeoutMs,
+          'Screenshot capture'
+        ),
+      {
+        maxRetries: 2,
+        delayMs: 1000,
+        shouldRetry: RetryPredicates.onTransientError,
+        onRetry: (attempt, error, delay) => {
+          logger?.warn(`Screenshot retry attempt ${attempt}`, {
+            error: error.message,
+            nextDelayMs: delay,
+          })
+        },
+      }
+    )) as Buffer | string | undefined
 
     let finalPath = fullPath
     if (screenshotBuffer) {
-      finalPath = await outputManager.writeFile(resolvedFilename, screenshotBuffer)
+      const bufferData = screenshotBuffer instanceof Buffer ? screenshotBuffer : Buffer.from(screenshotBuffer)
+      finalPath = await outputManager.writeFile(resolvedFilename, bufferData)
     }
 
-    logger?.info('Screenshot saved', { path: finalPath })
+    const duration = Date.now() - startTime
+    const bufferSize = screenshotBuffer instanceof Buffer ? screenshotBuffer.length : screenshotBuffer?.length
+    logger?.info('Screenshot saved', {
+      path: finalPath,
+      duration,
+      fullPage,
+      size: bufferSize,
+    })
 
-    return {
+    // If returnBase64 is also requested, include base64 in response
+    const result: {
+      success: boolean
+      message: string
+      path: string
+      base64?: string
+    } = {
       success: true,
       message: 'Screenshot saved to file',
       path: finalPath,
     }
+
+    if (returnBase64 && screenshotBuffer) {
+      result.base64 =
+        screenshotBuffer instanceof Buffer
+          ? screenshotBuffer.toString('base64')
+          : typeof screenshotBuffer === 'string'
+            ? screenshotBuffer
+            : String(screenshotBuffer)
+    }
+
+    return result
   } catch (error) {
+    const duration = Date.now() - startTime
     const errorMessage = error instanceof Error ? error.message : String(error)
+
     logger?.error('Screenshot failed', {
       error: errorMessage,
       filename,
+      fullPage,
+      returnBase64,
+      duration,
     })
 
     throw new Error(`Screenshot failed: ${errorMessage}`)
@@ -294,7 +421,13 @@ export async function getPageStack(session: SessionState): Promise<{
 
     logger?.info('Getting page stack')
 
-    const pageStack = await session.miniProgram.pageStack()
+    // Get page stack with timeout protection
+    const timeoutMs = getTimeout(session.config?.timeout, DEFAULT_TIMEOUTS.pageStack)
+    const pageStack = await withTimeout(
+      session.miniProgram.pageStack(),
+      timeoutMs,
+      'Get page stack'
+    ) as any[]
 
     // Update session page stack
     session.pages = pageStack
@@ -338,7 +471,13 @@ export async function getSystemInfo(session: SessionState): Promise<{
 
     logger?.info('Getting system information')
 
-    const systemInfo = await session.miniProgram.systemInfo()
+    // Get system info with timeout protection
+    const timeoutMs = getTimeout(session.config?.timeout, DEFAULT_TIMEOUTS.systemInfo)
+    const systemInfo = await withTimeout(
+      session.miniProgram.systemInfo(),
+      timeoutMs,
+      'Get system info'
+    )
 
     logger?.info('System information retrieved')
 

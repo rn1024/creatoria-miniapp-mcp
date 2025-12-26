@@ -176,18 +176,22 @@ export const MINIPROGRAM_TOOLS: Tool[] = [
   {
     name: 'miniprogram_screenshot',
     description:
-      'Take a screenshot of the mini program. Returns base64 string by default, or saves to file if filename is provided.',
+      'Take a screenshot of the mini program. Use returnBase64=true for quick base64 response, or provide filename to save to file.',
     inputSchema: {
       type: 'object',
       properties: {
         filename: {
           type: 'string',
           description:
-            'Optional filename to save screenshot to file. If not provided, returns base64 string instead.',
+            'Optional filename to save screenshot to file. If not provided and returnBase64=true, returns base64 string directly.',
         },
         fullPage: {
           type: 'boolean',
-          description: 'Whether to capture the full page (default: false)',
+          description: 'Whether to capture the full page including scroll area (default: false). Note: fullPage screenshots use longer timeout (30s vs 10s).',
+        },
+        returnBase64: {
+          type: 'boolean',
+          description: 'Return screenshot as base64 string. If true and no filename provided, returns base64 directly without saving file. (default: false)',
         },
       },
     },
