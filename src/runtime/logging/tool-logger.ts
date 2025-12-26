@@ -373,8 +373,8 @@ export class ToolLogger {
       // 3. Capture page snapshot
       const snapshotFilename = join(failureDir, 'snapshot.json')
 
-      const snapshotTools = await import('../../tools/snapshot.js')
-      await snapshotTools.snapshotPage(session, {
+      const snapshotHandlers = await import('../../capabilities/snapshot/handlers/index.js')
+      await snapshotHandlers.snapshotPage(session, {
         filename: snapshotFilename,
         includeScreenshot: true,
         fullPage: false,

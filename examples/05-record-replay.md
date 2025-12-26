@@ -1300,17 +1300,22 @@ jobs:
 
 **测试脚本** (`scripts/run-regression-tests.js`):
 ```javascript
-import { record_list, record_replay } from '../src/tools/record.js'
-import { miniprogram_launch, miniprogram_close } from '../src/tools/automator.js'
+// 注意：这是概念性示例，展示 MCP 工具的使用模式
+// 实际使用时需要通过 MCP 客户端调用这些工具
 
-async function runRegressionTests() {
-  await miniprogram_launch({ projectPath: process.env.PROJECT_PATH })
+async function runRegressionTests(mcpClient) {
+  // 使用 MCP 工具启动小程序
+  await mcpClient.callTool('miniprogram_launch', {
+    projectPath: process.env.PROJECT_PATH
+  })
 
-  const { sequences } = await record_list()
+  // 获取所有录制序列
+  const { sequences } = await mcpClient.callTool('record_list_sequences')
   const results = []
 
   for (const seq of sequences) {
-    const result = await record_replay({
+    // 回放每个序列
+    const result = await mcpClient.callTool('record_replay_sequence', {
       sequenceId: seq.id,
       continueOnError: true
     })
@@ -1322,7 +1327,8 @@ async function runRegressionTests() {
     })
   }
 
-  await miniprogram_close()
+  // 关闭小程序
+  await mcpClient.callTool('miniprogram_close')
 
   // 生成 HTML 报告
   generateReport(results)

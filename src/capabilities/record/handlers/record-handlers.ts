@@ -1,11 +1,39 @@
 /**
- * Recording and replay tool implementations
- * Handles action sequence recording, saving, and replay
+ * Record handlers - Action recording and replay utilities
  */
 
 import { promises as fs } from 'fs'
 import path from 'path'
-import type { SessionState, ActionSequence, RecordedAction } from '../types.js'
+import type { SessionState, ActionSequence, RecordedAction } from '../../../types.js'
+import type { ToolHandler } from '../../registry.js'
+
+/**
+ * Build a handler lookup map by loading all capabilities
+ * This is used for sequence replay to call handlers by tool name
+ */
+async function getHandlerMap(): Promise<Map<string, ToolHandler>> {
+  const handlers = new Map<string, ToolHandler>()
+
+  // Dynamically import all capability modules and collect handlers
+  const automator = await import('../../automator/index.js')
+  const miniprogram = await import('../../miniprogram/index.js')
+  const page = await import('../../page/index.js')
+  const element = await import('../../element/index.js')
+  const assert = await import('../../assert/index.js')
+  const snapshot = await import('../../snapshot/index.js')
+  const network = await import('../../network/index.js')
+
+  // Register all tools from each capability
+  for (const capability of [automator, miniprogram, page, element, assert, snapshot, network]) {
+    if (capability.capability?.tools) {
+      for (const tool of capability.capability.tools) {
+        handlers.set(tool.name, tool.handler)
+      }
+    }
+  }
+
+  return handlers
+}
 
 /**
  * Generate a unique sequence ID
@@ -29,32 +57,32 @@ async function ensureSequencesDir(session: SessionState): Promise<void> {
   await fs.mkdir(dir, { recursive: true })
 }
 
-/**
- * Start recording actions
- */
-export async function startRecording(
-  session: SessionState,
-  args: {
-    name?: string
-    description?: string
-  } = {}
-): Promise<{
+// ============================================================================
+// Recording Control
+// ============================================================================
+
+export interface StartRecordingArgs {
+  name?: string
+  description?: string
+}
+
+export interface StartRecordingResult {
   success: boolean
   message: string
   sequenceId?: string
-}> {
+}
+
+export async function startRecording(session: SessionState, args: StartRecordingArgs = {}): Promise<StartRecordingResult> {
   const { name = `Recording ${new Date().toISOString()}`, description } = args
   const logger = session.logger
 
   try {
     logger?.info('Starting recording', { name })
 
-    // Check if already recording
     if (session.recording?.isRecording) {
       throw new Error('Already recording. Stop current recording first.')
     }
 
-    // Initialize recording state
     const sequenceId = generateSequenceId()
     session.recording = {
       isRecording: true,
@@ -69,12 +97,7 @@ export async function startRecording(
     }
 
     logger?.info('Recording started', { sequenceId, name })
-
-    return {
-      success: true,
-      message: `Recording started: ${name}`,
-      sequenceId,
-    }
+    return { success: true, message: `Recording started: ${name}`, sequenceId }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     logger?.error('Failed to start recording', { error: errorMessage })
@@ -82,28 +105,25 @@ export async function startRecording(
   }
 }
 
-/**
- * Stop recording and save sequence
- */
-export async function stopRecording(
-  session: SessionState,
-  args: {
-    save?: boolean
-  } = {}
-): Promise<{
+export interface StopRecordingArgs {
+  save?: boolean
+}
+
+export interface StopRecordingResult {
   success: boolean
   message: string
   sequenceId?: string
   actionCount?: number
   filePath?: string
-}> {
+}
+
+export async function stopRecording(session: SessionState, args: StopRecordingArgs = {}): Promise<StopRecordingResult> {
   const { save = true } = args
   const logger = session.logger
 
   try {
     logger?.info('Stopping recording')
 
-    // Check if recording
     if (!session.recording?.isRecording || !session.recording.currentSequence) {
       throw new Error('Not currently recording')
     }
@@ -111,27 +131,18 @@ export async function stopRecording(
     const sequence = session.recording.currentSequence
     const actionCount = sequence.actions.length
 
-    // Stop recording
     session.recording.isRecording = false
 
     let filePath: string | undefined
 
-    // Save sequence if requested
     if (save) {
       await ensureSequencesDir(session)
       const filename = `${sequence.id}.json`
       filePath = path.join(getSequencesDir(session), filename)
-
       await fs.writeFile(filePath, JSON.stringify(sequence, null, 2), 'utf-8')
-
-      logger?.info('Sequence saved', {
-        sequenceId: sequence.id,
-        filePath,
-        actionCount,
-      })
+      logger?.info('Sequence saved', { sequenceId: sequence.id, filePath, actionCount })
     }
 
-    // Clear recording state
     session.recording = undefined
 
     return {
@@ -149,9 +160,7 @@ export async function stopRecording(
 }
 
 /**
- * Record an action (internal helper, called by tool wrapper)
- *
- * Thread-safe: Captures recording state atomically to prevent race conditions
+ * Record an action (internal helper)
  */
 export function recordAction(
   session: SessionState,
@@ -161,7 +170,6 @@ export function recordAction(
   duration?: number,
   error?: string
 ): void {
-  // Atomically capture recording state
   const recording = session.recording
   if (!recording || !recording.isRecording) {
     return
@@ -181,23 +189,18 @@ export function recordAction(
       success,
       error,
     }
-
-    // Atomically push action
-    // If recording was stopped between the checks above and here,
-    // the action will still be recorded (which is acceptable - better than losing it)
     currentSequence.actions.push(action)
   } catch (error) {
-    // Handle potential race condition where currentSequence becomes invalid
     const errorMessage = error instanceof Error ? error.message : String(error)
     console.error(`Failed to record action for ${toolName}:`, errorMessage)
-    // Silently fail - don't break the actual tool execution
   }
 }
 
-/**
- * List all saved sequences
- */
-export async function listSequences(session: SessionState): Promise<{
+// ============================================================================
+// Sequence Management
+// ============================================================================
+
+export interface ListSequencesResult {
   success: boolean
   message: string
   sequences: Array<{
@@ -207,7 +210,9 @@ export async function listSequences(session: SessionState): Promise<{
     createdAt: string
     actionCount: number
   }>
-}> {
+}
+
+export async function listSequences(session: SessionState): Promise<ListSequencesResult> {
   const logger = session.logger
 
   try {
@@ -235,12 +240,7 @@ export async function listSequences(session: SessionState): Promise<{
     }
 
     logger?.info('Sequences listed', { count: sequences.length })
-
-    return {
-      success: true,
-      message: `Found ${sequences.length} sequences`,
-      sequences,
-    }
+    return { success: true, message: `Found ${sequences.length} sequences`, sequences }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     logger?.error('Failed to list sequences', { error: errorMessage })
@@ -248,19 +248,17 @@ export async function listSequences(session: SessionState): Promise<{
   }
 }
 
-/**
- * Get a specific sequence
- */
-export async function getSequence(
-  session: SessionState,
-  args: {
-    sequenceId: string
-  }
-): Promise<{
+export interface GetSequenceArgs {
+  sequenceId: string
+}
+
+export interface GetSequenceResult {
   success: boolean
   message: string
   sequence: ActionSequence
-}> {
+}
+
+export async function getSequence(session: SessionState, args: GetSequenceArgs): Promise<GetSequenceResult> {
   const { sequenceId } = args
   const logger = session.logger
 
@@ -269,20 +267,11 @@ export async function getSequence(
 
     await ensureSequencesDir(session)
     const filePath = path.join(getSequencesDir(session), `${sequenceId}.json`)
-
     const content = await fs.readFile(filePath, 'utf-8')
     const sequence: ActionSequence = JSON.parse(content)
 
-    logger?.info('Sequence retrieved', {
-      sequenceId,
-      actionCount: sequence.actions.length,
-    })
-
-    return {
-      success: true,
-      message: `Sequence retrieved: ${sequence.name}`,
-      sequence,
-    }
+    logger?.info('Sequence retrieved', { sequenceId, actionCount: sequence.actions.length })
+    return { success: true, message: `Sequence retrieved: ${sequence.name}`, sequence }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     logger?.error('Failed to get sequence', { error: errorMessage, sequenceId })
@@ -290,18 +279,16 @@ export async function getSequence(
   }
 }
 
-/**
- * Delete a sequence
- */
-export async function deleteSequence(
-  session: SessionState,
-  args: {
-    sequenceId: string
-  }
-): Promise<{
+export interface DeleteSequenceArgs {
+  sequenceId: string
+}
+
+export interface DeleteSequenceResult {
   success: boolean
   message: string
-}> {
+}
+
+export async function deleteSequence(session: SessionState, args: DeleteSequenceArgs): Promise<DeleteSequenceResult> {
   const { sequenceId } = args
   const logger = session.logger
 
@@ -312,31 +299,24 @@ export async function deleteSequence(
     await fs.unlink(filePath)
 
     logger?.info('Sequence deleted', { sequenceId })
-
-    return {
-      success: true,
-      message: `Sequence deleted: ${sequenceId}`,
-    }
+    return { success: true, message: `Sequence deleted: ${sequenceId}` }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    logger?.error('Failed to delete sequence', {
-      error: errorMessage,
-      sequenceId,
-    })
+    logger?.error('Failed to delete sequence', { error: errorMessage, sequenceId })
     throw new Error(`Failed to delete sequence: ${errorMessage}`)
   }
 }
 
-/**
- * Replay a recorded sequence
- */
-export async function replaySequence(
-  session: SessionState,
-  args: {
-    sequenceId: string
-    continueOnError?: boolean
-  }
-): Promise<{
+// ============================================================================
+// Replay
+// ============================================================================
+
+export interface ReplaySequenceArgs {
+  sequenceId: string
+  continueOnError?: boolean
+}
+
+export interface ReplaySequenceResult {
   success: boolean
   message: string
   totalActions: number
@@ -347,63 +327,45 @@ export async function replaySequence(
     success: boolean
     error?: string
   }>
-}> {
+}
+
+export async function replaySequence(session: SessionState, args: ReplaySequenceArgs): Promise<ReplaySequenceResult> {
   const { sequenceId, continueOnError = false } = args
   const logger = session.logger
 
   try {
     logger?.info('Replaying sequence', { sequenceId, continueOnError })
 
-    // Get sequence
     const { sequence } = await getSequence(session, { sequenceId })
-
-    // Import tools dynamically
-    const tools = await import('./index.js')
+    const handlers = await getHandlerMap()
 
     const results = []
     let successCount = 0
     let failureCount = 0
 
-    // Replay each action
     for (const action of sequence.actions) {
       const startTime = Date.now()
 
       try {
-        // Get tool function
-        const toolFn = (tools as any)[action.toolName]
-        if (!toolFn || typeof toolFn !== 'function') {
+        const toolFn = handlers.get(action.toolName)
+        if (!toolFn) {
           throw new Error(`Tool not found: ${action.toolName}`)
         }
 
-        // Execute tool
         await toolFn(session, action.args)
 
         const duration = Date.now() - startTime
-        logger?.info('Action replayed successfully', {
-          toolName: action.toolName,
-          duration,
-        })
+        logger?.info('Action replayed successfully', { toolName: action.toolName, duration })
 
-        results.push({
-          toolName: action.toolName,
-          success: true,
-        })
+        results.push({ toolName: action.toolName, success: true })
         successCount++
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error)
         const duration = Date.now() - startTime
 
-        logger?.error('Action replay failed', {
-          toolName: action.toolName,
-          error: errorMessage,
-          duration,
-        })
+        logger?.error('Action replay failed', { toolName: action.toolName, error: errorMessage, duration })
 
-        results.push({
-          toolName: action.toolName,
-          success: false,
-          error: errorMessage,
-        })
+        results.push({ toolName: action.toolName, success: false, error: errorMessage })
         failureCount++
 
         if (!continueOnError) {
@@ -412,12 +374,7 @@ export async function replaySequence(
       }
     }
 
-    logger?.info('Sequence replay completed', {
-      sequenceId,
-      totalActions: sequence.actions.length,
-      successCount,
-      failureCount,
-    })
+    logger?.info('Sequence replay completed', { sequenceId, totalActions: sequence.actions.length, successCount, failureCount })
 
     return {
       success: failureCount === 0,
@@ -429,10 +386,7 @@ export async function replaySequence(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    logger?.error('Failed to replay sequence', {
-      error: errorMessage,
-      sequenceId,
-    })
+    logger?.error('Failed to replay sequence', { error: errorMessage, sequenceId })
     throw new Error(`Failed to replay sequence: ${errorMessage}`)
   }
 }

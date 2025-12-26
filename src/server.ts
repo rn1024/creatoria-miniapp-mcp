@@ -7,7 +7,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 import type { ServerConfig } from './types.js'
 import { SessionStore } from './runtime/session/index.js'
-import { registerTools } from './tools/index.js'
+import { setupCapabilities } from './capabilities/loader.js'
 import { mergeServerConfig } from './config/defaults.js'
 
 export async function startServer(config: Partial<ServerConfig> = {}): Promise<Server> {
@@ -54,9 +54,9 @@ export async function startServer(config: Partial<ServerConfig> = {}): Promise<S
     }
   )
 
-  // Register tools based on capabilities
-  // registerTools now actually registers the CallToolRequestSchema handler
-  const tools = registerTools(server, {
+  // Register tools based on capabilities using new architecture
+  // setupCapabilities loads capability modules dynamically and registers handlers
+  const { tools } = await setupCapabilities(server, {
     capabilities,
     sessionId, // Pass the unique session ID
     getSession: (sid) => {

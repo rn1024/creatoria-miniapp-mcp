@@ -2,7 +2,7 @@
  * Unit tests for Page tools
  */
 
-import * as pageTools from '../../src/tools/page'
+import * as pageTools from '../../src/capabilities/page/handlers/index'
 import type { SessionState } from '../../src/types'
 
 describe('Page Tools', () => {

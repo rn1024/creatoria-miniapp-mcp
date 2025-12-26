@@ -2,7 +2,7 @@
  * Unit tests for Automator tools
  */
 
-import * as automatorTools from '../../src/tools/automator'
+import * as automatorTools from '../../src/capabilities/automator/handlers/index'
 import type { SessionState } from '../../src/types'
 import automator from 'miniprogram-automator'
 

@@ -1,29 +1,39 @@
 /**
- * Page tool implementations
- * Handles page-level operations: query elements, data access, method calls
+ * Page handlers - Page-level operations
+ * Handles element queries, data access, method calls, and page metrics
  */
 
-import type { SessionState } from '../types.js'
-import { resolvePage } from '../runtime/element/element-ref.js'
-import { generateRefId } from '../runtime/element/element-ref.js'
+import type { SessionState } from '../../../types.js'
+import { resolvePage, generateRefId } from '../../../runtime/element/element-ref.js'
+
+// ============================================================================
+// Query Handlers
+// ============================================================================
+
+/**
+ * Query input arguments
+ */
+export interface QueryArgs {
+  selector: string
+  pagePath?: string
+  save?: boolean
+}
+
+/**
+ * Query result
+ */
+export interface QueryResult {
+  success: boolean
+  message: string
+  refId?: string
+  exists: boolean
+}
 
 /**
  * Query a single element on the page
  * Returns an ElementRef that can be used in subsequent element operations
  */
-export async function query(
-  session: SessionState,
-  args: {
-    selector: string
-    pagePath?: string
-    save?: boolean
-  }
-): Promise<{
-  success: boolean
-  message: string
-  refId?: string
-  exists: boolean
-}> {
+export async function query(session: SessionState, args: QueryArgs): Promise<QueryResult> {
   const { selector, pagePath, save = true } = args
   const logger = session.logger
 
@@ -36,10 +46,7 @@ export async function query(
 
     logger?.info('Querying element', { selector, pagePath })
 
-    // Resolve page (current or specified)
     const page = await resolvePage(session, pagePath)
-
-    // Query element
     const element = await page.$(selector)
 
     if (!element) {
@@ -51,7 +58,6 @@ export async function query(
       }
     }
 
-    // Save element to session if requested
     let refId: string | undefined
     if (save) {
       refId = generateRefId()
@@ -73,32 +79,34 @@ export async function query(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    logger?.error('Query failed', {
-      error: errorMessage,
-      selector,
-    })
-
+    logger?.error('Query failed', { error: errorMessage, selector })
     throw new Error(`Query failed: ${errorMessage}`)
   }
 }
 
 /**
- * Query all matching elements on the page
- * Returns an array of ElementRefs
+ * QueryAll input arguments
  */
-export async function queryAll(
-  session: SessionState,
-  args: {
-    selector: string
-    pagePath?: string
-    save?: boolean
-  }
-): Promise<{
+export interface QueryAllArgs {
+  selector: string
+  pagePath?: string
+  save?: boolean
+}
+
+/**
+ * QueryAll result
+ */
+export interface QueryAllResult {
   success: boolean
   message: string
   refIds?: string[]
   count: number
-}> {
+}
+
+/**
+ * Query all matching elements on the page
+ */
+export async function queryAll(session: SessionState, args: QueryAllArgs): Promise<QueryAllResult> {
   const { selector, pagePath, save = true } = args
   const logger = session.logger
 
@@ -111,16 +119,12 @@ export async function queryAll(
 
     logger?.info('Querying all elements', { selector, pagePath })
 
-    // Resolve page (current or specified)
     const page = await resolvePage(session, pagePath)
-
-    // Query all elements
     const elements = await page.$$(selector)
     const count = elements.length
 
     logger?.info(`Found ${count} elements`, { selector })
 
-    // Save elements to session if requested
     let refIds: string[] | undefined
     if (save && count > 0) {
       refIds = []
@@ -144,31 +148,37 @@ export async function queryAll(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    logger?.error('QueryAll failed', {
-      error: errorMessage,
-      selector,
-    })
-
+    logger?.error('QueryAll failed', { error: errorMessage, selector })
     throw new Error(`QueryAll failed: ${errorMessage}`)
   }
 }
 
+// ============================================================================
+// Wait Handler
+// ============================================================================
+
 /**
- * Wait for a condition to be met
- * Supports: selector (string), timeout (number), or function
+ * WaitFor input arguments
  */
-export async function waitFor(
-  session: SessionState,
-  args: {
-    condition: string | number
-    pagePath?: string
-    timeout?: number
-  }
-): Promise<{
+export interface WaitForArgs {
+  condition: string | number
+  pagePath?: string
+  timeout?: number
+}
+
+/**
+ * WaitFor result
+ */
+export interface WaitForResult {
   success: boolean
   message: string
-}> {
-  const { condition, pagePath, timeout } = args
+}
+
+/**
+ * Wait for a condition to be met
+ */
+export async function waitFor(session: SessionState, args: WaitForArgs): Promise<WaitForResult> {
+  const { condition, pagePath } = args
   const logger = session.logger
 
   try {
@@ -178,12 +188,10 @@ export async function waitFor(
       )
     }
 
-    logger?.info('Waiting for condition', { condition, pagePath, timeout })
+    logger?.info('Waiting for condition', { condition, pagePath })
 
-    // Resolve page (current or specified)
     const page = await resolvePage(session, pagePath)
 
-    // Wait for condition
     if (typeof condition === 'number') {
       await page.waitFor(condition)
       logger?.info(`Waited for ${condition}ms`)
@@ -192,7 +200,6 @@ export async function waitFor(
         message: `Waited for ${condition}ms`,
       }
     } else {
-      // String condition (selector)
       await page.waitFor(condition)
       logger?.info(`Waited for selector: ${condition}`)
       return {
@@ -202,30 +209,39 @@ export async function waitFor(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    logger?.error('WaitFor failed', {
-      error: errorMessage,
-      condition,
-    })
-
+    logger?.error('WaitFor failed', { error: errorMessage, condition })
     throw new Error(`WaitFor failed: ${errorMessage}`)
   }
 }
 
+// ============================================================================
+// Data Handlers
+// ============================================================================
+
 /**
- * Get page data
- * Optionally specify a path to get nested data
+ * GetData input arguments
  */
-export async function getData(
-  session: SessionState,
-  args: {
-    path?: string
-    pagePath?: string
-  } = {}
-): Promise<{
+export interface GetDataArgs {
+  path?: string
+  pagePath?: string
+}
+
+/**
+ * GetData result
+ */
+export interface GetDataResult {
   success: boolean
   message: string
   data: any
-}> {
+}
+
+/**
+ * Get page data
+ */
+export async function getData(
+  session: SessionState,
+  args: GetDataArgs = {}
+): Promise<GetDataResult> {
   const { path, pagePath } = args
   const logger = session.logger
 
@@ -238,10 +254,7 @@ export async function getData(
 
     logger?.info('Getting page data', { path, pagePath })
 
-    // Resolve page (current or specified)
     const page = await resolvePage(session, pagePath)
-
-    // Get data
     const data = await page.data(path)
 
     logger?.info('Page data retrieved', { path, dataType: typeof data })
@@ -253,29 +266,31 @@ export async function getData(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    logger?.error('GetData failed', {
-      error: errorMessage,
-      path,
-    })
-
+    logger?.error('GetData failed', { error: errorMessage, path })
     throw new Error(`GetData failed: ${errorMessage}`)
   }
 }
 
 /**
- * Set page data
- * Updates the page's data object
+ * SetData input arguments
  */
-export async function setData(
-  session: SessionState,
-  args: {
-    data: Record<string, any>
-    pagePath?: string
-  }
-): Promise<{
+export interface SetDataArgs {
+  data: Record<string, any>
+  pagePath?: string
+}
+
+/**
+ * SetData result
+ */
+export interface SetDataResult {
   success: boolean
   message: string
-}> {
+}
+
+/**
+ * Set page data
+ */
+export async function setData(session: SessionState, args: SetDataArgs): Promise<SetDataResult> {
   const { data, pagePath } = args
   const logger = session.logger
 
@@ -288,10 +303,7 @@ export async function setData(
 
     logger?.info('Setting page data', { data, pagePath })
 
-    // Resolve page (current or specified)
     const page = await resolvePage(session, pagePath)
-
-    // Set data
     await page.setData(data)
 
     logger?.info('Page data set successfully', { keys: Object.keys(data) })
@@ -302,31 +314,40 @@ export async function setData(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    logger?.error('SetData failed', {
-      error: errorMessage,
-      data,
-    })
-
+    logger?.error('SetData failed', { error: errorMessage, data })
     throw new Error(`SetData failed: ${errorMessage}`)
   }
 }
 
+// ============================================================================
+// Method Handler
+// ============================================================================
+
 /**
- * Call a method on the page
- * Invokes a method defined in the page's JS logic
+ * CallMethod input arguments
  */
-export async function callMethod(
-  session: SessionState,
-  args: {
-    method: string
-    args?: any[]
-    pagePath?: string
-  }
-): Promise<{
+export interface CallMethodArgs {
+  method: string
+  args?: any[]
+  pagePath?: string
+}
+
+/**
+ * CallMethod result
+ */
+export interface CallMethodResult {
   success: boolean
   message: string
   result?: any
-}> {
+}
+
+/**
+ * Call a method on the page
+ */
+export async function callMethod(
+  session: SessionState,
+  args: CallMethodArgs
+): Promise<CallMethodResult> {
   const { method, args: methodArgs = [], pagePath } = args
   const logger = session.logger
 
@@ -339,10 +360,7 @@ export async function callMethod(
 
     logger?.info('Calling page method', { method, args: methodArgs, pagePath })
 
-    // Resolve page (current or specified)
     const page = await resolvePage(session, pagePath)
-
-    // Call method
     const result = await page.callMethod(method, ...methodArgs)
 
     logger?.info('Page method called successfully', { method, result })
@@ -354,25 +372,26 @@ export async function callMethod(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    logger?.error('CallMethod failed', {
-      error: errorMessage,
-      method,
-    })
-
+    logger?.error('CallMethod failed', { error: errorMessage, method })
     throw new Error(`CallMethod failed: ${errorMessage}`)
   }
 }
 
+// ============================================================================
+// Size & Scroll Handlers
+// ============================================================================
+
 /**
- * Get page size
- * Returns page width, height, and scrollable height
+ * GetSize input arguments
  */
-export async function getSize(
-  session: SessionState,
-  args: {
-    pagePath?: string
-  } = {}
-): Promise<{
+export interface GetSizeArgs {
+  pagePath?: string
+}
+
+/**
+ * GetSize result
+ */
+export interface GetSizeResult {
   success: boolean
   message: string
   size: {
@@ -380,7 +399,15 @@ export async function getSize(
     height: number
     scrollHeight: number
   }
-}> {
+}
+
+/**
+ * Get page size
+ */
+export async function getSize(
+  session: SessionState,
+  args: GetSizeArgs = {}
+): Promise<GetSizeResult> {
   const { pagePath } = args
   const logger = session.logger
 
@@ -393,10 +420,7 @@ export async function getSize(
 
     logger?.info('Getting page size', { pagePath })
 
-    // Resolve page (current or specified)
     const page = await resolvePage(session, pagePath)
-
-    // Get size
     const size = await page.size()
 
     logger?.info('Page size retrieved', { size })
@@ -408,28 +432,34 @@ export async function getSize(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    logger?.error('GetSize failed', {
-      error: errorMessage,
-    })
-
+    logger?.error('GetSize failed', { error: errorMessage })
     throw new Error(`GetSize failed: ${errorMessage}`)
   }
 }
 
 /**
- * Get page scroll position
- * Returns the current vertical scroll offset
+ * GetScrollTop input arguments
  */
-export async function getScrollTop(
-  session: SessionState,
-  args: {
-    pagePath?: string
-  } = {}
-): Promise<{
+export interface GetScrollTopArgs {
+  pagePath?: string
+}
+
+/**
+ * GetScrollTop result
+ */
+export interface GetScrollTopResult {
   success: boolean
   message: string
   scrollTop: number
-}> {
+}
+
+/**
+ * Get page scroll position
+ */
+export async function getScrollTop(
+  session: SessionState,
+  args: GetScrollTopArgs = {}
+): Promise<GetScrollTopResult> {
   const { pagePath } = args
   const logger = session.logger
 
@@ -442,10 +472,7 @@ export async function getScrollTop(
 
     logger?.info('Getting page scrollTop', { pagePath })
 
-    // Resolve page (current or specified)
     const page = await resolvePage(session, pagePath)
-
-    // Get scrollTop
     const scrollTop = await page.scrollTop()
 
     logger?.info('Page scrollTop retrieved', { scrollTop })
@@ -457,10 +484,7 @@ export async function getScrollTop(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    logger?.error('GetScrollTop failed', {
-      error: errorMessage,
-    })
-
+    logger?.error('GetScrollTop failed', { error: errorMessage })
     throw new Error(`GetScrollTop failed: ${errorMessage}`)
   }
 }

@@ -3,7 +3,7 @@
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
-import { registerTools, SUPPORTED_CAPABILITIES } from '../../src/tools/index'
+import { setupCapabilities, SUPPORTED_CAPABILITIES } from '../../src/capabilities/index'
 import type { SessionState } from '../../src/types'
 
 describe('Capabilities System', () => {
@@ -51,9 +51,9 @@ describe('Capabilities System', () => {
     })
   })
 
-  describe('registerTools with capabilities', () => {
-    it('should register all tools with core capability', () => {
-      const tools = registerTools(mockServer, {
+  describe('setupCapabilities with capabilities', () => {
+    it('should register all tools with core capability', async () => {
+      const { tools } = await setupCapabilities(mockServer, {
         capabilities: ['core'],
         sessionId: 'test',
         getSession: () => mockSession,
@@ -63,8 +63,9 @@ describe('Capabilities System', () => {
       expect(mockServer.setRequestHandler).toHaveBeenCalled()
     })
 
-    it('should default to core capability if none specified', () => {
-      const tools = registerTools(mockServer, {
+    it('should default to core capability if none specified', async () => {
+      const { tools } = await setupCapabilities(mockServer, {
+        capabilities: ['core'],
         sessionId: 'test',
         getSession: () => mockSession,
       })
@@ -72,8 +73,8 @@ describe('Capabilities System', () => {
       expect(tools).toHaveLength(65) // All 65 tools
     })
 
-    it('should register only automator tools', () => {
-      const tools = registerTools(mockServer, {
+    it('should register only automator tools', async () => {
+      const { tools } = await setupCapabilities(mockServer, {
         capabilities: ['automator'],
         sessionId: 'test',
         getSession: () => mockSession,
@@ -89,8 +90,8 @@ describe('Capabilities System', () => {
       ])
     })
 
-    it('should register only miniprogram tools', () => {
-      const tools = registerTools(mockServer, {
+    it('should register only miniprogram tools', async () => {
+      const { tools } = await setupCapabilities(mockServer, {
         capabilities: ['miniprogram'],
         sessionId: 'test',
         getSession: () => mockSession,
@@ -107,8 +108,8 @@ describe('Capabilities System', () => {
       ])
     })
 
-    it('should register only page tools', () => {
-      const tools = registerTools(mockServer, {
+    it('should register only page tools', async () => {
+      const { tools } = await setupCapabilities(mockServer, {
         capabilities: ['page'],
         sessionId: 'test',
         getSession: () => mockSession,
@@ -118,8 +119,8 @@ describe('Capabilities System', () => {
       expect(tools.every((t) => t.name.startsWith('page_'))).toBe(true)
     })
 
-    it('should register only element tools', () => {
-      const tools = registerTools(mockServer, {
+    it('should register only element tools', async () => {
+      const { tools } = await setupCapabilities(mockServer, {
         capabilities: ['element'],
         sessionId: 'test',
         getSession: () => mockSession,
@@ -129,8 +130,8 @@ describe('Capabilities System', () => {
       expect(tools.every((t) => t.name.startsWith('element_'))).toBe(true)
     })
 
-    it('should register only assert tools', () => {
-      const tools = registerTools(mockServer, {
+    it('should register only assert tools', async () => {
+      const { tools } = await setupCapabilities(mockServer, {
         capabilities: ['assert'],
         sessionId: 'test',
         getSession: () => mockSession,
@@ -140,8 +141,8 @@ describe('Capabilities System', () => {
       expect(tools.every((t) => t.name.startsWith('assert_'))).toBe(true)
     })
 
-    it('should register only snapshot tools', () => {
-      const tools = registerTools(mockServer, {
+    it('should register only snapshot tools', async () => {
+      const { tools } = await setupCapabilities(mockServer, {
         capabilities: ['snapshot'],
         sessionId: 'test',
         getSession: () => mockSession,
@@ -151,8 +152,8 @@ describe('Capabilities System', () => {
       expect(tools.every((t) => t.name.startsWith('snapshot_'))).toBe(true)
     })
 
-    it('should register only record tools', () => {
-      const tools = registerTools(mockServer, {
+    it('should register only record tools', async () => {
+      const { tools } = await setupCapabilities(mockServer, {
         capabilities: ['record'],
         sessionId: 'test',
         getSession: () => mockSession,
@@ -162,8 +163,8 @@ describe('Capabilities System', () => {
       expect(tools.every((t) => t.name.startsWith('record_'))).toBe(true)
     })
 
-    it('should register only network tools', () => {
-      const tools = registerTools(mockServer, {
+    it('should register only network tools', async () => {
+      const { tools } = await setupCapabilities(mockServer, {
         capabilities: ['network'],
         sessionId: 'test',
         getSession: () => mockSession,
@@ -173,8 +174,8 @@ describe('Capabilities System', () => {
       expect(tools.every((t) => t.name.startsWith('network_'))).toBe(true)
     })
 
-    it('should register multiple capabilities', () => {
-      const tools = registerTools(mockServer, {
+    it('should register multiple capabilities', async () => {
+      const { tools } = await setupCapabilities(mockServer, {
         capabilities: ['automator', 'page', 'network'],
         sessionId: 'test',
         getSession: () => mockSession,
@@ -200,9 +201,9 @@ describe('Capabilities System', () => {
       expect(networkTools).toHaveLength(6)
     })
 
-    it('should not register duplicates with core and specific capabilities', () => {
+    it('should not register duplicates with core and specific capabilities', async () => {
       // If 'core' is specified, it should include all tools regardless of other capabilities
-      const tools = registerTools(mockServer, {
+      const { tools } = await setupCapabilities(mockServer, {
         capabilities: ['core', 'automator', 'page'],
         sessionId: 'test',
         getSession: () => mockSession,
@@ -211,8 +212,8 @@ describe('Capabilities System', () => {
       expect(tools).toHaveLength(65) // All tools, no duplicates
     })
 
-    it('should handle empty capabilities array', () => {
-      const tools = registerTools(mockServer, {
+    it('should handle empty capabilities array', async () => {
+      const { tools } = await setupCapabilities(mockServer, {
         capabilities: [],
         sessionId: 'test',
         getSession: () => mockSession,
@@ -221,10 +222,10 @@ describe('Capabilities System', () => {
       expect(tools).toHaveLength(0) // No tools registered
     })
 
-    it('should log capabilities being registered', () => {
+    it('should log capabilities being registered', async () => {
       const consoleError = jest.spyOn(console, 'error')
 
-      registerTools(mockServer, {
+      await setupCapabilities(mockServer, {
         capabilities: ['automator', 'network'],
         sessionId: 'test',
         getSession: () => mockSession,
@@ -236,21 +237,21 @@ describe('Capabilities System', () => {
       )
     })
 
-    it('should log tool counts by category', () => {
+    it('should log tool counts by category', async () => {
       const consoleError = jest.spyOn(console, 'error')
 
-      registerTools(mockServer, {
+      await setupCapabilities(mockServer, {
         capabilities: ['automator', 'page'],
         sessionId: 'test',
         getSession: () => mockSession,
       })
 
-      expect(consoleError).toHaveBeenCalledWith(expect.stringContaining('Automator: 4'))
-      expect(consoleError).toHaveBeenCalledWith(expect.stringContaining('Page: 8'))
+      expect(consoleError).toHaveBeenCalledWith(expect.stringContaining('automator: 4'))
+      expect(consoleError).toHaveBeenCalledWith(expect.stringContaining('page: 8'))
     })
 
-    it('should handle all capabilities except core', () => {
-      const tools = registerTools(mockServer, {
+    it('should handle all capabilities except core', async () => {
+      const { tools } = await setupCapabilities(mockServer, {
         capabilities: [
           'automator',
           'miniprogram',

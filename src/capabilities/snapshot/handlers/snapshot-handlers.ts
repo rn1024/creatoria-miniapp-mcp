@@ -1,25 +1,24 @@
 /**
- * Snapshot tools for MCP server
- * Provides utilities for capturing page and application state snapshots
+ * Snapshot handlers - State capture and diagnostic utilities
  */
 
-import type { SessionState } from '../types.js'
-import * as miniprogramTools from './miniprogram.js'
-import * as pageTools from './page.js'
+import type { SessionState } from '../../../types.js'
+import { getPageStack, getSystemInfo, screenshot } from '../../miniprogram/handlers/index.js'
+import { getData } from '../../page/handlers/index.js'
+import { getText, getSize, getOffset } from '../../element/handlers/index.js'
 
-/**
- * Capture a complete page snapshot (data + screenshot)
- * Includes page data, page info, and screenshot
- */
-export async function snapshotPage(
-  session: SessionState,
-  args: {
-    pagePath?: string
-    filename?: string
-    includeScreenshot?: boolean
-    fullPage?: boolean
-  }
-): Promise<{
+// ============================================================================
+// Page Snapshot
+// ============================================================================
+
+export interface SnapshotPageArgs {
+  pagePath?: string
+  filename?: string
+  includeScreenshot?: boolean
+  fullPage?: boolean
+}
+
+export interface SnapshotPageResult {
   success: boolean
   message: string
   snapshotPath: string
@@ -30,15 +29,15 @@ export async function snapshotPage(
     pageData: any
     pageQuery: Record<string, any>
   }
-}> {
+}
+
+export async function snapshotPage(session: SessionState, args: SnapshotPageArgs): Promise<SnapshotPageResult> {
   const { pagePath, filename, includeScreenshot = true, fullPage = false } = args
   const logger = session.logger
 
   try {
     if (!session.miniProgram) {
-      throw new Error(
-        'MiniProgram not connected. Call miniprogram_launch or miniprogram_connect first.'
-      )
+      throw new Error('MiniProgram not connected. Call miniprogram_launch or miniprogram_connect first.')
     }
 
     if (!session.outputManager) {
@@ -47,9 +46,8 @@ export async function snapshotPage(
 
     logger?.info('Capturing page snapshot', { pagePath, includeScreenshot })
 
-    // Validate filename if provided (security: prevent path traversal)
     if (filename) {
-      const { validateFilename } = await import('../core/validation.js')
+      const { validateFilename } = await import('../../../runtime/validation/validation.js')
       try {
         validateFilename(filename, ['json'])
       } catch (error) {
@@ -58,18 +56,15 @@ export async function snapshotPage(
       }
     }
 
-    // Get current page from session or specified path
-    const pageStackResult = await miniprogramTools.getPageStack(session)
+    const pageStackResult = await getPageStack(session)
     const currentPageInfo = pageStackResult.pages[pageStackResult.pages.length - 1]
 
     if (!currentPageInfo) {
       throw new Error('No active page found')
     }
 
-    // Get page data
-    const pageDataResult = await pageTools.getData(session, { pagePath })
+    const pageDataResult = await getData(session, { pagePath })
 
-    // Build snapshot data
     const timestamp = new Date().toISOString()
     const snapshotData = {
       timestamp,
@@ -78,7 +73,6 @@ export async function snapshotPage(
       pageQuery: currentPageInfo.query,
     }
 
-    // Save snapshot JSON
     const outputManager = session.outputManager
     await outputManager.ensureOutputDir()
 
@@ -90,16 +84,11 @@ export async function snapshotPage(
 
     logger?.info('Page snapshot data saved', { path: snapshotPath })
 
-    // Take screenshot if requested
     let screenshotPath: string | undefined
     if (includeScreenshot) {
       const screenshotFilename = snapshotFilename.replace('.json', '.png')
-      const screenshotResult = await miniprogramTools.screenshot(session, {
-        filename: screenshotFilename,
-        fullPage,
-      })
+      const screenshotResult = await screenshot(session, { filename: screenshotFilename, fullPage })
       screenshotPath = screenshotResult.path
-
       logger?.info('Page screenshot saved', { path: screenshotPath })
     }
 
@@ -114,27 +103,22 @@ export async function snapshotPage(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    logger?.error('Page snapshot failed', {
-      error: errorMessage,
-      pagePath,
-    })
-
+    logger?.error('Page snapshot failed', { error: errorMessage, pagePath })
     throw new Error(`Page snapshot failed: ${errorMessage}`)
   }
 }
 
-/**
- * Capture a complete application snapshot
- * Includes system info, page stack, current page data, and screenshot
- */
-export async function snapshotFull(
-  session: SessionState,
-  args: {
-    filename?: string
-    includeScreenshot?: boolean
-    fullPage?: boolean
-  }
-): Promise<{
+// ============================================================================
+// Full Application Snapshot
+// ============================================================================
+
+export interface SnapshotFullArgs {
+  filename?: string
+  includeScreenshot?: boolean
+  fullPage?: boolean
+}
+
+export interface SnapshotFullResult {
   success: boolean
   message: string
   snapshotPath: string
@@ -149,15 +133,15 @@ export async function snapshotFull(
       data: any
     }
   }
-}> {
+}
+
+export async function snapshotFull(session: SessionState, args: SnapshotFullArgs): Promise<SnapshotFullResult> {
   const { filename, includeScreenshot = true, fullPage = false } = args
   const logger = session.logger
 
   try {
     if (!session.miniProgram) {
-      throw new Error(
-        'MiniProgram not connected. Call miniprogram_launch or miniprogram_connect first.'
-      )
+      throw new Error('MiniProgram not connected. Call miniprogram_launch or miniprogram_connect first.')
     }
 
     if (!session.outputManager) {
@@ -166,9 +150,8 @@ export async function snapshotFull(
 
     logger?.info('Capturing full application snapshot', { includeScreenshot })
 
-    // Validate filename if provided (security: prevent path traversal)
     if (filename) {
-      const { validateFilename } = await import('../core/validation.js')
+      const { validateFilename } = await import('../../../runtime/validation/validation.js')
       try {
         validateFilename(filename, ['json'])
       } catch (error) {
@@ -177,21 +160,16 @@ export async function snapshotFull(
       }
     }
 
-    // Get system info
-    const systemInfoResult = await miniprogramTools.getSystemInfo(session)
-
-    // Get page stack
-    const pageStackResult = await miniprogramTools.getPageStack(session)
+    const systemInfoResult = await getSystemInfo(session)
+    const pageStackResult = await getPageStack(session)
     const currentPageInfo = pageStackResult.pages[pageStackResult.pages.length - 1]
 
     if (!currentPageInfo) {
       throw new Error('No active page found')
     }
 
-    // Get current page data
-    const pageDataResult = await pageTools.getData(session, {})
+    const pageDataResult = await getData(session, {})
 
-    // Build snapshot data
     const timestamp = new Date().toISOString()
     const snapshotData = {
       timestamp,
@@ -204,7 +182,6 @@ export async function snapshotFull(
       },
     }
 
-    // Save snapshot JSON
     const outputManager = session.outputManager
     await outputManager.ensureOutputDir()
 
@@ -216,23 +193,15 @@ export async function snapshotFull(
 
     logger?.info('Application snapshot data saved', { path: snapshotPath })
 
-    // Take screenshot if requested
     let screenshotPath: string | undefined
     if (includeScreenshot) {
       const screenshotFilename = snapshotFilename.replace('.json', '.png')
-      const screenshotResult = await miniprogramTools.screenshot(session, {
-        filename: screenshotFilename,
-        fullPage,
-      })
+      const screenshotResult = await screenshot(session, { filename: screenshotFilename, fullPage })
       screenshotPath = screenshotResult.path
-
       logger?.info('Application screenshot saved', { path: screenshotPath })
     }
 
-    logger?.info('Full application snapshot completed', {
-      snapshotPath,
-      screenshotPath,
-    })
+    logger?.info('Full application snapshot completed', { snapshotPath, screenshotPath })
 
     return {
       success: true,
@@ -243,26 +212,22 @@ export async function snapshotFull(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    logger?.error('Full application snapshot failed', {
-      error: errorMessage,
-    })
-
+    logger?.error('Full application snapshot failed', { error: errorMessage })
     throw new Error(`Full application snapshot failed: ${errorMessage}`)
   }
 }
 
-/**
- * Capture an element snapshot (properties + screenshot)
- * Includes element attributes, properties, size, and optional screenshot
- */
-export async function snapshotElement(
-  session: SessionState,
-  args: {
-    refId: string
-    filename?: string
-    includeScreenshot?: boolean
-  }
-): Promise<{
+// ============================================================================
+// Element Snapshot
+// ============================================================================
+
+export interface SnapshotElementArgs {
+  refId: string
+  filename?: string
+  includeScreenshot?: boolean
+}
+
+export interface SnapshotElementResult {
   success: boolean
   message: string
   snapshotPath: string
@@ -275,15 +240,15 @@ export async function snapshotElement(
     size: { width: number; height: number } | null
     offset: { left: number; top: number } | null
   }
-}> {
+}
+
+export async function snapshotElement(session: SessionState, args: SnapshotElementArgs): Promise<SnapshotElementResult> {
   const { refId, filename, includeScreenshot = false } = args
   const logger = session.logger
 
   try {
     if (!session.miniProgram) {
-      throw new Error(
-        'MiniProgram not connected. Call miniprogram_launch or miniprogram_connect first.'
-      )
+      throw new Error('MiniProgram not connected. Call miniprogram_launch or miniprogram_connect first.')
     }
 
     if (!session.outputManager) {
@@ -292,9 +257,8 @@ export async function snapshotElement(
 
     logger?.info('Capturing element snapshot', { refId, includeScreenshot })
 
-    // Validate filename if provided (security: prevent path traversal)
     if (filename) {
-      const { validateFilename } = await import('../core/validation.js')
+      const { validateFilename } = await import('../../../runtime/validation/validation.js')
       try {
         validateFilename(filename, ['json'])
       } catch (error) {
@@ -303,37 +267,27 @@ export async function snapshotElement(
       }
     }
 
-    // Import element tools dynamically to avoid circular dependency
-    const elementTools = await import('./element.js')
-
-    // Get element text
     let text: string | undefined
     try {
-      const textResult = await elementTools.getText(session, { refId })
+      const textResult = await getText(session, { refId })
       text = textResult.text
     } catch {
-      // Element might not have text
       text = undefined
     }
 
-    // Get element size
-    const sizeResult = await elementTools.getSize(session, { refId })
+    const sizeResult = await getSize(session, { refId })
+    const offsetResult = await getOffset(session, { refId })
 
-    // Get element offset
-    const offsetResult = await elementTools.getOffset(session, { refId })
-
-    // Build snapshot data
     const timestamp = new Date().toISOString()
     const snapshotData = {
       timestamp,
       refId,
       text,
-      attributes: {}, // We would need to know which attributes to get
+      attributes: {},
       size: sizeResult.size,
       offset: offsetResult.offset,
     }
 
-    // Save snapshot JSON
     const outputManager = session.outputManager
     await outputManager.ensureOutputDir()
 
@@ -345,22 +299,15 @@ export async function snapshotElement(
 
     logger?.info('Element snapshot data saved', { path: snapshotPath })
 
-    // Take screenshot if requested
     let screenshotPath: string | undefined
     if (includeScreenshot) {
       const screenshotFilename = snapshotFilename.replace('.json', '.png')
-      const screenshotResult = await miniprogramTools.screenshot(session, {
-        filename: screenshotFilename,
-      })
+      const screenshotResult = await screenshot(session, { filename: screenshotFilename })
       screenshotPath = screenshotResult.path
-
       logger?.info('Element screenshot saved', { path: screenshotPath })
     }
 
-    logger?.info('Element snapshot completed', {
-      snapshotPath,
-      screenshotPath,
-    })
+    logger?.info('Element snapshot completed', { snapshotPath, screenshotPath })
 
     return {
       success: true,
@@ -371,11 +318,7 @@ export async function snapshotElement(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    logger?.error('Element snapshot failed', {
-      error: errorMessage,
-      refId,
-    })
-
+    logger?.error('Element snapshot failed', { error: errorMessage, refId })
     throw new Error(`Element snapshot failed: ${errorMessage}`)
   }
 }

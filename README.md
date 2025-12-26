@@ -9,12 +9,13 @@ Model Context Protocol (MCP) server for WeChat Mini Program automation using the
 
 ## Features
 
-- 🤖 **LLM-Friendly**: 65 AI-optimized tools for natural language automation
-- 🎯 **Complete Coverage**: Automator, MiniProgram, Page, Element, Assert, Snapshot, Record, Network tools
-- 🔧 **Zero Config**: Auto-detects project path from `project.config.json` or `app.json`
-- 📦 **npx Ready**: No installation needed, just `npx -y @creatoria/miniapp-mcp`
-- 🧪 **Test Automation**: Built-in assertion and recording capabilities
-- 🎨 **TypeScript**: Full type definitions with 545 passing tests
+- **LLM-Friendly**: 65 AI-optimized tools for natural language automation
+- **Complete Coverage**: Automator, MiniProgram, Page, Element, Assert, Snapshot, Record, Network tools
+- **Robust Runtime**: Built-in timeout protection and retry mechanism for all async operations
+- **Zero Config**: Auto-detects project path from `project.config.json` or `app.json`
+- **npx Ready**: No installation needed, just `npx -y @creatoria/miniapp-mcp`
+- **Test Automation**: Built-in assertion and recording capabilities
+- **TypeScript**: Full type definitions with comprehensive test coverage
 
 ## Quick Start
 
@@ -127,107 +128,161 @@ The server automatically searches for mini program projects:
 <details>
 <summary><strong>Automator (4 tools)</strong> - Connection & Lifecycle</summary>
 
-- `miniprogram_launch` - Launch WeChat Mini Program
-- `miniprogram_connect` - Connect to running DevTools instance
-- `miniprogram_disconnect` - Disconnect but keep IDE running
-- `miniprogram_close` - Close session and cleanup resources
+| Tool | Description |
+|------|-------------|
+| `miniprogram_launch` | Launch WeChat Mini Program with automator |
+| `miniprogram_connect` | Connect to running DevTools instance |
+| `miniprogram_disconnect` | Disconnect but keep IDE running |
+| `miniprogram_close` | Close session and cleanup resources |
 
 </details>
 
 <details>
 <summary><strong>MiniProgram (6 tools)</strong> - App-Level Operations</summary>
 
-- `miniprogram_navigate` - Navigate using navigateTo/redirectTo/reLaunch/switchTab/navigateBack
-- `miniprogram_call_wx` - Call WeChat API methods (wx.*)
-- `miniprogram_evaluate` - Execute JavaScript in mini program context
-- `miniprogram_screenshot` - Take screenshots
-- `miniprogram_get_page_stack` - Get current page stack
-- `miniprogram_get_system_info` - Get system information
+| Tool | Description |
+|------|-------------|
+| `miniprogram_navigate` | Navigate using navigateTo/redirectTo/reLaunch/switchTab/navigateBack |
+| `miniprogram_call_wx` | Call WeChat API methods (wx.*) |
+| `miniprogram_evaluate` | Execute JavaScript in mini program context |
+| `miniprogram_screenshot` | Take screenshots (supports base64 return and fullPage mode) |
+| `miniprogram_get_page_stack` | Get current page stack |
+| `miniprogram_get_system_info` | Get system information |
 
 </details>
 
 <details>
 <summary><strong>Page (8 tools)</strong> - Page-Level Operations</summary>
 
-- `page_query` - Query single element
-- `page_query_all` - Query all matching elements
-- `page_wait_for` - Wait for condition or selector
-- `page_get_data` - Get page data
-- `page_set_data` - Set page data
-- `page_call_method` - Call page methods
-- `page_get_size` - Get page dimensions
-- `page_get_scroll_top` - Get scroll position
+| Tool | Description |
+|------|-------------|
+| `page_query` | Query single element |
+| `page_query_all` | Query all matching elements |
+| `page_wait_for` | Wait for condition or selector |
+| `page_get_data` | Get page data |
+| `page_set_data` | Set page data |
+| `page_call_method` | Call page methods |
+| `page_get_size` | Get page dimensions |
+| `page_get_scroll_top` | Get scroll position |
 
 </details>
 
 <details>
 <summary><strong>Element (23 tools)</strong> - Element-Level Operations</summary>
 
-- `element_tap` - Tap/click element
-- `element_longpress` - Long press element
-- `element_input` - Input text (input/textarea)
-- `element_get_text` - Get text content
-- `element_get_attribute` - Get element attribute
-- `element_get_property` - Get element property
-- `element_get_value` - Get element value
-- `element_trigger` - Trigger custom events
-- Component-specific: ScrollView, Swiper, MovableView, Slider methods
+| Tool | Description |
+|------|-------------|
+| `element_tap` | Tap/click element |
+| `element_longpress` | Long press element |
+| `element_input` | Input text (input/textarea) |
+| `element_get_text` | Get text content |
+| `element_get_attribute` | Get element attribute |
+| `element_get_property` | Get element property |
+| `element_get_value` | Get element value |
+| `element_get_size` | Get element size |
+| `element_get_offset` | Get element offset |
+| `element_trigger` | Trigger custom events |
+| `element_get_style` | Get element style |
+| `element_touchstart` | Touch start event |
+| `element_touchmove` | Touch move event |
+| `element_touchend` | Touch end event |
+| `element_scroll_to` | Scroll to position (ScrollView) |
+| `element_scroll_width` | Get scroll width (ScrollView) |
+| `element_scroll_height` | Get scroll height (ScrollView) |
+| `element_swipe_to` | Swipe to index (Swiper) |
+| `element_move_to` | Move to position (MovableView) |
+| `element_slide_to` | Slide to value (Slider) |
+| `element_call_context_method` | Call context method |
+| `element_set_data` | Set data on custom element |
+| `element_call_method` | Call method on custom element |
 
 </details>
 
 <details>
 <summary><strong>Assert (9 tools)</strong> - Testing & Verification</summary>
 
-- `assert_exists` - Assert element exists
-- `assert_not_exists` - Assert element doesn't exist
-- `assert_text` - Assert text equals expected
-- `assert_text_contains` - Assert text contains substring
-- `assert_value` - Assert value equals expected
-- `assert_attribute` - Assert attribute equals expected
-- `assert_property` - Assert property equals expected
-- `assert_data` - Assert page data equals expected
-- `assert_visible` - Assert element is visible
+| Tool | Description |
+|------|-------------|
+| `assert_exists` | Assert element exists |
+| `assert_not_exists` | Assert element doesn't exist |
+| `assert_text` | Assert text equals expected |
+| `assert_text_contains` | Assert text contains substring |
+| `assert_value` | Assert value equals expected |
+| `assert_attribute` | Assert attribute equals expected |
+| `assert_property` | Assert property equals expected |
+| `assert_data` | Assert page data equals expected |
+| `assert_visible` | Assert element is visible |
 
 </details>
 
 <details>
 <summary><strong>Snapshot (3 tools)</strong> - State Capture</summary>
 
-- `snapshot_page` - Capture page snapshot (data + screenshot)
-- `snapshot_full` - Capture full app snapshot (system + page stack)
-- `snapshot_element` - Capture element snapshot
+| Tool | Description |
+|------|-------------|
+| `snapshot_page` | Capture page snapshot (data + screenshot) |
+| `snapshot_full` | Capture full app snapshot (system + page stack) |
+| `snapshot_element` | Capture element snapshot |
 
 </details>
 
 <details>
 <summary><strong>Record (6 tools)</strong> - Action Recording</summary>
 
-- `record_start` - Start recording actions
-- `record_stop` - Stop and save recording
-- `record_list` - List saved recordings
-- `record_get` - Get recording details
-- `record_delete` - Delete recording
-- `record_replay` - Replay recorded actions
+| Tool | Description |
+|------|-------------|
+| `record_start` | Start recording actions |
+| `record_stop` | Stop and save recording |
+| `record_list` | List saved recordings |
+| `record_get` | Get recording details |
+| `record_delete` | Delete recording |
+| `record_replay` | Replay recorded actions |
 
 </details>
 
 <details>
 <summary><strong>Network (6 tools)</strong> - Mock & Testing</summary>
 
-- `network_mock_wx_method` - Mock WeChat API methods
-- `network_restore_wx_method` - Restore mocked methods
-- `network_mock_request` - Mock wx.request responses
-- `network_mock_request_failure` - Mock request failures
-- `network_restore_request` - Restore wx.request
-- `network_restore_all_mocks` - Restore all mocks
+| Tool | Description |
+|------|-------------|
+| `network_mock_wx_method` | Mock WeChat API methods |
+| `network_restore_wx_method` | Restore mocked methods |
+| `network_mock_request` | Mock wx.request responses |
+| `network_mock_request_failure` | Mock request failures |
+| `network_restore_request` | Restore wx.request |
+| `network_restore_all_mocks` | Restore all mocks |
 
 </details>
+
+## Runtime Features
+
+### Timeout Protection
+
+All async operations are protected with configurable timeouts to prevent hanging:
+
+| Operation | Default Timeout |
+|-----------|----------------|
+| Navigation | 30s |
+| Screenshot (viewport) | 10s |
+| Screenshot (fullPage) | 30s |
+| wx.* API calls | 10s |
+| Page stack queries | 5s |
+| System info queries | 5s |
+| Element queries | 10s |
+| Wait operations | 30s |
+
+### Retry Mechanism
+
+Transient errors are automatically retried with configurable strategies:
+- Default: 2 retries with 1s delay
+- Exponential backoff available
+- Custom retry predicates supported
 
 ## Requirements
 
 - **Node.js**: >= 18.0.0
 - **WeChat DevTools**: [Download](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)
-  - Enable CLI/HTTP calls in Settings → Security
+  - Enable CLI/HTTP calls in Settings -> Security
   - Default automation port: 9420
 - **Mini Program Project**: Any WeChat mini program with `project.config.json` or `app.json`
 
@@ -239,14 +294,23 @@ The server automatically searches for mini program projects:
 You: "Launch the mini program and navigate to the product list page"
 
 Claude: [Calls miniprogram_connect + miniprogram_navigate]
-✅ Connected to DevTools
-✅ Navigated to pages/product/list
+Connected to DevTools
+Navigated to pages/product/list
 
 You: "Find the first product title and verify it contains 'iPhone'"
 
 Claude: [Calls page_query + element_get_text + assert_text_contains]
-✅ Found element with text: "iPhone 15 Pro"
-✅ Assertion passed: text contains "iPhone"
+Found element with text: "iPhone 15 Pro"
+Assertion passed: text contains "iPhone"
+```
+
+### Screenshot with Base64 Return
+
+```
+You: "Take a screenshot and show me what the page looks like"
+
+Claude: [Calls miniprogram_screenshot with returnBase64=true]
+Screenshot captured successfully (base64 returned directly)
 ```
 
 ### Programmatic Usage
@@ -266,16 +330,6 @@ See [examples/](./examples/) directory for complete workflows:
 - [Runtime Skeleton Mapping](./docs/migration/runtime-skeleton.md)
 - [Tool Schema Strategy](./docs/migration/tool-schema-strategy.md)
 - [Troubleshooting](./docs/troubleshooting.md) - Common issues and solutions
-- [完整实现方案](./docs/完整实现方案.md) - Detailed implementation blueprint (ZH)
-- [微信小程序自动化完整操作手册](./docs/微信小程序自动化完整操作手册.md) - Official automation guidance (ZH)
-
-## Migration Planning
-
-- Active branch: `migration-structure-prep`
-- Current focus: stabilize 0.1.x while reshaping runtime/app/capability layers
-- Task tracking: `.llm/task_cards/`, latest status in `.llm/state.json`
-- Schema generation: `pnpm generate:schemas`（根据 Zod schema 生成工具 JSON Schema）
-- Runtime layout: 详见 `docs/migration/runtime-skeleton.md`
 
 ## Development
 
@@ -314,4 +368,4 @@ MIT License - see [LICENSE](./LICENSE) file for details.
 
 ---
 
-Made with ❤️ for the WeChat Mini Program developer community
+Made with love for the WeChat Mini Program developer community

@@ -2,14 +2,14 @@
  * Unit tests for Assert tools
  */
 
-import * as assertTools from '../../src/tools/assert'
-import * as pageTools from '../../src/tools/page'
-import * as elementTools from '../../src/tools/element'
+import * as assertTools from '../../src/capabilities/assert/handlers/index'
+import * as pageTools from '../../src/capabilities/page/handlers/index'
+import * as elementTools from '../../src/capabilities/element/handlers/index'
 import type { SessionState } from '../../src/types'
 
 // Mock the page and element tools
-jest.mock('../../src/tools/page')
-jest.mock('../../src/tools/element')
+jest.mock('../../src/capabilities/page/handlers/index')
+jest.mock('../../src/capabilities/element/handlers/index')
 
 describe('Assert Tools', () => {
   let mockSession: SessionState

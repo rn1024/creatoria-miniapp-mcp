@@ -2,7 +2,7 @@
  * Unit tests for Element tools
  */
 
-import * as elementTools from '../../src/tools/element'
+import * as elementTools from '../../src/capabilities/element/handlers/index'
 import type { SessionState } from '../../src/types'
 
 describe('Element Tools', () => {

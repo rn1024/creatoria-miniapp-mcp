@@ -4,10 +4,10 @@
 
 import { ToolLogger } from '../../src/core/tool-logger'
 import type { SessionState, Logger, LoggerConfig } from '../../src/types'
-import * as snapshotTools from '../../src/tools/snapshot'
+import * as snapshotTools from '../../src/capabilities/snapshot/handlers/index'
 
 // Mock snapshot tools
-jest.mock('../../src/tools/snapshot')
+jest.mock('../../src/capabilities/snapshot/handlers/index')
 
 describe('ToolLogger', () => {
   let mockLogger: Logger

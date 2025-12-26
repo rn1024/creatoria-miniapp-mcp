@@ -2,7 +2,7 @@
  * Unit tests for Network Mock tools
  */
 
-import * as networkTools from '../../src/tools/network'
+import * as networkTools from '../../src/capabilities/network/handlers/index'
 import type { SessionState } from '../../src/types'
 
 describe('Network Mock Tools', () => {

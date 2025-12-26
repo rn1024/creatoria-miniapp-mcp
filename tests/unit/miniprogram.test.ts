@@ -2,7 +2,7 @@
  * Unit tests for MiniProgram tools
  */
 
-import * as miniprogramTools from '../../src/tools/miniprogram'
+import * as miniprogramTools from '../../src/capabilities/miniprogram/handlers/index'
 import type { SessionState } from '../../src/types'
 
 describe('MiniProgram Tools', () => {

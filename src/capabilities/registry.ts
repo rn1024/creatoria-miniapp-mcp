@@ -11,16 +11,15 @@ import type { SessionState } from '../types.js'
 
 /**
  * Tool handler function signature
+ * Uses 'any' for args to allow typed handlers to be assigned
  */
-export type ToolHandler<TArgs = unknown, TResult = unknown> = (
-  session: SessionState,
-  args: TArgs
-) => Promise<TResult>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ToolHandler = (session: SessionState, args: any) => Promise<any>
 
 /**
  * Complete tool definition including schema and handler
  */
-export interface ToolDefinition<TArgs = unknown, TResult = unknown> {
+export interface ToolDefinition {
   /** Tool name (must be unique across all capabilities) */
   name: string
   /** Human-readable description */
@@ -32,7 +31,7 @@ export interface ToolDefinition<TArgs = unknown, TResult = unknown> {
   /** Optional Zod schema for output validation */
   outputSchema?: ZodTypeAny
   /** Handler function that executes the tool */
-  handler: ToolHandler<TArgs, TResult>
+  handler: ToolHandler
 }
 
 /**
@@ -136,9 +135,25 @@ export class ToolRegistry {
   }
 
   /**
+   * JSON Schema type for MCP Tool inputSchema
+   */
+  private createJsonSchema(
+    properties: Record<string, unknown> = {},
+    required?: string[]
+  ): { type: 'object'; properties: Record<string, unknown>; required?: string[] } {
+    return {
+      type: 'object' as const,
+      properties,
+      ...(required && required.length > 0 ? { required } : {}),
+    }
+  }
+
+  /**
    * Convert Zod schema to JSON Schema for MCP Tool format
    */
-  private zodToJsonSchema(schema: ZodTypeAny): Record<string, unknown> {
+  private zodToJsonSchema(
+    schema: ZodTypeAny
+  ): { type: 'object'; properties: Record<string, unknown>; required?: string[] } {
     // Use zod-to-json-schema or manual conversion
     // For now, use the shape if available
     const zodSchema = schema as any
@@ -159,16 +174,12 @@ export class ToolRegistry {
           }
         }
 
-        return {
-          type: 'object',
-          properties,
-          ...(required.length > 0 ? { required } : {}),
-        }
+        return this.createJsonSchema(properties, required)
       }
     }
 
     // Fallback for non-object schemas
-    return { type: 'object', properties: {} }
+    return this.createJsonSchema({})
   }
 
   /**

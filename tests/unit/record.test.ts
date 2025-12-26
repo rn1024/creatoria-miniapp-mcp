@@ -2,7 +2,7 @@
  * Unit tests for Record tools
  */
 
-import * as recordTools from '../../src/tools/record'
+import * as recordTools from '../../src/capabilities/record/handlers/index'
 import type { SessionState, ActionSequence } from '../../src/types'
 import { promises as fs } from 'fs'
 import path from 'path'
@@ -16,6 +16,54 @@ jest.mock('fs', () => ({
     readdir: jest.fn(),
     unlink: jest.fn(),
   },
+}))
+
+// Mock capability modules for replaySequence tests
+const mockNavigate = jest.fn()
+const mockTap = jest.fn()
+
+jest.mock('../../src/capabilities/automator/index.js', () => ({
+  capability: { name: 'automator', tools: [] },
+}))
+
+jest.mock('../../src/capabilities/miniprogram/index.js', () => ({
+  capability: {
+    name: 'miniprogram',
+    tools: [
+      {
+        name: 'miniprogram_navigate',
+        handler: (...args: unknown[]) => mockNavigate(...args),
+      },
+    ],
+  },
+}))
+
+jest.mock('../../src/capabilities/page/index.js', () => ({
+  capability: { name: 'page', tools: [] },
+}))
+
+jest.mock('../../src/capabilities/element/index.js', () => ({
+  capability: {
+    name: 'element',
+    tools: [
+      {
+        name: 'element_tap',
+        handler: (...args: unknown[]) => mockTap(...args),
+      },
+    ],
+  },
+}))
+
+jest.mock('../../src/capabilities/assert/index.js', () => ({
+  capability: { name: 'assert', tools: [] },
+}))
+
+jest.mock('../../src/capabilities/snapshot/index.js', () => ({
+  capability: { name: 'snapshot', tools: [] },
+}))
+
+jest.mock('../../src/capabilities/network/index.js', () => ({
+  capability: { name: 'network', tools: [] },
 }))
 
 describe('Record Tools', () => {
@@ -327,15 +375,11 @@ describe('Record Tools', () => {
 
       ;(fs.readFile as jest.Mock).mockResolvedValue(JSON.stringify(mockSequence))
 
-      // Mock the imported tools module
-      const mockNavigate = jest.fn().mockResolvedValue({
+      // Set up mock navigate handler to succeed
+      mockNavigate.mockResolvedValue({
         success: true,
         message: 'Navigated',
       })
-
-      jest.doMock('../../src/tools/index.js', () => ({
-        miniprogram_navigate: mockNavigate,
-      }))
 
       const result = await recordTools.replaySequence(mockSession, {
         sequenceId: 'seq_test',
@@ -344,6 +388,10 @@ describe('Record Tools', () => {
       expect(result.totalActions).toBe(1)
       expect(result.successCount).toBe(1)
       expect(result.failureCount).toBe(0)
+      expect(mockNavigate).toHaveBeenCalledWith(mockSession, {
+        method: 'navigateTo',
+        url: '/pages/index/index',
+      })
     })
 
     it('should stop on first error when continueOnError is false', async () => {
@@ -370,6 +418,9 @@ describe('Record Tools', () => {
       }
 
       ;(fs.readFile as jest.Mock).mockResolvedValue(JSON.stringify(mockSequence))
+
+      // Set up mock tap handler to fail
+      mockTap.mockRejectedValue(new Error('Element not found'))
 
       await expect(
         recordTools.replaySequence(mockSession, {

@@ -2,15 +2,15 @@
  * Unit tests for Snapshot tools
  */
 
-import * as snapshotTools from '../../src/tools/snapshot'
-import * as miniprogramTools from '../../src/tools/miniprogram'
-import * as pageTools from '../../src/tools/page'
+import * as snapshotTools from '../../src/capabilities/snapshot/handlers/index'
+import * as miniprogramTools from '../../src/capabilities/miniprogram/handlers/index'
+import * as pageTools from '../../src/capabilities/page/handlers/index'
 import type { SessionState } from '../../src/types'
 
 // Mock the miniprogram and page tools
-jest.mock('../../src/tools/miniprogram')
-jest.mock('../../src/tools/page')
-jest.mock('../../src/tools/element')
+jest.mock('../../src/capabilities/miniprogram/handlers/index')
+jest.mock('../../src/capabilities/page/handlers/index')
+jest.mock('../../src/capabilities/element/handlers/index')
 
 describe('Snapshot Tools', () => {
   let mockSession: SessionState
