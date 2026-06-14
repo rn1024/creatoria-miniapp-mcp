@@ -374,6 +374,20 @@ export interface MiniProgram {
    * Close the mini program (IDE window)
    */
   close(): Promise<void>
+
+  /**
+   * Listen to mini program events
+   */
+  on(event: 'console', callback: (data: ConsoleEvent) => void): void
+  on(event: 'error', callback: (data: ErrorEvent) => void): void
+  on(event: string, callback: (...args: any[]) => void): void
+
+  /**
+   * Remove event listener
+   */
+  off(event: 'console', callback: (data: ConsoleEvent) => void): void
+  off(event: 'error', callback: (data: ErrorEvent) => void): void
+  off(event: string, callback: (...args: any[]) => void): void
 }
 
 /**
@@ -439,6 +453,22 @@ export interface ConnectOptions {
    * Connection timeout in milliseconds
    */
   timeout?: number
+}
+
+/**
+ * Console event data emitted by MiniProgram
+ */
+export interface ConsoleEvent {
+  type: 'log' | 'warn' | 'error' | 'info' | 'debug'
+  args: any[]
+}
+
+/**
+ * Error event data emitted by MiniProgram
+ */
+export interface ErrorEvent {
+  message: string
+  stack?: string
 }
 
 /**

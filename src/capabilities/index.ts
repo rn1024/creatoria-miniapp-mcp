@@ -37,6 +37,7 @@ export { capability as assertCapability } from './assert/index.js'
 export { capability as snapshotCapability } from './snapshot/index.js'
 export { capability as recordCapability } from './record/index.js'
 export { capability as networkCapability } from './network/index.js'
+export { capability as loggingCapability } from './logging/index.js'
 
 // ============================================================================
 // Schema Registry
@@ -57,3 +58,4 @@ export * as assert from './assert/index.js'
 export * as snapshot from './snapshot/index.js'
 export * as record from './record/index.js'
 export * as network from './network/index.js'
+export * as logging from './logging/index.js'

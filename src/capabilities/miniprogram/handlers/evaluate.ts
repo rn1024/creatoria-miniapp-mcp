@@ -60,9 +60,16 @@ async function evaluateImpl(session: SessionState, args: EvaluateArgs): Promise<
     // Get timeout from config or use default (5 seconds for evaluate)
     const timeoutMs = getTimeout(session.config?.evaluateTimeout, DEFAULT_TIMEOUTS.evaluate)
 
+    // DevTools "App.callFunction" expects a function declaration string, not a bare expression.
+    // The automator calls .toString() on whatever is passed, so we wrap the expression in a
+    // function string directly. A bare expression like "getApp().globalData" causes
+    // "Arg string terminates parameters early" because DevTools tries to parse it as a function.
+    const argNames = evalArgs.map((_, i) => `arg${i}`).join(', ')
+    const fnStr = `function(${argNames}) { return (${expression}) }`
+
     // Evaluate expression with timeout protection
     const result = await withTimeout(
-      session.miniProgram.evaluate(expression, ...evalArgs),
+      session.miniProgram.evaluate(fnStr, ...evalArgs),
       timeoutMs,
       'Evaluate expression'
     )

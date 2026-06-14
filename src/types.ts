@@ -52,6 +52,7 @@ export interface SessionState {
   outputManager?: OutputManager // Session-specific output manager
   recording?: RecordingState // Recording state
   reportData?: ReportData // Session report collection (F3)
+  logBuffer?: LogBufferState // Console/error log collection state
 }
 
 export interface SessionConfig {
@@ -267,4 +268,40 @@ export interface SessionReport {
     error: string
     snapshotPath?: string
   }>
+}
+
+/**
+ * Console log entry from mini program runtime
+ */
+export interface ConsoleLogEntry {
+  timestamp: string
+  type: 'log' | 'warn' | 'error' | 'info' | 'debug'
+  args: any[]
+}
+
+/**
+ * Error entry from mini program runtime
+ */
+export interface ErrorLogEntry {
+  timestamp: string
+  message: string
+  stack?: string
+}
+
+/**
+ * Union type for any log entry
+ */
+export type MiniProgramLogEntry = ConsoleLogEntry | ErrorLogEntry
+
+/**
+ * Log buffer state for console/error event collection
+ */
+export interface LogBufferState {
+  isListening: boolean
+  entries: MiniProgramLogEntry[]
+  maxEntries: number
+  /** @internal Event handler references for cleanup via off() */
+  _consoleHandler?: (data: any) => void
+  /** @internal Event handler references for cleanup via off() */
+  _errorHandler?: (data: any) => void
 }

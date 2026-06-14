@@ -38,6 +38,7 @@ export const SUPPORTED_CAPABILITIES = [
   'snapshot', // State capture
   'record', // Recording and replay
   'network', // Network mocking
+  'logging', // Console and error log collection
 ] as const
 
 export type CapabilityName = (typeof SUPPORTED_CAPABILITIES)[number]

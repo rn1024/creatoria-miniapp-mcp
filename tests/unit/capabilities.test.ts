@@ -47,6 +47,7 @@ describe('Capabilities System', () => {
         'snapshot',
         'record',
         'network',
+        'logging',
       ])
     })
   })
@@ -59,7 +60,7 @@ describe('Capabilities System', () => {
         getSession: () => mockSession,
       })
 
-      expect(tools).toHaveLength(65) // All 65 tools
+      expect(tools).toHaveLength(69) // All 69 tools (65 original + 4 logging)
       expect(mockServer.setRequestHandler).toHaveBeenCalled()
     })
 
@@ -70,7 +71,7 @@ describe('Capabilities System', () => {
         getSession: () => mockSession,
       })
 
-      expect(tools).toHaveLength(65) // All 65 tools
+      expect(tools).toHaveLength(69) // All 69 tools (65 original + 4 logging)
     })
 
     it('should register only automator tools', async () => {
@@ -209,7 +210,7 @@ describe('Capabilities System', () => {
         getSession: () => mockSession,
       })
 
-      expect(tools).toHaveLength(65) // All tools, no duplicates
+      expect(tools).toHaveLength(69) // All tools, no duplicates
     })
 
     it('should handle empty capabilities array', async () => {
